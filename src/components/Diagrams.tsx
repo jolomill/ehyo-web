@@ -4,8 +4,9 @@
 */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sprout, Sun, Droplets, BookOpen, Music, Film, MapPin, Pencil } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+import { BookOpen, Music, Film, Pencil } from 'lucide-react';
 
 interface EngineNode {
     label: string;

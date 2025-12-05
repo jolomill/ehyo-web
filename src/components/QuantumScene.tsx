@@ -11,20 +11,21 @@ import * as THREE from 'three';
 const FloatingChar = ({ char, position, color, size = 1, rotation = [0, 0, 0] }: { char: string, position: [number, number, number], color: string, size?: number, rotation?: [number, number, number] }) => {
   return (
       <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[-0.2, 0.2]}>
-          <Html 
-            transform={false} 
-            position={position} 
-            occlude="blending"
-            style={{ 
-              pointerEvents: 'none',
-              userSelect: 'none'
-            }}
-            center
-          >
-             <span className="font-serif font-bold whitespace-nowrap" style={{ color: color, fontSize: `${size * 2}rem`, opacity: 0.9 }}>
-               {char}
-             </span>
-          </Html>
+          <group position={position} rotation={rotation}>
+            <Html 
+              transform={false} 
+              occlude="blending"
+              style={{ 
+                pointerEvents: 'none',
+                userSelect: 'none'
+              }}
+              center
+            >
+               <span className="font-serif font-bold whitespace-nowrap" style={{ color: color, fontSize: `${size * 2}rem`, opacity: 0.9 }}>
+                 {char}
+               </span>
+            </Html>
+          </group>
       </Float>
   )
 }
