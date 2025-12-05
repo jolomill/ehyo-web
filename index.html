@@ -1,6 +1,43 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          serif: ['"Playfair Display"', 'serif'],
+          sans: ['"Inter"', 'sans-serif'],
+        },
+        colors: {
+          ehyo: {
+            bg: '#FBFAF6',
+            text: '#2D2A26',
+            coral: '#FF8FAB',
+            indigo: '#6B7FD7',
+            sage: '#A3B18A',
+            dark: '#1a1a1a',
+          }
+        },
+        animation: {
+          'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+          'float': 'float 6s ease-in-out infinite',
+        },
+        keyframes: {
+          fadeInUp: {
+            '0%': { opacity: '0', transform: 'translateY(20px)' },
+            '100%': { opacity: '1', transform: 'translateY(0)' },
+          },
+          float: {
+            '0%, 100%': { transform: 'translateY(0)' },
+            '50%': { transform: 'translateY(-20px)' },
+          }
+        }
+      }
+    }
+  }
+</script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
