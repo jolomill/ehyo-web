@@ -6,10 +6,12 @@
 import React, { useState, useEffect } from 'react';
 import { HeroScene } from './components/QuantumScene';
 import { CultureContextEngine } from './components/Diagrams';
+import { ChangelogPage } from './components/ChangelogPage';
+import { RoadmapPage } from './components/RoadmapPage';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout } from 'lucide-react';
 
-const Logo = ({ scrolled }: { scrolled: boolean }) => (
-  <div className="flex flex-col items-center group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
+  <div className="flex flex-col items-center group cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
     <span className={`font-serif text-3xl font-bold tracking-tight transition-colors duration-300 ${scrolled ? 'text-ehyo-text' : 'text-ehyo-text'}`}>
       EhYo
     </span>
@@ -31,10 +33,11 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: str
 );
 
 type Language = 'en' | 'zh';
+type Page = 'home' | 'changelog' | 'roadmap';
 
 const translations = {
   en: {
-    nav: { get: "Get Started" },
+    nav: { get: "Get Started", changelog: "Changelog", roadmap: "Roadmap" },
     hero: {
       beta: "Now Available in Beta",
       h1_1: "EhYo",
@@ -82,7 +85,7 @@ const translations = {
     }
   },
   zh: {
-     nav: { get: "下載" },
+     nav: { get: "下載", changelog: "更新日誌", roadmap: "Roadmap" },
     hero: {
       beta: "Beta 測試版現已開放",
       h1_1: "EhYo",
@@ -130,10 +133,18 @@ const translations = {
   }
 };
 
+
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [lang, setLang] = useState<Language>('en');
+  const [page, setPage] = useState<Page>('home');
+
+  const navigate = (p: Page) => {
+    setPage(p);
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const t = translations[lang];
 
@@ -149,16 +160,16 @@ const App: React.FC = () => {
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#FBFAF6]/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-6'}`}>
         <div className="container mx-auto px-6 flex justify-between items-center">
-          <Logo scrolled={scrolled} />
+          <Logo scrolled={scrolled} onClick={() => navigate('home')} />
           
           <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide text-stone-600">
+            <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
+            <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
             {/* Language Switcher */}
-            <div className="flex items-center gap-2 border-stone-300 pr-6 mr-[-1rem]">
-                <button onClick={() => setLang('en')} className={`transition-colors ${lang === 'en' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-stone-600'}`}>EN</button>
-                <button onClick={() => setLang('zh')} className={`transition-colors ${lang === 'zh' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-stone-600'}`}>中</button>
+            <div className="flex items-center gap-2 border-stone-300 pl-4 border-l">
+                <button onClick={() => setLang('en')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'en' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>EN</button>
+                <button onClick={() => setLang('zh')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'zh' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>中</button>
             </div>
-
-            
           </div>
 
           <button className="md:hidden text-stone-900 p-2" onClick={() => setMenuOpen(!menuOpen)}>
@@ -171,16 +182,20 @@ const App: React.FC = () => {
       {menuOpen && (
         <div className="fixed inset-0 z-40 bg-[#FBFAF6] flex flex-col items-center justify-center gap-8 text-xl font-serif animate-fade-in">
             <Logo scrolled={true} />
-            <div className="flex gap-6 mt-4">
-                <button onClick={() => { setLang('en'); setMenuOpen(false); }} className={lang === 'en' ? 'font-bold' : ''}>EN</button>
-                <button onClick={() => { setLang('zh'); setMenuOpen(false); }} className={lang === 'zh' ? 'font-bold' : ''}>中</button>
+            <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
+            <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
+            <div className="flex gap-6 mt-2">
+                <button onClick={() => { setLang('en'); setMenuOpen(false); }} className={lang === 'en' ? 'font-bold' : 'text-stone-400'}>EN</button>
+                <button onClick={() => { setLang('zh'); setMenuOpen(false); }} className={lang === 'zh' ? 'font-bold' : 'text-stone-400'}>中</button>
             </div>
-           
         </div>
       )}
 
+      {page === 'changelog' && <ChangelogPage lang={lang} />}
+      {page === 'roadmap' && <RoadmapPage lang={lang} />}
+
       {/* Hero Section */}
-      <header className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <header className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${page !== 'home' ? 'hidden' : ''}`}>
         <HeroScene />
         
         {/* Soft Overlay - Reduced opacity at center (0.0) for better visibility of Earth */}
@@ -215,7 +230,7 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main>
+      <main className={page !== 'home' ? 'hidden' : ''}>
         {/* Philosophy Section - Updated Layout */}
         <section id="philosophy" className="py-24 bg-white relative overflow-hidden">
           {/* Decorative background element */}
@@ -322,7 +337,7 @@ const App: React.FC = () => {
 
       </main>
 
-      <footer className="bg-[#F5F4F0] text-stone-600 py-16 border-t border-stone-200">
+      <footer className={`bg-[#F5F4F0] text-stone-600 py-16 border-t border-stone-200 ${page !== 'home' ? 'hidden' : ''}`}>
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
             <div className="text-center md:text-left max-w-xs">
                 <Logo scrolled={true} />
