@@ -45,19 +45,19 @@ const roadmapItems: {
   en: { title: string; desc: string };
   zh: { title: string; desc: string };
 }[] = [
-  {
-    quarter: '2025 Q1',
-    status: 'completed',
-    en: {
-      title: 'Public Beta Launch',
-      desc: 'Opening invitation code applications for the first batch of users to test the core cultural context engine.',
+    {
+      quarter: '2025 Q1',
+      status: 'completed',
+      en: {
+        title: 'Public Beta Launch',
+        desc: 'Opening invitation code applications for the first batch of users to test EhYo.',
+      },
+      zh: {
+        title: 'Beta 公開測試啟動',
+        desc: '開放邀請碼申請，邀請首批使用者測試。',
+      },
     },
-    zh: {
-      title: 'Beta 公開測試啟動',
-      desc: '開放邀請碼申請，邀請首批使用者測試核心的文化語境引擎。',
-    },
-  },
-];
+  ];
 
 const text = {
   en: {
