@@ -46,7 +46,7 @@ const roadmapItems: {
   zh: { title: string; desc: string };
 }[] = [
     {
-      quarter: '2025 Q1',
+      quarter: '2025 April',
       status: 'completed',
       en: {
         title: 'Public Beta Launch',
@@ -55,6 +55,18 @@ const roadmapItems: {
       zh: {
         title: 'Beta 公開測試啟動',
         desc: '開放邀請碼申請，邀請首批使用者測試。',
+      },
+    },
+    {
+      quarter: '2025 Q2',
+      status: 'in-progress',
+      en: {
+        title: 'Community Mode in Development',
+        desc: 'Building a postcard mode that lets users connect with native speakers.',
+      },
+      zh: {
+        title: '社群模式開發中',
+        desc: '正在開發明信片模式，讓你可以和母語者交流。',
       },
     },
   ];
@@ -71,9 +83,9 @@ const text = {
   zh: {
     tag: '未來展望',
     title: '開發地圖',
-    sub: '透明呈現 EhYo 的下一步方向。',
+    sub: '這裡呈現 EhYo 的下一步方向。',
     cta_title: '你想看到什麼功能？',
-    cta_sub: 'EhYo 致力讓學習回歸人文本質，我們重視每一位使用者的回饋。',
+    cta_sub: 'EhYo 致力讓語言學習回歸人文本質，你的參與非常重要。',
     cta_btn: '加入討論',
   },
 };
