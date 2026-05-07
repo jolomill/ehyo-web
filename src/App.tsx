@@ -83,15 +83,15 @@ const translations = {
     }
   },
   zh: {
-    nav: { get: "下載", changelog: "更新日誌", roadmap: "Roadmap" },
+    nav: { get: "下載", changelog: "更新日誌", roadmap: "開發路線" },
     hero: {
       beta: "Beta 測試版現已開放",
       h1_1: "EhYo",
-      sub: "學語言，不只是背單字。而是維持你的語言大腦。",
+      sub: "學語言，不是背單字。而是建立起屬於你的語言大腦。",
       btn_start: "試試看！",
     },
     phil: {
-      title: "學語言很久，怕沒用就忘光？",
+      title: "學了很久的語言，怕沒用就忘光？",
       p1: "都交給 EhYo。",
       p2: "EhYo 專為忙碌的你設計，用大腦科學的方式，讓你輕鬆維持多國語言能力。讓你的語言能力不再只是「學過」，而是「會用」。",
 
