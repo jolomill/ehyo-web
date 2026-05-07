@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { HeroScene } from './components/QuantumScene';
-import { CultureContextEngine } from './components/Diagrams';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones } from 'lucide-react';
