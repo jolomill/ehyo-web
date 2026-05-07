@@ -315,7 +315,16 @@ const translations = {
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window === 'undefined') return 'en';
+    const saved = localStorage.getItem('ehyo-lang');
+    if (saved === 'en' || saved === 'zh') return saved;
+    return navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ehyo-lang', lang);
+  }, [lang]);
   const [page, setPage] = useState<Page>('home');
   type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
   const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
