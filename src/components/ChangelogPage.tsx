@@ -1,8 +1,17 @@
-import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical } from 'lucide-react';
+import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical, Headphones } from 'lucide-react';
 
 type Language = 'en' | 'zh';
 
 const entries = [
+  {
+    date: '2026/5/7',
+    version: 'v1.0.9',
+    items: [
+      { icon: Headphones, zh: { label: '聽寫練習卡', desc: '新增「聽寫練習」模式！現在你可以透過聽力測驗來練習拼寫單字，讓聽覺與書寫記憶同步提升！' }, en: { label: 'Dictation Practice Cards', desc: 'The new "Dictation Mode" is here! You can now practice spelling words through listening tests, helping you sync your listening and writing skills for more effective learning.' } },
+      { icon: Wrench, zh: { label: '經驗值系統計算架構修復', desc: '' }, en: { label: 'XP System', desc: 'Fixed issues with the experience point calculation architecture.' } },
+      { icon: Wrench, zh: { label: '語言隔離機制改善', desc: '' }, en: { label: 'Language Isolation', desc: 'Improved the isolation mechanism to ensure a more consistent language environment.' } },
+    ],
+  },
   {
     date: '2025/5/4',
     version: 'v1.0.8',
