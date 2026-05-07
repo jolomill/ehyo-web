@@ -8,7 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { CultureContextEngine } from './components/Diagrams';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
-import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout } from 'lucide-react';
+import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones } from 'lucide-react';
 
 const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
   <div className="flex flex-col items-center group cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
@@ -47,22 +47,112 @@ const translations = {
     phil: {
       title: "Spent years on a language, afraid it'll fade away?",
       p1: "Leave it to EhYo.",
-      p2: "EhYo is built for busy people. Using brain science, it helps you effortlessly maintain multilingual ability — so your language isn't just something you \"studied,\" but something you can actually use.",
+      p2: "EhYo is built for busy people. Grounded in brain science, it helps you effortlessly keep the languages you've learned alive — so they're not just something you \"studied,\" but something you can actually use.",
     },
     feat: {
       title: "Effortless Maintenance",
       sub: "Everything you need to keep your languages sharp, all in one place.",
       c1_t: "Personalized Content",
-      c1_d: "Tailored to your interests, level, and learning patterns — delivering the most relevant resources for you.",
+      c1_d: "Shaped around your interests, level, and learning patterns — so every resource feels relevant.",
       c2_t: "Expression Practice",
-      c2_d: "More than grammar corrections — EhYo suggests more natural, native-sounding ways to express yourself.",
+      c2_d: "More than grammar corrections — EhYo suggests natural, native-sounding ways to say what you mean.",
       c3_t: "Smart Review",
-      c3_d: "Find your weak spots and conquer them. EhYo turns them into long-term memory."
+      c3_d: "Find your weak spots and conquer them. EhYo helps move them into long-term memory.",
+      c4_t: "Real-World Practice",
+      c4_d: "Join EhYo events like postcard exchanges — connect with native speakers and put your language to real use."
+    },
+    showcase: {
+      tabs: {
+        reading: "Reading",
+        vocabulary: "Vocabulary",
+        writing: "Writing",
+        listening: "Listening"
+      },
+      reading: {
+        slides: [
+          {
+            image: "/reading.png",
+            title: "Your personal reading library",
+            bullets: [
+              "See your weekly reading time at a glance.",
+              "Spot the difference between today and yesterday in seconds.",
+              "Get reading material matched to your level.",
+              "Add EPUB books, articles, song lyrics — anything you want to read."
+            ]
+          },
+          {
+            image: "/reading2-eng.png",
+            title: "Tap any line for grammar, words, and sentence practice",
+            bullets: [
+              "Each sentence broken down by structure.",
+              "Plain-language explanations of how words are actually used.",
+              "Write your own sentence and get feedback on the spot."
+            ]
+          }
+        ]
+      },
+      vocabulary: {
+        slides: [
+          {
+            image: "/voc-eng.png",
+            title: "A research-backed mix of practice modes",
+            bullets: [
+              "Cloze, sentence-making, flashcards, dictation — every angle covered.",
+              "Every result is recorded, so EhYo keeps adapting to you.",
+              "More practice modes coming soon."
+            ]
+          }
+        ]
+      },
+      writing: {
+        slides: [
+          {
+            image: "/writing_eg.png",
+            title: "Guided writing, made for you",
+            bullets: [
+              "Prompts shaped by your level, interests, and recent vocabulary.",
+              "Words you've been struggling with show up right under the prompt.",
+              "Grammar slips you tend to repeat get flagged as you write.",
+              "Get suggestions on grammar and phrasing — and write more fluently every time."
+            ]
+          },
+          {
+            image: "/writing2-diary.png",
+            title: "Free writing, your way",
+            bullets: [
+              "Write a short story, a single line, or a journal entry — no rules.",
+              "Pull from your saved words to keep practice grounded.",
+              "Send it off for feedback whenever you're ready."
+            ]
+          }
+        ]
+      },
+      listening: {
+        slides: [
+          {
+            image: "/listening-eng.png",
+            title: "Video practice, shaped around you",
+            bullets: [
+              "Clips native speakers actually watch — recommended based on what you're into.",
+              "Add or remove interests anytime."
+            ]
+          },
+          {
+            image: "/shadowing.png",
+            title: "The most effective way to practice speaking",
+            bullets: [
+              "Shadowing mode highlights each line as it plays.",
+              "Record yourself and compare side by side.",
+              "Loop a tricky line, or play it back against the original."
+            ]
+          }
+        ]
+      }
     },
     engine: {
       tag: "CORE CONCEPT",
       title: "Progress Visualization",
-      p1: "Track your brain's growth intuitively — see signs of progress every single day. Visualized data makes improvement impossible to ignore.",
+      p1: "Intuitively track your brain's growth — see signs of progress every single day. Visualized data makes improvement impossible to miss.",
       p2: "Perfect for busy professionals, travel enthusiasts, or anyone who wants to stay linguistically sharp without drowning in textbooks.",
       nodes: [
         { label: "Literal", text: "Direct meaning" },
@@ -79,7 +169,7 @@ const translations = {
       trial: "Free 7-day trial."
     },
     footer: {
-      desc: "EhYo is an App dedicated to making language learning personal, cultural, and deeply human."
+      desc: "EhYo is an app dedicated to making language learning personal, cultural, and deeply human."
     }
   },
   zh: {
@@ -87,7 +177,7 @@ const translations = {
     hero: {
       beta: "Beta 測試版現已開放",
       h1_1: "EhYo",
-      sub: "學語言，不是背單字。而是建立起屬於你的語言大腦。",
+      sub: "學語言，不是背單字，是建立起屬於你的語言大腦。",
       btn_start: "試試看！",
     },
     phil: {
@@ -104,7 +194,98 @@ const translations = {
       c2_t: "表達練習",
       c2_d: "不止文法改錯，還會提供你更道地的表達方式。",
       c3_t: "智慧複習",
-      c3_d: "找出弱點征服它！讓 EhYo 幫你轉換成長期記憶。"
+      c3_d: "找出弱點征服它！讓 EhYo 幫你轉換成長期記憶。",
+      c4_t: "社交輸出",
+      c4_d: "明信片交換等社交功能，讓你跟世界各地的母語者互動，把學到的語言真正用出來。"
+    },
+    showcase: {
+      tabs: {
+        reading: "閱讀",
+        vocabulary: "單字",
+        writing: "寫作",
+        listening: "聽力"
+      },
+      reading: {
+        slides: [
+          {
+            image: "/reading.png",
+            title: "你的個人閱讀庫",
+            bullets: [
+              "一眼掌握本週閱讀時間。",
+              "一目瞭然今天和昨天的閱讀時間差異。",
+              "依照你的程度，提供最合適的閱讀素材。",
+              "新增 epub 書籍、文章、歌詞或其他內容。"
+            ]
+          },
+          {
+            image: "/reading2-zh.png",
+            title: "點一下，掌握文法、單字以及造句",
+            bullets: [
+              "文法斷句解析結構。",
+              "白話解釋詞彙用法，讓你知道在生活如何使用。",
+              "同步練習造句，得到回饋！"
+            ]
+          }
+        ]
+      },
+      vocabulary: {
+        slides: [
+          {
+            image: "/voc-zh.png",
+            title: "科學化的多元練習",
+            bullets: [
+              "綜合練習、造句、閃卡、聽寫，補齊所有漏洞。",
+              "所有的練習結果都會被記錄，讓 EhYo 更加個人化。",
+              "即將推出更多練習！"
+            ]
+          }
+        ]
+      },
+      writing: {
+        slides: [
+          {
+            image: "/writing-zh.png",
+            title: "個人化的引導寫作練習",
+            bullets: [
+              "根據你的程度、興趣與近期單字，產生量身訂做的題目。",
+              "下方展示最近格外需要練習的單字。",
+              "寫作時會提示最近常錯的文法。",
+              "給予文法與自然表達的建議，幫你越寫越順。"
+            ]
+          },
+          {
+            image: "/writing2-diary.png",
+            title: "自由書寫，想寫什麼就寫什麼",
+            bullets: [
+              "寫個小故事、一句話、或是當作日記，沒有任何限制。",
+              "從你收藏的單字中挑選使用，讓練習更有意義。",
+              "寫完隨時送出，馬上得到回饋。"
+            ]
+          }
+        ]
+      },
+      listening: {
+        slides: [
+          {
+            image: "/listening-zh.png",
+            title: "屬於你的影片練習",
+            bullets: [
+              "依據你感興趣的主題，推薦母語者會看的影片。",
+              "隨時可以新增或減少興趣。",
+
+            ]
+          },
+          {
+            image: "/shadowing.png",
+            title: "最有效的口說練習方式",
+            bullets: [
+              "跟讀模式逐句標示。",
+              "錄下自己的聲音比對。",
+              "單句循環播放和單句比對原音。"
+            ]
+          }
+        ]
+      }
     },
     engine: {
       tag: "核心概念",
@@ -137,6 +318,17 @@ const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [lang, setLang] = useState<Language>('en');
   const [page, setPage] = useState<Page>('home');
+  type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
+  const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
+  const [imageIdx, setImageIdx] = useState(0);
+  const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
+
+  const featureTabs: { id: FeatureId; icon: any }[] = [
+    { id: 'reading', icon: BookOpen },
+    { id: 'vocabulary', icon: Sprout },
+    { id: 'writing', icon: PenLine },
+    { id: 'listening', icon: Headphones }
+  ];
 
   const navigate = (p: Page) => {
     setPage(p);
@@ -178,7 +370,7 @@ const App: React.FC = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#FBFAF6] flex flex-col items-center justify-center gap-8 text-xl font-serif animate-fade-in">
+        <div className="fixed inset-0 z-40 bg-[#FBFAF6] flex flex-col items-center justify-center gap-8 text-xl font-serif-in">
           <Logo scrolled={true} />
           <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
           <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
@@ -200,22 +392,22 @@ const App: React.FC = () => {
         <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(251,250,246,0.0)_0%,rgba(251,250,246,0.5)_70%,rgba(251,250,246,1)_100%)]" />
 
         <div className="relative z-10 container mx-auto px-6 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-full shadow-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-full shadow-sm-in-up" style={{ animationDelay: '0.1s' }}>
             <span className="w-2 h-2 rounded-full bg-ehyo-coral"></span>
             <span className="text-xs font-bold tracking-widest text-stone-500 uppercase">{t.hero.beta}</span>
           </div>
 
-          <h1 className="font-serif text-6xl md:text-8xl font-medium leading-tight mb-8 text-ehyo-text drop-shadow-sm animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <h1 className="font-serif text-6xl md:text-8xl font-medium leading-tight mb-8 text-ehyo-text drop-shadow-sm-in-up" style={{ animationDelay: '0.2s' }}>
             {t.hero.h1_1}
           </h1>
 
-          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm animate-fade-in-up" style={{ animationDelay: '0.25s' }}>
+          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm-in-up" style={{ animationDelay: '0.25s' }}>
             {t.hero.sub}
           </div>
 
 
 
-          <div className="flex flex-col md:flex-row justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          <div className="flex flex-col md:flex-row justify-center gap-4-in-up" style={{ animationDelay: '0.4s' }}>
             <a
               href="https://apps.apple.com/us/app/ehyo/id6745819373"
               target="_blank"
@@ -235,7 +427,7 @@ const App: React.FC = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-ehyo-sage/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
 
           <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
-            <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage animate-fade-in-up">
+            <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage-in-up">
               <Sprout size={28} />
             </div>
 
@@ -261,7 +453,7 @@ const App: React.FC = () => {
               <p className="text-stone-500">{t.feat.sub}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard
                 icon={Globe}
                 title={t.feat.c1_t}
@@ -277,7 +469,118 @@ const App: React.FC = () => {
                 title={t.feat.c3_t}
                 description={t.feat.c3_d}
               />
+              <FeatureCard
+                icon={Mail}
+                title={t.feat.c4_t}
+                description={t.feat.c4_d}
+              />
             </div>
+          </div>
+        </section>
+
+        {/* Feature Showcase (continues Effortless Maintenance section) */}
+        <section className="pt-4 pb-24 bg-[#FBFAF6]">
+          <div className="container mx-auto px-6">
+            {/* Tab Pills */}
+            <div className="flex flex-wrap justify-center gap-3 mb-16">
+              {featureTabs.map(({ id, icon: Icon }) => {
+                const active = activeFeature === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => { setActiveFeature(id); setImageIdx(0); }}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
+                      ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
+                      : 'bg-white text-stone-500 hover:bg-stone-100'
+                      }`}
+                  >
+                    <Icon size={16} strokeWidth={2} />
+                    {t.showcase.tabs[id]}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Tab Content */}
+            {(() => {
+              const feat = t.showcase[activeFeature];
+              const slides = feat.slides;
+              const slide = slides[imageIdx];
+              const hasMany = slides.length > 1;
+              const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
+              const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
+              const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
+              const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+              return (
+                <div className="max-w-5xl mx-auto">
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
+                    {/* Left arrow */}
+                    <button
+                      onClick={prev}
+                      aria-label="Previous"
+                      disabled={!hasMany}
+                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                        }`}
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+
+                    {/* Image + Description */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                      <div className="flex justify-center overflow-hidden">
+                        <img
+                          key={slide.image}
+                          src={slide.image}
+                          alt={slide.title}
+                          className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
+                        />
+                      </div>
+                      <div key={slide.title} className={animClass}>
+                        <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
+                          {slide.title}
+                        </h3>
+                        <ul className="space-y-3">
+                          {slide.bullets.map((b, i) => (
+                            <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
+                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
+                                <Check size={12} strokeWidth={3} />
+                              </span>
+                              <span>{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Right arrow */}
+                    <button
+                      onClick={next}
+                      aria-label="Next"
+                      disabled={!hasMany}
+                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                        }`}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+
+                  {/* Dot indicator */}
+                  {hasMany && (
+                    <div className="flex justify-center gap-1.5 mt-10">
+                      {slides.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => goTo(i)}
+                          aria-label={`Go to slide ${i + 1}`}
+                          className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
+                            }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </section>
 
@@ -303,7 +606,14 @@ const App: React.FC = () => {
                 </p>
               </div>
               <div className="flex justify-center">
-                <CultureContextEngine nodesData={t.engine.nodes} />
+                <video
+                  src="/brainxp.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full max-w-md rounded-2xl shadow-2xl"
+                />
               </div>
             </div>
           </div>
