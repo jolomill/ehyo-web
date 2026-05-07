@@ -13,7 +13,7 @@ const entries = [
     ],
   },
   {
-    date: '2025/5/4',
+    date: '2026/5/4',
     version: 'v1.0.8',
     items: [
       { icon: Mic, zh: { label: '跟讀單句錄音', desc: '你可以一邊錄下自己的聲音，一邊對照原音練習，讓口說能力更進步！' }, en: { label: 'Sentence Shadowing', desc: 'Record yourself while listening to the original audio — practice speaking and hear the difference in real time.' } },
@@ -22,7 +22,7 @@ const entries = [
     ],
   },
   {
-    date: '2025/4/26',
+    date: '2026/4/26',
     version: 'v1.0.7',
     items: [
       { icon: Wrench, zh: { label: '修正 bugs', desc: '' }, en: { label: 'Bug fixes', desc: '' } },
@@ -30,7 +30,7 @@ const entries = [
     ],
   },
   {
-    date: '2025/4/21',
+    date: '2026/4/21',
     version: 'v1.0.6',
     items: [
       { icon: Package, zh: { label: '引入優惠碼系統', desc: '' }, en: { label: 'Promo code system', desc: '' } },
@@ -38,7 +38,7 @@ const entries = [
     ],
   },
   {
-    date: '2025/4/16',
+    date: '2026/4/16',
     version: undefined,
     items: [
       { icon: FlaskConical, zh: { label: 'Beta 測試啟動', desc: '邀請首批測試者。' }, en: { label: 'Beta Launch', desc: 'First batch of testers invited.' } },
