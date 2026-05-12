@@ -62,11 +62,11 @@ const roadmapItems: {
       status: 'in-progress',
       en: {
         title: 'Community Mode in Development',
-        desc: 'Building a postcard mode that lets users connect with native speakers.',
+        desc: 'Building a postcard mode that lets users connect with native speakers. More community features are in the works.',
       },
       zh: {
         title: '社群模式開發中',
-        desc: '正在開發明信片模式，讓你可以和母語者交流。',
+        desc: '正在開發明信片模式，讓你可以和母語者交流。其他社群功能也在開發中。',
       },
     },
   ];
