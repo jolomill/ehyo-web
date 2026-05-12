@@ -58,15 +58,15 @@ const roadmapItems: {
       },
     },
     {
-      quarter: '2025 Q2',
+      quarter: '2025 May',
       status: 'in-progress',
       en: {
         title: 'Community Mode in Development',
-        desc: 'Building a postcard mode that lets users connect with native speakers. More community features are in the works.',
+        desc: 'Building a postcard mode that lets users connect with native speakers.',
       },
       zh: {
         title: '社群模式開發中',
-        desc: '正在開發明信片模式，讓你可以和母語者交流。其他社群功能也在開發中。',
+        desc: '正在開發明信片模式，讓你可以和母語者交流。',
       },
     },
   ];
