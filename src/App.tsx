@@ -683,7 +683,7 @@ const App: React.FC = () => {
           <p>© 2025 EhYo Language Learning. All rights reserved.</p>
           <div className="flex gap-6 justify-center md:justify-end mt-4 md:mt-0">
             <button onClick={() => navigate('privacy')} className="bg-transparent outline-none hover:text-ehyo-indigo transition-colors">Privacy Policy</button>
-            <a href="https://languagehyo.notion.site/Privacy-Policy-for-EhYo-241fac091b8d8017909decefd86f4bd6?source=copy_link" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+            <a href="mailto:valzin@ehyo.app" className="hover:text-ehyo-indigo transition-colors">Contact</a>
           </div>
         </div>
       </footer>
