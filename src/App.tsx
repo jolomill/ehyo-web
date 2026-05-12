@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones } from 'lucide-react';
 
 const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
@@ -32,7 +33,7 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: str
 );
 
 type Language = 'en' | 'zh';
-type Page = 'home' | 'changelog' | 'roadmap';
+type Page = 'home' | 'changelog' | 'roadmap' | 'privacy';
 
 const translations = {
   en: {
@@ -391,6 +392,7 @@ const App: React.FC = () => {
 
       {page === 'changelog' && <ChangelogPage lang={lang} />}
       {page === 'roadmap' && <RoadmapPage lang={lang} />}
+      {page === 'privacy' && <PrivacyPolicyPage />}
 
       {/* Hero Section */}
       <header className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${page !== 'home' ? 'hidden' : ''}`}>
@@ -653,7 +655,7 @@ const App: React.FC = () => {
 
       </main>
 
-      <footer className={`bg-[#F5F4F0] text-stone-600 py-16 border-t border-stone-200 ${page !== 'home' ? 'hidden' : ''}`}>
+      <footer className={`bg-[#F5F4F0] text-stone-600 py-16 border-t border-stone-200 ${page === 'changelog' || page === 'roadmap' ? 'hidden' : ''}`}>
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
           <div className="text-center md:text-left max-w-xs">
             <Logo scrolled={true} />
@@ -680,7 +682,7 @@ const App: React.FC = () => {
         <div className="container mx-auto px-6 mt-16 pt-8 border-t border-stone-300 text-center md:text-left flex flex-col md:flex-row justify-between text-xs text-stone-400">
           <p>© 2025 EhYo Language Learning. All rights reserved.</p>
           <div className="flex gap-6 justify-center md:justify-end mt-4 md:mt-0">
-            <a href="https://languagehyo.notion.site/Privacy-Policy-for-EhYo-241fac091b8d8017909decefd86f4bd6?source=copy_link" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+            <button onClick={() => navigate('privacy')} className="bg-transparent outline-none hover:text-ehyo-indigo transition-colors">Privacy Policy</button>
             <a href="https://languagehyo.notion.site/Privacy-Policy-for-EhYo-241fac091b8d8017909decefd86f4bd6?source=copy_link" target="_blank" rel="noopener noreferrer">Terms of Service</a>
           </div>
         </div>
