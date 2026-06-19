@@ -1,8 +1,16 @@
-import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical, Headphones } from 'lucide-react';
+import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical, Headphones, RefreshCw, SlidersHorizontal } from 'lucide-react';
 
 type Language = 'en' | 'zh';
 
 const entries = [
+  {
+    date: '2026/6/19',
+    version: 'v1.0.10',
+    items: [
+      { icon: RefreshCw, zh: { label: '跨裝置同步', desc: '新增跨裝置同步功能，讓你在不同裝置上都能接續學習進度！' }, en: { label: 'Cross-Device Sync', desc: 'Added cross-device sync so you can pick up your learning progress on any device.' } },
+      { icon: SlidersHorizontal, zh: { label: '文章難度個人化調整', desc: '文章難度將根據你的學習狀況進行個人化調整，提供更合適的閱讀體驗。' }, en: { label: 'Personalized Article Difficulty', desc: 'Article difficulty now adjusts to your learning progress for a more tailored reading experience.' } },
+    ],
+  },
   {
     date: '2026/5/7',
     version: 'v1.0.9',
