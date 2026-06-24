@@ -8,7 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones } from 'lucide-react';
+import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
 const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
   <div className="flex flex-col items-center group cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
@@ -32,6 +32,30 @@ const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: str
   </div>
 );
 
+const ProblemOnlyCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
+  <div className="bg-stone-50/70 p-8 rounded-2xl border border-stone-100">
+    <div className="flex items-start gap-4">
+      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-stone-400 flex-shrink-0">
+        <Icon size={24} strokeWidth={1.5} />
+      </div>
+      <div>
+        <h3 className="font-serif text-lg font-bold text-stone-500 leading-snug">{title}</h3>
+        <p className="text-sm text-stone-400 leading-relaxed mt-1">{description}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const SolutionCard = ({ title, description }: { title: string, description: string }) => (
+  <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md hover:border-ehyo-indigo/20 transition-all duration-300">
+    <div className="flex items-center gap-2 mb-3 text-ehyo-sage">
+      <Check size={20} strokeWidth={2.5} />
+      <span className="font-serif text-lg font-bold text-ehyo-text">{title}</span>
+    </div>
+    <p className="text-stone-600 leading-relaxed">{description}</p>
+  </div>
+);
+
 type Language = 'en' | 'zh';
 type Page = 'home' | 'changelog' | 'roadmap' | 'privacy';
 
@@ -41,13 +65,43 @@ const translations = {
     hero: {
       beta: "Now Available in Beta",
       h1_1: "EhYo",
-      sub: "Not just learning a language — keeping your language alive.",
+      sub: "Designed for self-learners — save your time\nand turn every mistake into your learning journey.",
+      langs: "Supports 28+ languages: English, Chinese, Japanese, Korean, Spanish, and more",
       btn_start: "Try it out!",
     },
+    prob: {
+      title: "EhYo solves these problems",
+      c1_t: "Learning material scattered everywhere",
+      c1_d: "Articles, ebooks, and web pages are all over the place. Even looking up grammar and vocabulary eats into your time.",
+      c2_t: "Wasting precious time",
+      c2_d: "Spending a lot of time organizing notes and looking things up.",
+      c3_t: "Learning words you can't actually use",
+      c3_d: "You don't know how to apply new vocabulary in real context, and you can barely remember what you've learned when it's time to review.",
+      c4_t: "Hard to track your own mistakes",
+      c4_d: "When mistakes aren't properly logged or corrected, you end up repeating the same errors over and over.",
+      c5_t: "One-sided practice",
+      c5_d: "You want to improve all your language skills, but unconsciously focus on just one and neglect the rest.",
+      c6_t: "Fear of losing a language you've mastered",
+      c6_d: "Without constant use, a language you worked so hard to learn slowly fades away.",
+      s1_t: "Centralized Management",
+      s1_d: "Import your own material—EPUBs, articles, videos, and more—to read, translate, note, organize, and review, all within EhYo.",
+      s2_t: "Effortless Time-Saving",
+      s2_d: "EhYo saves you the time spent looking things up and organizing, while you learn new vocabulary and grammar — automatically sorted into your learning record.",
+      s3_t: "Tailored Difficulty Levels",
+      s3_d: "From beginner to advanced, EhYo delivers content and feedback adapted to your specific proficiency level.",
+      s4_t: "Smart Mistake Tracking",
+      s4_d: "Go beyond basic vocabulary review. While practicing your writing, EhYo flags your most frequent grammar blind spots.",
+      s5_t: "Personalized Tracking",
+      s5_d: "Visual charts show exactly which skills need work, so you grow in listening, speaking, reading, and writing alike.",
+      s6_t: "Independent Multilingual Tracks",
+      s6_d: "Keep your languages separate and clutter-free. Confidently learn a new language while maintaining your progress in existing ones.",
+      s7_t: "Cross-Device Sync",
+      s7_d: "Read and save new words on your computer or tablet, then pick up practice on your phone — anytime, anywhere.",
+    },
     phil: {
-      title: "Spent years on a language, afraid it'll fade away?",
+      title: "Spending a lot of time on language?",
       p1: "Leave it to EhYo.",
-      p2: "EhYo is built for busy people. Grounded in brain science, it helps you effortlessly keep the languages you've learned alive — so they're not just something you \"studied,\" but something you can actually use.",
+      p2: "EhYo is built for people who want to learn efficiently. Powered by your own learning record, it helps you effortlessly keep the languages you've learned alive — so they're not just something you \"studied,\" but something you can actually use.",
     },
     feat: {
       title: "Effortless Maintenance",
@@ -177,13 +231,43 @@ const translations = {
     hero: {
       beta: "Beta 測試版現已開放",
       h1_1: "EhYo",
-      sub: "學語言，不是背單字，是建立起屬於你的語言大腦。",
+      sub: "為語言自學者設計— 根據你的學習紀錄，打造最有效率的學習。",
+      langs: "支援 28+ 種語言學習：英文、中文、日文、韓文、西班牙文...等",
       btn_start: "試試看！",
     },
+    prob: {
+      title: "EhYo 解決這些問題",
+      c1_t: "學習資料散落各處",
+      c1_d: "文章、電子書、其他讀物分散四處，光是查文法、查單字用法就花掉不少時間。",
+      c2_t: "花費許多時間",
+      c2_d: "花費大量時間整理筆記、查詢資料。",
+      c3_t: "學了單字卻不會用",
+      c3_d: "不知道怎麼把新學的單字用出來，練習時也常常想不起自己學過哪些字。",
+      c4_t: "難以追蹤自己的錯誤",
+      c4_d: "犯過的錯沒被好好記下、改正，結果不小心又犯了類似的錯。",
+      c5_t: "練習總是偏重單一面向",
+      c5_d: "想要全方面提升語言能力，卻不知不覺只練某一項技能，忽略了其他面向。",
+      c6_t: "怕學了很久的語言退步",
+      c6_d: "語言因為太久沒使用，漸漸生疏、被遺忘。",
+      s1_t: "集中管理",
+      s1_d: "匯入自己的素材，包含 EPUB、文章、影片等。翻譯、紀錄、整理、複習，EhYo 一次滿足。",
+      s2_t: "輕鬆省時",
+      s2_d: "EhYo 幫你省去查詢、整理的時間，同時學習新詞彙與文法結構。分門別類的增加到你的學習紀錄裡！",
+      s3_t: "支援多種難度",
+      s3_d: "從初學到進階，EhYo 依照程度給予不同內容和回饋。",
+      s4_t: "錯誤追蹤",
+      s4_d: "除了基本的單字複習之外，寫作練習時，EhYo 會提示你最近常犯的文法錯誤。",
+      s5_t: "個人化追蹤",
+      s5_d: "用視覺化圖像讓你一目了然缺乏哪些練習，全面發展聽說讀寫技能。",
+      s6_t: "分隔的多語言紀錄",
+      s6_d: "各語言紀錄獨立不互相干擾，讓你安心同時學習新語言、維持舊語言的進度。",
+      s7_t: "跨裝置同步",
+      s7_d: "你可以在電腦、平板上進行閱讀、記錄下字詞，再到手機上進行練習！",
+    },
     phil: {
-      title: "學了很久的語言，怕沒用就忘光？",
+      title: "花很多時間在語言上？",
       p1: "都交給 EhYo。",
-      p2: "EhYo 專為忙碌的你設計，用大腦科學的方式，讓你輕鬆維持多國語言能力。讓你的語言能力不再只是「學過」，而是「會用」。",
+      p2: "EhYo 專為想要有效率學習的你設計，根據你的學習紀錄，讓你輕鬆維持多國語言能力。讓你的語言能力不再只是「學過」，而是「會用」。",
 
     },
     feat: {
@@ -411,7 +495,7 @@ const App: React.FC = () => {
             {t.hero.h1_1}
           </h1>
 
-          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm-in-up" style={{ animationDelay: '0.25s' }}>
+          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm-in-up whitespace-pre-line" style={{ animationDelay: '0.25s' }}>
             {t.hero.sub}
           </div>
 
@@ -427,6 +511,10 @@ const App: React.FC = () => {
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
+
+          <p className="text-sm text-stone-400 mt-6" style={{ animationDelay: '0.45s', fontSize: '14px' }}>
+            {t.hero.langs}
+          </p>
         </div>
       </header>
 
@@ -455,6 +543,71 @@ const App: React.FC = () => {
           </div>
         </section>
 
+        {/* Problems Section */}
+        <section id="problems" className="py-24 bg-[#FBFAF6]">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16 max-w-2xl mx-auto">
+              <h2 className="font-serif text-4xl mb-4">{t.prob.title}</h2>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col gap-6 md:flex-1 md:mt-[4.5rem]">
+                <ProblemOnlyCard icon={FolderOpen} title={t.prob.c1_t} description={t.prob.c1_d} />
+                <ProblemOnlyCard icon={Clock} title={t.prob.c2_t} description={t.prob.c2_d} />
+                <ProblemOnlyCard icon={Lightbulb} title={t.prob.c3_t} description={t.prob.c3_d} />
+                <ProblemOnlyCard icon={RotateCcw} title={t.prob.c4_t} description={t.prob.c4_d} />
+                <ProblemOnlyCard icon={Scale} title={t.prob.c5_t} description={t.prob.c5_d} />
+                <ProblemOnlyCard icon={Hourglass} title={t.prob.c6_t} description={t.prob.c6_d} />
+              </div>
+
+              <div className="flex flex-col gap-6 md:flex-1">
+                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} />
+                <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} />
+                <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} />
+                <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} />
+                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} />
+                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
+                <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Culture Engine Section */}
+        <section className="py-24 bg-ehyo-text text-white overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-indigo blur-[120px] absolute top-[-100px] left-[-100px]"></div>
+            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-coral blur-[120px] absolute bottom-[-100px] right-[-100px]"></div>
+          </div>
+
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-ehyo-coral text-xs font-bold tracking-widest uppercase rounded-full mb-6 border border-white/10">
+                  {t.engine.tag}
+                </div>
+                <h2 className="font-serif text-4xl md:text-5xl mb-6">{t.engine.title}</h2>
+                <p className="text-lg text-stone-300 mb-6 leading-relaxed">
+                  {t.engine.p1}
+                </p>
+                <p className="text-lg text-stone-300 leading-relaxed">
+                  {t.engine.p2}
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <video
+                  src="/brainxp.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full max-w-md rounded-2xl shadow-2xl"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Grid */}
         <section id="features" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
@@ -463,27 +616,44 @@ const App: React.FC = () => {
               <p className="text-stone-500">{t.feat.sub}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <FeatureCard
-                icon={Globe}
-                title={t.feat.c1_t}
-                description={t.feat.c1_d}
-              />
-              <FeatureCard
-                icon={Heart}
-                title={t.feat.c2_t}
-                description={t.feat.c2_d}
-              />
-              <FeatureCard
-                icon={BookOpen}
-                title={t.feat.c3_t}
-                description={t.feat.c3_d}
-              />
-              <FeatureCard
-                icon={Mail}
-                title={t.feat.c4_t}
-                description={t.feat.c4_d}
-              />
+            <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-4">
+              <div className="flex-1">
+                <FeatureCard
+                  icon={Globe}
+                  title={t.feat.c1_t}
+                  description={t.feat.c1_d}
+                />
+              </div>
+              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
+                <ArrowRight size={28} />
+              </div>
+              <div className="flex-1">
+                <FeatureCard
+                  icon={Heart}
+                  title={t.feat.c2_t}
+                  description={t.feat.c2_d}
+                />
+              </div>
+              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
+                <ArrowRight size={28} />
+              </div>
+              <div className="flex-1">
+                <FeatureCard
+                  icon={BookOpen}
+                  title={t.feat.c3_t}
+                  description={t.feat.c3_d}
+                />
+              </div>
+              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
+                <ArrowRight size={28} />
+              </div>
+              <div className="flex-1">
+                <FeatureCard
+                  icon={Mail}
+                  title={t.feat.c4_t}
+                  description={t.feat.c4_d}
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -591,41 +761,6 @@ const App: React.FC = () => {
                 </div>
               );
             })()}
-          </div>
-        </section>
-
-        {/* Culture Engine Section */}
-        <section className="py-24 bg-ehyo-text text-white overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-indigo blur-[120px] absolute top-[-100px] left-[-100px]"></div>
-            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-coral blur-[120px] absolute bottom-[-100px] right-[-100px]"></div>
-          </div>
-
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-ehyo-coral text-xs font-bold tracking-widest uppercase rounded-full mb-6 border border-white/10">
-                  {t.engine.tag}
-                </div>
-                <h2 className="font-serif text-4xl md:text-5xl mb-6">{t.engine.title}</h2>
-                <p className="text-lg text-stone-300 mb-6 leading-relaxed">
-                  {t.engine.p1}
-                </p>
-                <p className="text-lg text-stone-300 leading-relaxed">
-                  {t.engine.p2}
-                </p>
-              </div>
-              <div className="flex justify-center">
-                <video
-                  src="/brainxp.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full max-w-md rounded-2xl shadow-2xl"
-                />
-              </div>
-            </div>
           </div>
         </section>
 
