@@ -4,6 +4,13 @@ type Language = 'en' | 'zh';
 
 const entries = [
   {
+    date: '2026/6/28',
+    version: 'v1.0.11',
+    items: [
+      { icon: Wrench, zh: { label: 'Bug 修復', desc: '修復了若干已知問題，提升整體穩定性。' }, en: { label: 'Bug Fixes', desc: 'Fixed several known issues to improve overall stability.' } },
+    ],
+  },
+  {
     date: '2026/6/19',
     version: 'v1.0.10',
     items: [
