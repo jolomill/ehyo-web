@@ -46,7 +46,7 @@ const roadmapItems: {
   zh: { title: string; desc: string };
 }[] = [
     {
-      quarter: '2025 April',
+      quarter: '2026 April',
       status: 'completed',
       en: {
         title: 'Public Beta Launch',
@@ -58,7 +58,7 @@ const roadmapItems: {
       },
     },
     {
-      quarter: '2025 May',
+      quarter: '2026 May',
       status: 'in-progress',
       en: {
         title: 'Community Mode in Development',
