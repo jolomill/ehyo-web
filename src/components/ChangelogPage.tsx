@@ -1,8 +1,20 @@
-import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical, Headphones, RefreshCw, SlidersHorizontal } from 'lucide-react';
+import { Mic, Tag, Brain, Wrench, BookText, Package, FlaskConical, Headphones, RefreshCw, SlidersHorizontal, Sparkles, Zap, Rocket } from 'lucide-react';
 
 type Language = 'en' | 'zh';
 
 const entries = [
+  {
+    date: '2026/7/14',
+    version: 'v1.0.13',
+    items: [
+      { icon: Brain, zh: { label: '首頁全新 UI', desc: '大腦首頁重新設計，統一視覺風格，介面更一致、更有質感。' }, en: { label: 'Brand New Home UI', desc: 'Redesigned the brain home screen with a more consistent, polished visual style.' } },
+      { icon: Sparkles, zh: { label: '升級動畫優化', desc: '升等慶祝動畫更流暢華麗。' }, en: { label: 'Level-Up Animation Update', desc: 'Smoother, more polished level-up celebration animation.' } },
+      { icon: Mic, zh: { label: '口說功能調整', desc: '移除鍵盤輸入，改為純語音互動，練習更直覺。' }, en: { label: 'Speaking Feature Update', desc: 'Removed keyboard input in favor of pure voice interaction for a more intuitive practice flow.' } },
+      { icon: Rocket, zh: { label: '首次使用流程加速', desc: '優化新手引導流程，讓你能更快開始使用！' }, en: { label: 'Faster First-Time Setup', desc: 'Streamlined onboarding so you can start using the app sooner.' } },
+      { icon: Wrench, zh: { label: 'Bug 修復', desc: '修復了若干已知問題，提升整體穩定性。' }, en: { label: 'Bug Fixes', desc: 'Fixed several known issues to improve overall stability.' } },
+      { icon: Zap, zh: { label: '小項目最佳化', desc: '多處細節優化，提升整體使用體驗。' }, en: { label: 'Minor Optimizations', desc: 'Various small improvements for a better overall experience.' } },
+    ],
+  },
   {
     date: '2026/6/28',
     version: 'v1.0.11',
