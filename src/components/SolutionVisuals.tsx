@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -40,17 +40,19 @@ const usePhase = (steps: number[], play: boolean, reduceMotion: boolean | null, 
 
 // ---------------------------------------------------------------------------
 // 1. CENTRALIZED MANAGEMENT
-// Books, news, videos, vocab practice and notes fly into EhYo, shrinking and fading.
+// Books, news, videos, vocab practice, speaking, review and notes fly into EhYo, shrinking and fading.
 // ---------------------------------------------------------------------------
 
 const CENTRALIZE_CYCLE = 5;
 
 const SOURCES = [
-  { icon: BookOpen, left: 50, top: 14, color: INDIGO },
-  { icon: Newspaper, left: 84, top: 36, color: CORAL },
-  { icon: PlayCircle, left: 74, top: 84, color: SAGE },
-  { icon: Layers, left: 26, top: 84, color: INDIGO },
-  { icon: NotebookPen, left: 16, top: 36, color: CORAL },
+  { icon: BookOpen, left: 50, top: 13, color: INDIGO }, // books
+  { icon: Newspaper, left: 78, top: 27, color: CORAL }, // web news
+  { icon: PlayCircle, left: 85, top: 58, color: SAGE }, // videos
+  { icon: Layers, left: 66, top: 83, color: INDIGO }, // vocab practice
+  { icon: Mic, left: 34, top: 83, color: CORAL }, // speaking
+  { icon: RotateCcw, left: 15, top: 58, color: SAGE }, // review
+  { icon: NotebookPen, left: 22, top: 27, color: INDIGO }, // notes
 ];
 
 export const CentralizeVisual: React.FC = () => {
@@ -114,55 +116,68 @@ export interface TimeSaveText {
   translateText: string;
   grammar: string;
   grammarText: string;
+  record: string;
+  vocab: string;
+  grammarBin: string;
 }
 
-const TIME_SENTENCE = ['She', 'decided', 'to', 'pursue', 'her', 'dream.'];
-const TIME_TARGET = 3;
-const TIME_STEPS = [0.8, 0.9, 3.2, 0.5]; // idle, select, show, fade
+const TIME_SENTENCE = ['Ella', 'decidió', 'perseguir', 'sus', 'sueños.'];
+const TIME_TARGET = 1;
+const TIME_FILED = { vocab: 'decidir', grammar: 'Pretérito' };
+const TIME_STEPS = [0.8, 0.9, 2.4, 2.4, 0.5]; // idle, select, look-up, file into record, fade
 
 export const TimeSaveVisual: React.FC<{ text: TimeSaveText }> = ({ text }) => {
   const { ref, play, reduceMotion } = usePlay();
-  const phase = usePhase(TIME_STEPS, play, reduceMotion, 2);
-  const selected = phase === 1 || phase === 2;
-  const showCards = phase === 2;
+  const phase = usePhase(TIME_STEPS, play, reduceMotion, 3);
+  const selected = phase >= 1 && phase <= 3;
+  const showCards = phase === 2 || phase === 3;
+  const filed = phase === 3;
 
   const cards = [
     { icon: PenLine, title: text.example, body: text.exampleText, color: INDIGO },
     { icon: Languages, title: text.translate, body: text.translateText, color: CORAL },
     { icon: BookText, title: text.grammar, body: text.grammarText, color: SAGE },
   ];
+  const bins = [
+    { label: text.vocab, item: TIME_FILED.vocab, count: 12, color: CORAL },
+    { label: text.grammarBin, item: TIME_FILED.grammar, count: 7, color: SAGE },
+  ];
 
   return (
-    <div ref={ref} className={`${stageClass} px-4 pt-7 pb-5`} aria-hidden="true">
-      <p className="text-center font-serif text-lg md:text-xl text-ehyo-text mb-7">
-        {TIME_SENTENCE.map((w, i) =>
-          i === TIME_TARGET ? (
-            <span key={i} className="relative inline-block mx-1">
-              <motion.span
-                className="absolute -inset-x-1 -inset-y-0.5 rounded bg-ehyo-indigo/20 origin-left"
-                animate={{ scaleX: selected ? 1 : 0 }}
-                transition={{ duration: 0.35 }}
-              />
-              <span className="relative font-semibold">{w}</span>
-              <motion.span
-                className="absolute -right-3 top-4 text-ehyo-text"
-                animate={
-                  selected
-                    ? { opacity: 1, x: 0, y: 0, scale: [1, 0.8, 1] }
-                    : { opacity: 0, x: 24, y: 18, scale: 1 }
-                }
-                transition={{ duration: 0.4 }}
-              >
-                <MousePointer2 size={16} fill="white" />
-              </motion.span>
-            </span>
-          ) : (
-            <span key={i} className="mx-1">{w}</span>
-          ),
-        )}
+    <div ref={ref} className={`${stageClass} px-4 pt-6 pb-4`} aria-hidden="true">
+      <p className="text-center font-serif text-lg md:text-xl text-ehyo-text mb-6">
+        {TIME_SENTENCE.map((w, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && ' '}
+            {i === TIME_TARGET ? (
+              <span className="relative inline-block">
+                <motion.span
+                  className="absolute -inset-x-1 -inset-y-0.5 rounded bg-ehyo-indigo/20 origin-left"
+                  animate={{ scaleX: selected ? 1 : 0 }}
+                  transition={{ duration: 0.35 }}
+                />
+                <span className="relative font-semibold">{w}</span>
+                <motion.span
+                  className="absolute -right-3 top-4 text-ehyo-text"
+                  animate={
+                    phase === 1 || phase === 2
+                      ? { opacity: 1, x: 0, y: 0, scale: [1, 0.8, 1] }
+                      : { opacity: 0, x: 24, y: 18, scale: 1 }
+                  }
+                  transition={{ duration: 0.4 }}
+                >
+                  <MousePointer2 size={16} fill="white" />
+                </motion.span>
+              </span>
+            ) : (
+              w
+            )}
+          </React.Fragment>
+        ))}
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 min-h-[6.5rem]">
+      {/* Look-up: example, translation, grammar at once */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 min-h-[6rem]">
         {cards.map((c, i) => {
           const Icon = c.icon;
           return (
@@ -181,6 +196,41 @@ export const TimeSaveVisual: React.FC<{ text: TimeSaveText }> = ({ text }) => {
             </motion.div>
           );
         })}
+      </div>
+
+      {/* Learning record: new word and grammar get sorted into their own folders */}
+      <div className="mt-3 rounded-lg border border-dashed border-stone-200 bg-white/60 p-2.5">
+        <div className="flex items-center gap-1 text-[11px] font-bold text-stone-400 mb-2">
+          <FolderOpen size={12} />
+          {text.record}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {bins.map((b, i) => (
+            <div key={i} className="rounded-md bg-white border border-stone-100 px-2 py-1.5 min-h-[3.25rem]">
+              <div className="flex items-center justify-between text-[11px] font-bold" style={{ color: b.color }}>
+                <span>{b.label}</span>
+                <motion.span
+                  key={filed ? 'up' : 'base'}
+                  initial={filed ? { scale: 1.6 } : false}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5 + i * 0.25, type: 'spring', stiffness: 400, damping: 14 }}
+                  className="tabular-nums"
+                >
+                  {filed ? b.count + 1 : b.count}
+                </motion.span>
+              </div>
+              <motion.div
+                className="mt-1 inline-block whitespace-nowrap text-[11px] font-semibold text-ehyo-text rounded px-1.5 py-0.5"
+                style={{ background: `${b.color}26` }}
+                initial={false}
+                animate={filed ? { opacity: 1, y: 0 } : { opacity: 0, y: -28 }}
+                transition={{ duration: 0.5, delay: filed ? 0.2 + i * 0.25 : 0, ease: 'easeOut' }}
+              >
+                + {b.item}
+              </motion.div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -277,6 +327,12 @@ export const LevelVisual: React.FC<{ text: LevelText }> = ({ text }) => {
 
   return (
     <div ref={ref} className={`${stageClass} p-4`} aria-hidden="true">
+      {/* The same word at both levels */}
+      <div className="text-center mb-2">
+        <span className="font-serif text-2xl font-bold text-ehyo-text">decide</span>
+        <span className="ml-2 text-xs italic text-stone-400">v.</span>
+      </div>
+
       {/* A1 / B2 switch */}
       <div className="flex justify-center mb-4">
         <div className="relative flex bg-white rounded-full border border-stone-200 p-1 text-sm font-bold">

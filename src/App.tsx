@@ -96,7 +96,7 @@ const translations = {
       s7_d: "Read and save new words on your computer or tablet, then pick up practice on your phone — anytime, anywhere.",
     },
     vis: {
-      time: { example: "Example", exampleText: "He pursued a career in music.", translate: "Translation", translateText: "追求；致力於", grammar: "Grammar", grammarText: "pursue + noun (transitive)" },
+      time: { example: "Example", exampleText: "Decidí estudiar en Madrid.", translate: "Translation", translateText: "decided (decidir, past tense)", grammar: "Grammar", grammarText: "Preterite: decid- + -ió (3rd person singular)", record: "Learning record", vocab: "Vocabulary", grammarBin: "Grammar" },
       level: { build: "Build", notes: "Notes", reading: "Reading", notesA1: "decide = to make a choice", notesB2: "decide on / against · syn. resolve, determine" },
       weak: "Next up: let's strengthen your verb forms!",
       brain: { listening: "Listening", speaking: "Speaking", reading: "Reading", writing: "Writing", vocab: "Vocab", grammar: "Grammar", weak: "Needs work" },
@@ -269,7 +269,7 @@ const translations = {
       s7_d: "你可以在電腦、平板上進行閱讀、記錄下字詞，再到手機上進行練習！",
     },
     vis: {
-      time: { example: "造句", exampleText: "He pursued a career in music.", translate: "翻譯", translateText: "追求；致力於", grammar: "文法", grammarText: "pursue + 名詞（及物動詞）" },
+      time: { example: "造句", exampleText: "Decidí estudiar en Madrid.", translate: "翻譯", translateText: "決定了（decidir 的過去式）", grammar: "文法", grammarText: "簡單過去式：decid- + -ió（第三人稱單數）", record: "學習紀錄", vocab: "詞彙", grammarBin: "文法" },
       level: { build: "拼句", notes: "筆記", reading: "閱讀素材", notesA1: "decide ＝ 決定", notesB2: "decide on / against ＝ 選定／決定不⋯；近義：resolve, determine" },
       weak: "接下來幫你加強動詞變化！",
       brain: { listening: "聽", speaking: "說", reading: "讀", writing: "寫", vocab: "單字", grammar: "文法", weak: "需要加強" },
