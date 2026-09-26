@@ -9,17 +9,12 @@ import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual } from './components/SolutionVisuals';
+import { EhYoMark } from './components/EhYoMark';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
-const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
-  <div className="flex flex-col items-center group cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
-    <span className={`font-serif text-3xl font-bold tracking-tight transition-colors duration-300 ${scrolled ? 'text-ehyo-text' : 'text-ehyo-text'}`}>
-      EhYo
-    </span>
-    {/* Book/Smile Curve underneath */}
-    <svg width="40" height="8" viewBox="0 0 40 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="mt-[-2px]">
-      <path d="M2 2C10 6 18 6 20 2C22 6 30 6 38 2" stroke="#6B7FD7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
+  <div className="flex items-center cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
+    <EhYoMark className="h-11 w-auto" />
   </div>
 );
 
@@ -87,7 +82,6 @@ const translations = {
       c6_d: "Without constant use, a language you worked so hard to learn slowly fades away.",
       s1_t: "Centralized Management",
       s1_d: "Import your own material—EPUBs, articles, videos, and more—to read, translate, note, organize, and review, all within EhYo.",
-      s1_v: ["Books", "News", "Videos", "Vocab Practice", "Notes"],
       s2_t: "Effortless Time-Saving",
       s2_d: "EhYo saves you the time spent looking things up and organizing, while you learn new vocabulary and grammar — automatically sorted into your learning record.",
       s3_t: "Tailored Difficulty Levels",
@@ -254,7 +248,6 @@ const translations = {
       c6_d: "語言因為太久沒使用，漸漸生疏、被遺忘。",
       s1_t: "集中管理",
       s1_d: "匯入自己的素材，包含 EPUB、文章、影片等。翻譯、紀錄、整理、複習，EhYo 一次滿足。",
-      s1_v: ["書籍", "網頁新聞", "影片", "單字練習", "筆記"],
       s2_t: "輕鬆省時",
       s2_d: "EhYo 幫你省去查詢、整理的時間，同時學習新詞彙與文法結構。分門別類的增加到你的學習紀錄裡！",
       s3_t: "支援多種難度",
@@ -565,7 +558,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-6 md:flex-1">
-                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual labels={t.prob.s1_v} />} />
+                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual />} />
                 <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} />
                 <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} />
                 <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} />

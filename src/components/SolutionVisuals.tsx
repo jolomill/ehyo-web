@@ -6,6 +6,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { BookOpen, Newspaper, PlayCircle, Layers, NotebookPen } from 'lucide-react';
+import { EhYoMark } from './EhYoMark';
 
 const CYCLE = 5; // seconds per loop
 
@@ -20,7 +21,7 @@ const SOURCES = [
 
 // --- VISUAL: CENTRALIZED MANAGEMENT ---
 // Books, news, videos, vocab practice and notes fly into EhYo, shrinking and fading.
-export const CentralizeVisual: React.FC<{ labels: string[] }> = ({ labels }) => {
+export const CentralizeVisual: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
   const reduceMotion = useReducedMotion();
@@ -32,10 +33,6 @@ export const CentralizeVisual: React.FC<{ labels: string[] }> = ({ labels }) => 
       className="relative w-full h-56 rounded-xl bg-ehyo-bg border border-stone-100 overflow-hidden"
       aria-hidden="true"
     >
-      {/* Faint guide rings */}
-      <div className="absolute left-1/2 top-1/2 w-40 h-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ehyo-indigo/15" />
-      <div className="absolute left-1/2 top-1/2 w-64 h-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ehyo-indigo/10" />
-
       {SOURCES.map((s, i) => {
         const Icon = s.icon;
         const start = { left: `${s.left}%`, top: `${s.top}%`, opacity: 1, scale: 1 };
@@ -62,9 +59,8 @@ export const CentralizeVisual: React.FC<{ labels: string[] }> = ({ labels }) => 
               delay: i * 0.12,
             }}
           >
-            <div className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 whitespace-nowrap bg-white rounded-full pl-2 pr-3 py-1.5 shadow-sm border border-stone-100 text-xs font-medium text-ehyo-text">
-              <Icon size={14} style={{ color: s.color }} strokeWidth={2} />
-              {labels[i]}
+            <div className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center bg-white rounded-full shadow-sm border border-stone-100">
+              <Icon size={20} style={{ color: s.color }} strokeWidth={1.75} />
             </div>
           </motion.div>
         );
@@ -82,11 +78,8 @@ export const CentralizeVisual: React.FC<{ labels: string[] }> = ({ labels }) => 
             animate={play ? { scale: [1, 1, 1.9, 1.9], opacity: [0, 0.6, 0, 0] } : { opacity: 0 }}
             transition={{ duration: CYCLE, times: [0, 0.66, 0.9, 1], repeat: Infinity, delay: 0.3 }}
           />
-          <div className="relative w-20 h-20 rounded-full bg-white shadow-md ring-4 ring-ehyo-indigo/40 flex flex-col items-center justify-center">
-            <span className="font-serif text-lg font-bold text-ehyo-text leading-none">EhYo</span>
-            <svg width="28" height="6" viewBox="0 0 40 8" fill="none" className="mt-0.5">
-              <path d="M2 2C10 6 18 6 20 2C22 6 30 6 38 2" stroke="#6B7FD7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <div className="relative w-24 h-24 rounded-full bg-white shadow-md ring-4 ring-ehyo-indigo/30 flex items-center justify-center">
+            <EhYoMark className="w-16" />
           </div>
         </div>
       </motion.div>
