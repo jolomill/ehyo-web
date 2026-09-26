@@ -8,6 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { CentralizeVisual } from './components/SolutionVisuals';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
 const Logo = ({ scrolled, onClick }: { scrolled: boolean; onClick?: () => void }) => (
@@ -46,13 +47,14 @@ const ProblemOnlyCard = ({ icon: Icon, title, description }: { icon: any, title:
   </div>
 );
 
-const SolutionCard = ({ title, description }: { title: string, description: string }) => (
+const SolutionCard = ({ title, description, visual }: { title: string, description: string, visual?: React.ReactNode }) => (
   <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md hover:border-ehyo-indigo/20 transition-all duration-300">
     <div className="flex items-center gap-2 mb-3 text-ehyo-sage">
       <Check size={20} strokeWidth={2.5} />
       <span className="font-serif text-lg font-bold text-ehyo-text">{title}</span>
     </div>
     <p className="text-stone-600 leading-relaxed">{description}</p>
+    {visual && <div className="mt-6">{visual}</div>}
   </div>
 );
 
@@ -85,6 +87,7 @@ const translations = {
       c6_d: "Without constant use, a language you worked so hard to learn slowly fades away.",
       s1_t: "Centralized Management",
       s1_d: "Import your own material—EPUBs, articles, videos, and more—to read, translate, note, organize, and review, all within EhYo.",
+      s1_v: ["Books", "News", "Videos", "Vocab Practice", "Notes"],
       s2_t: "Effortless Time-Saving",
       s2_d: "EhYo saves you the time spent looking things up and organizing, while you learn new vocabulary and grammar — automatically sorted into your learning record.",
       s3_t: "Tailored Difficulty Levels",
@@ -251,6 +254,7 @@ const translations = {
       c6_d: "語言因為太久沒使用，漸漸生疏、被遺忘。",
       s1_t: "集中管理",
       s1_d: "匯入自己的素材，包含 EPUB、文章、影片等。翻譯、紀錄、整理、複習，EhYo 一次滿足。",
+      s1_v: ["書籍", "網頁新聞", "影片", "單字練習", "筆記"],
       s2_t: "輕鬆省時",
       s2_d: "EhYo 幫你省去查詢、整理的時間，同時學習新詞彙與文法結構。分門別類的增加到你的學習紀錄裡！",
       s3_t: "支援多種難度",
@@ -561,7 +565,7 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-6 md:flex-1">
-                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} />
+                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual labels={t.prob.s1_v} />} />
                 <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} />
                 <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} />
                 <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} />
