@@ -3,36 +3,61 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useRef } from 'react';
-import { motion, useInView, useReducedMotion } from 'framer-motion';
-import { BookOpen, Newspaper, PlayCircle, Layers, NotebookPen } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
+import {
+  BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
+  BookText, XCircle, Bookmark, CheckCircle2,
+} from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
-const CYCLE = 5; // seconds per loop
+const INDIGO = '#6B7FD7';
+const CORAL = '#FF8FAB';
+const SAGE = '#A3B18A';
+const RED = '#E5484D';
 
-// Starting positions (percent of the stage) arranged around the center
-const SOURCES = [
-  { icon: BookOpen, left: 50, top: 14, color: '#6B7FD7' },
-  { icon: Newspaper, left: 84, top: 36, color: '#FF8FAB' },
-  { icon: PlayCircle, left: 74, top: 84, color: '#A3B18A' },
-  { icon: Layers, left: 26, top: 84, color: '#6B7FD7' },
-  { icon: NotebookPen, left: 16, top: 36, color: '#FF8FAB' },
-];
+const stageClass = 'relative w-full rounded-xl bg-ehyo-bg border border-stone-100 overflow-hidden';
 
-// --- VISUAL: CENTRALIZED MANAGEMENT ---
-// Books, news, videos, vocab practice and notes fly into EhYo, shrinking and fading.
-export const CentralizeVisual: React.FC = () => {
+// Plays only while on screen and when the viewer hasn't asked for reduced motion.
+const usePlay = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
   const reduceMotion = useReducedMotion();
-  const play = inView && !reduceMotion;
+  return { ref, play: inView && !reduceMotion, reduceMotion };
+};
+
+// Steps through phases (durations in seconds) in a loop while playing.
+// With reduced motion it rests on `still`, the most descriptive phase.
+const usePhase = (steps: number[], play: boolean, reduceMotion: boolean | null, still: number) => {
+  const [phase, setPhase] = useState(0);
+  useEffect(() => {
+    if (!play) return;
+    const id = setTimeout(() => setPhase(p => (p + 1) % steps.length), steps[phase] * 1000);
+    return () => clearTimeout(id);
+  }, [phase, play, steps]);
+  return reduceMotion ? still : phase;
+};
+
+// ---------------------------------------------------------------------------
+// 1. CENTRALIZED MANAGEMENT
+// Books, news, videos, vocab practice and notes fly into EhYo, shrinking and fading.
+// ---------------------------------------------------------------------------
+
+const CENTRALIZE_CYCLE = 5;
+
+const SOURCES = [
+  { icon: BookOpen, left: 50, top: 14, color: INDIGO },
+  { icon: Newspaper, left: 84, top: 36, color: CORAL },
+  { icon: PlayCircle, left: 74, top: 84, color: SAGE },
+  { icon: Layers, left: 26, top: 84, color: INDIGO },
+  { icon: NotebookPen, left: 16, top: 36, color: CORAL },
+];
+
+export const CentralizeVisual: React.FC = () => {
+  const { ref, play } = usePlay();
 
   return (
-    <div
-      ref={ref}
-      className="relative w-full h-56 rounded-xl bg-ehyo-bg border border-stone-100 overflow-hidden"
-      aria-hidden="true"
-    >
+    <div ref={ref} className={`${stageClass} h-56`} aria-hidden="true">
       {SOURCES.map((s, i) => {
         const Icon = s.icon;
         const start = { left: `${s.left}%`, top: `${s.top}%`, opacity: 1, scale: 1 };
@@ -52,7 +77,7 @@ export const CentralizeVisual: React.FC = () => {
                 : start
             }
             transition={{
-              duration: CYCLE,
+              duration: CENTRALIZE_CYCLE,
               times: [0, 0.12, 0.4, 0.68, 1],
               ease: 'easeInOut',
               repeat: Infinity,
@@ -66,22 +91,608 @@ export const CentralizeVisual: React.FC = () => {
         );
       })}
 
-      {/* Center: EhYo */}
       <motion.div
         className="absolute left-1/2 top-1/2 z-20"
         animate={play ? { scale: [1, 1, 1.15, 1, 1] } : { scale: 1 }}
-        transition={{ duration: CYCLE, times: [0, 0.6, 0.72, 0.82, 1], repeat: Infinity, delay: 0.3 }}
+        transition={{ duration: CENTRALIZE_CYCLE, times: [0, 0.6, 0.72, 0.82, 1], repeat: Infinity, delay: 0.3 }}
       >
-        <div className="-translate-x-1/2 -translate-y-1/2 relative">
-          <motion.div
-            className="absolute inset-0 rounded-full bg-ehyo-indigo/30"
-            animate={play ? { scale: [1, 1, 1.9, 1.9], opacity: [0, 0.6, 0, 0] } : { opacity: 0 }}
-            transition={{ duration: CYCLE, times: [0, 0.66, 0.9, 1], repeat: Infinity, delay: 0.3 }}
-          />
-          <div className="relative w-24 h-24 rounded-full bg-white shadow-md ring-4 ring-ehyo-indigo/30 flex items-center justify-center">
-            <EhYoMark className="w-16" />
-          </div>
+        <EhYoMark className="w-28 -translate-x-1/2 -translate-y-1/2" />
+      </motion.div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 2. TIME-SAVING
+// Selecting a word pops up an example sentence, translation and grammar at once.
+// ---------------------------------------------------------------------------
+
+export interface TimeSaveText {
+  example: string;
+  exampleText: string;
+  translate: string;
+  translateText: string;
+  grammar: string;
+  grammarText: string;
+}
+
+const TIME_SENTENCE = ['She', 'decided', 'to', 'pursue', 'her', 'dream.'];
+const TIME_TARGET = 3;
+const TIME_STEPS = [0.8, 0.9, 3.2, 0.5]; // idle, select, show, fade
+
+export const TimeSaveVisual: React.FC<{ text: TimeSaveText }> = ({ text }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(TIME_STEPS, play, reduceMotion, 2);
+  const selected = phase === 1 || phase === 2;
+  const showCards = phase === 2;
+
+  const cards = [
+    { icon: PenLine, title: text.example, body: text.exampleText, color: INDIGO },
+    { icon: Languages, title: text.translate, body: text.translateText, color: CORAL },
+    { icon: BookText, title: text.grammar, body: text.grammarText, color: SAGE },
+  ];
+
+  return (
+    <div ref={ref} className={`${stageClass} px-4 pt-7 pb-5`} aria-hidden="true">
+      <p className="text-center font-serif text-lg md:text-xl text-ehyo-text mb-7">
+        {TIME_SENTENCE.map((w, i) =>
+          i === TIME_TARGET ? (
+            <span key={i} className="relative inline-block mx-1">
+              <motion.span
+                className="absolute -inset-x-1 -inset-y-0.5 rounded bg-ehyo-indigo/20 origin-left"
+                animate={{ scaleX: selected ? 1 : 0 }}
+                transition={{ duration: 0.35 }}
+              />
+              <span className="relative font-semibold">{w}</span>
+              <motion.span
+                className="absolute -right-3 top-4 text-ehyo-text"
+                animate={
+                  selected
+                    ? { opacity: 1, x: 0, y: 0, scale: [1, 0.8, 1] }
+                    : { opacity: 0, x: 24, y: 18, scale: 1 }
+                }
+                transition={{ duration: 0.4 }}
+              >
+                <MousePointer2 size={16} fill="white" />
+              </motion.span>
+            </span>
+          ) : (
+            <span key={i} className="mx-1">{w}</span>
+          ),
+        )}
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 min-h-[6.5rem]">
+        {cards.map((c, i) => {
+          const Icon = c.icon;
+          return (
+            <motion.div
+              key={i}
+              className="bg-white rounded-lg border border-stone-100 shadow-sm p-2.5 origin-top"
+              initial={false}
+              animate={showCards ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -10, scale: 0.9 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <div className="flex items-center gap-1 mb-1 text-[11px] font-bold whitespace-nowrap" style={{ color: c.color }}>
+                <Icon size={12} strokeWidth={2.25} />
+                {c.title}
+              </div>
+              <p className="text-[11px] md:text-xs leading-snug text-stone-600">{c.body}</p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 3. DIFFERENT LEVELS
+// The same word ("decide") at A1 vs B2: sentence building, notes and reading.
+// ---------------------------------------------------------------------------
+
+export interface LevelText {
+  build: string;
+  notes: string;
+  reading: string;
+  notesA1: string;
+  notesB2: string;
+}
+
+const LEVEL_CONTENT = {
+  A1: {
+    tiles: ['I', 'decide', 'to', 'go', 'home.'],
+    reading: "Tom can't decide. Pizza or rice? He decides: pizza!",
+  },
+  B2: {
+    tiles: ['Having', 'weighed', 'the', 'risks,', 'she', 'decided', 'against', 'it.'],
+    reading: 'Regulators have yet to decide whether the merger will be allowed to proceed.',
+  },
+};
+const LEVEL_STEPS = [3.8, 3.8];
+const isTarget = (w: string) => /^decid/i.test(w);
+
+const Highlight: React.FC<{ text: string }> = ({ text }) => (
+  <>
+    {text.split(' ').map((w, i) => (
+      <React.Fragment key={i}>
+        {i > 0 && ' '}
+        {isTarget(w) ? <span className="text-ehyo-coral font-semibold">{w}</span> : w}
+      </React.Fragment>
+    ))}
+  </>
+);
+
+export const LevelVisual: React.FC<{ text: LevelText }> = ({ text }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(LEVEL_STEPS, play, reduceMotion, 0);
+  const level = phase === 0 ? 'A1' : 'B2';
+  const content = LEVEL_CONTENT[level];
+  const swap = {
+    initial: { opacity: 0, y: 6 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -6 },
+    transition: { duration: 0.3 },
+  };
+
+  const rows = [
+    {
+      label: text.build,
+      body: (
+        <div className="flex flex-wrap gap-1">
+          {content.tiles.map((w, i) => (
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.08 }}
+              className={`px-1.5 py-0.5 rounded border text-xs ${
+                isTarget(w) ? 'bg-ehyo-coral/10 border-ehyo-coral/40 text-ehyo-text font-semibold' : 'bg-white border-stone-200 text-stone-600'
+              }`}
+            >
+              {w}
+            </motion.span>
+          ))}
         </div>
+      ),
+    },
+    {
+      label: text.notes,
+      body: (
+        <div className="flex items-start gap-1.5 text-xs text-stone-600 leading-snug">
+          <NotebookPen size={13} className="text-ehyo-indigo mt-0.5 flex-shrink-0" />
+          <span>{level === 'A1' ? text.notesA1 : text.notesB2}</span>
+        </div>
+      ),
+    },
+    {
+      label: text.reading,
+      body: (
+        <p className="text-xs italic text-stone-600 leading-snug">
+          <Highlight text={content.reading} />
+        </p>
+      ),
+    },
+  ];
+
+  return (
+    <div ref={ref} className={`${stageClass} p-4`} aria-hidden="true">
+      {/* A1 / B2 switch */}
+      <div className="flex justify-center mb-4">
+        <div className="relative flex bg-white rounded-full border border-stone-200 p-1 text-sm font-bold">
+          <motion.div
+            className="absolute top-1 bottom-1 w-14 rounded-full bg-ehyo-indigo"
+            animate={{ x: level === 'A1' ? 0 : 56 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+          />
+          {(['A1', 'B2'] as const).map(l => (
+            <span
+              key={l}
+              className={`relative w-14 text-center py-0.5 transition-colors duration-300 ${level === l ? 'text-white' : 'text-stone-400'}`}
+            >
+              {l}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        {rows.map((r, i) => (
+          <div key={i} className="flex flex-col sm:flex-row gap-1 sm:gap-3 items-start bg-white/70 rounded-lg px-3 py-2 border border-stone-100">
+            <span className="sm:w-14 flex-shrink-0 text-[11px] font-bold text-stone-400 pt-0.5">{r.label}</span>
+            <div className="w-full sm:flex-1 min-h-[2.25rem]">
+              <AnimatePresence mode="wait">
+                <motion.div key={level} {...swap}>{r.body}</motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 4. MISTAKE TRACKING
+// Wrong sentences get crossed out, flow into EhYo, and EhYo suggests what to train next.
+// ---------------------------------------------------------------------------
+
+const WEAK_SENTENCES = [
+  { words: ['I', "didn't"], wrong: 'knew', top: 16 },
+  { words: ['She', "didn't"], wrong: 'knows', top: 38 },
+];
+const WEAK_STEPS = [0.5, 1.2, 1.4, 1.1, 2.8, 0.4]; // idle, s1, s2, absorb, bubble, reset
+const LOGO_TOP = 80;
+
+export const WeaknessVisual: React.FC<{ bubble: string }> = ({ bubble }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(WEAK_STEPS, play, reduceMotion, 2);
+
+  return (
+    <div ref={ref} className={`${stageClass} h-60`} aria-hidden="true">
+      {WEAK_SENTENCES.map((s, i) => {
+        const shown = phase >= i + 1 && phase <= 2;
+        const absorbed = phase >= 3;
+        return (
+          <motion.div
+            key={i}
+            className="absolute left-1/2 z-10"
+            initial={false}
+            animate={
+              absorbed
+                ? { top: `${LOGO_TOP}%`, opacity: 0, scale: 0.2 }
+                : { top: `${s.top}%`, opacity: shown ? 1 : 0, scale: shown ? 1 : 0.9 }
+            }
+            transition={{ duration: absorbed ? 0.8 : 0.35, ease: 'easeInOut', delay: absorbed ? i * 0.1 : 0 }}
+          >
+            <div className="-translate-x-1/2 flex items-center gap-2 whitespace-nowrap bg-white rounded-lg px-3 py-1.5 shadow-sm border border-stone-100 font-serif text-base text-ehyo-text">
+              <span>{s.words.join(' ')}</span>
+              <span className="relative">
+                <motion.span
+                  initial={false}
+                  animate={{ color: shown ? RED : '#2D2A26' }}
+                  transition={{ delay: shown ? 0.45 : 0 }}
+                >
+                  {s.wrong}
+                </motion.span>
+                <motion.span
+                  className="absolute left-0 right-0 top-1/2 h-0.5 bg-[#E5484D] origin-left"
+                  initial={false}
+                  animate={{ scaleX: shown ? 1 : 0 }}
+                  transition={{ delay: shown ? 0.45 : 0, duration: 0.25 }}
+                />
+              </span>
+              <motion.span
+                initial={false}
+                animate={{ scale: shown ? 1 : 0 }}
+                transition={{ delay: shown ? 0.6 : 0, type: 'spring', stiffness: 500, damping: 18 }}
+              >
+                <XCircle size={18} color={RED} />
+              </motion.span>
+            </div>
+          </motion.div>
+        );
+      })}
+
+      {/* EhYo's suggestion */}
+      <motion.div
+        className="absolute left-1/2 top-[30%] z-20 w-[85%] max-w-xs"
+        initial={false}
+        animate={phase === 4 ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: 10 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        style={{ x: '-50%', transformOrigin: '50% 100%' }}
+      >
+        <div className="relative bg-ehyo-indigo text-white text-sm font-medium text-center rounded-2xl px-4 py-2.5 shadow-md">
+          {bubble}
+          <span className="absolute left-1/2 -bottom-1.5 w-3 h-3 -translate-x-1/2 rotate-45 bg-ehyo-indigo" />
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="absolute left-1/2 z-20"
+        style={{ top: `${LOGO_TOP}%` }}
+        animate={{ scale: phase === 3 ? [1, 1, 1.15, 1] : 1 }}
+        transition={{ duration: 1, times: [0, 0.5, 0.75, 1] }}
+      >
+        <EhYoMark className="w-24 -translate-x-1/2 -translate-y-1/2" />
+      </motion.div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// BRAIN MAP (shared by 5 & 6)
+// A side-view brain split into skill regions; each fills according to its level.
+// ---------------------------------------------------------------------------
+
+export interface BrainLabels {
+  listening: string;
+  speaking: string;
+  reading: string;
+  writing: string;
+  vocab: string;
+  grammar: string;
+  weak: string;
+}
+
+type Skill = 'speaking' | 'writing' | 'reading' | 'grammar' | 'vocab' | 'listening';
+type Levels = Record<Skill, number>;
+
+const BRAIN_OUTLINE =
+  'M40 95 C20 90 15 60 35 45 C40 25 70 12 95 18 C115 8 150 12 162 32 C185 40 190 70 178 88 C182 105 165 118 148 112 C140 125 118 128 108 116 C95 124 75 122 68 110 C55 115 42 108 40 95 Z';
+
+const BRAIN_REGIONS: { skill: Skill; points: string; label: [number, number] }[] = [
+  { skill: 'speaking', points: '0,0 75,0 65,70 0,110', label: [42, 68] },
+  { skill: 'writing', points: '75,0 125,0 112,55 65,70', label: [95, 40] },
+  { skill: 'reading', points: '125,0 200,0 200,62 112,55', label: [150, 40] },
+  { skill: 'grammar', points: '0,110 65,70 102,82 96,150 0,150', label: [72, 98] },
+  { skill: 'vocab', points: '65,70 112,55 200,62 200,86 102,82', label: [140, 73] },
+  { skill: 'listening', points: '102,82 200,86 200,150 96,150', label: [130, 102] },
+];
+
+// Brain folds, drawn over the regions for texture
+const BRAIN_FOLDS = [
+  'M48 60 C58 52 62 40 74 36',
+  'M100 26 C108 34 104 44 116 48',
+  'M138 22 C142 32 156 36 160 48',
+  'M150 60 C160 64 170 60 176 70',
+  'M60 88 C70 84 80 90 90 86',
+  'M118 92 C128 96 140 90 150 96',
+];
+
+export const BrainMap: React.FC<{
+  levels: Levels;
+  color: string;
+  labels: BrainLabels;
+  weak: Skill;
+  filled: boolean;
+}> = ({ levels, color, labels, weak, filled }) => (
+  <svg viewBox="10 4 186 132" className="w-full max-w-sm mx-auto block">
+    <defs>
+      <clipPath id="brain-clip">
+        <path d={BRAIN_OUTLINE} />
+      </clipPath>
+    </defs>
+
+    {/* Cerebellum and stem */}
+    <path d="M128 112 L134 132 L144 132 L142 112 Z" fill="#E7E5E4" />
+    <ellipse cx="158" cy="116" rx="17" ry="10" fill="#E7E5E4" />
+
+    <path d={BRAIN_OUTLINE} fill="white" />
+    <g clipPath="url(#brain-clip)">
+      {BRAIN_REGIONS.map((r, i) => (
+        <motion.polygon
+          key={r.skill}
+          points={r.points}
+          stroke="white"
+          strokeWidth={2}
+          initial={false}
+          animate={{
+            fill: color,
+            fillOpacity: filled ? 0.12 + levels[r.skill] * 0.78 : 0.06,
+          }}
+          transition={{ duration: 0.7, delay: filled ? i * 0.12 : 0 }}
+        />
+      ))}
+      {BRAIN_FOLDS.map((d, i) => (
+        <path key={i} d={d} fill="none" stroke="white" strokeOpacity={0.6} strokeWidth={1.5} strokeLinecap="round" />
+      ))}
+      {/* Weakest skill: pulsing red outline */}
+      <motion.polygon
+        points={BRAIN_REGIONS.find(x => x.skill === weak)!.points}
+        fill="none"
+        stroke={RED}
+        strokeWidth={2.5}
+        strokeDasharray="5 3"
+        initial={false}
+        animate={filled ? { opacity: [0, 1, 0.35, 1] } : { opacity: 0 }}
+        transition={filled ? { delay: 1.2, duration: 1.6, repeat: Infinity, repeatType: 'reverse' } : { duration: 0.2 }}
+      />
+    </g>
+    <path d={BRAIN_OUTLINE} fill="none" stroke="#D6D3D1" strokeWidth={1.5} />
+
+    {BRAIN_REGIONS.map(r => {
+      const isWeak = r.skill === weak;
+      return (
+        <g key={r.skill} fontFamily="Inter, sans-serif" textAnchor="middle">
+          <text x={r.label[0]} y={r.label[1]} fontSize={8.5} fontWeight={700} fill="#2D2A26">
+            {labels[r.skill]}
+          </text>
+          <motion.text
+            x={r.label[0]}
+            y={r.label[1] + 9}
+            fontSize={7}
+            fill={isWeak ? RED : '#57534E'}
+            initial={false}
+            animate={{ opacity: filled ? 1 : 0 }}
+            transition={{ delay: filled ? 0.8 : 0 }}
+          >
+            {Math.round(levels[r.skill] * 100)}%
+          </motion.text>
+        </g>
+      );
+    })}
+
+    {/* "Needs work" tag on the weakest skill */}
+    {(() => {
+      const r = BRAIN_REGIONS.find(x => x.skill === weak)!;
+      return (
+        <motion.g
+          initial={false}
+          animate={filled ? { opacity: [0, 1, 0.55, 1] } : { opacity: 0 }}
+          transition={filled ? { delay: 1.2, duration: 1.6, repeat: Infinity, repeatType: 'reverse' } : { duration: 0.2 }}
+        >
+          <rect x={r.label[0] - 20} y={r.label[1] - 26} width={40} height={12} rx={6} fill={RED} />
+          <text x={r.label[0]} y={r.label[1] - 17.5} fontSize={7} fontWeight={700} fill="white" textAnchor="middle" fontFamily="Inter, sans-serif">
+            {labels.weak}
+          </text>
+        </motion.g>
+      );
+    })()}
+  </svg>
+);
+
+// ---------------------------------------------------------------------------
+// 5. PERSONALIZED TRACKING
+// ---------------------------------------------------------------------------
+
+const TRACK_LEVELS: Levels = { listening: 0.8, speaking: 0.3, reading: 0.9, writing: 0.55, vocab: 0.75, grammar: 0.6 };
+const TRACK_STEPS = [0.6, 6];
+
+export const TrackingVisual: React.FC<{ labels: BrainLabels }> = ({ labels }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(TRACK_STEPS, play, reduceMotion, 1);
+
+  return (
+    <div ref={ref} className={`${stageClass} px-4 py-5`} aria-hidden="true">
+      <BrainMap levels={TRACK_LEVELS} color={INDIGO} labels={labels} weak="speaking" filled={phase === 1} />
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 6. SEPARATE LANGUAGES
+// Switching language swaps in that language's own brain map.
+// ---------------------------------------------------------------------------
+
+const LANG_TRACKS: { name: string; color: string; weak: Skill; levels: Levels }[] = [
+  { name: 'English', color: INDIGO, weak: 'speaking', levels: TRACK_LEVELS },
+  { name: '日本語', color: CORAL, weak: 'writing', levels: { listening: 0.7, speaking: 0.5, reading: 0.45, writing: 0.2, vocab: 0.6, grammar: 0.4 } },
+  { name: 'Español', color: SAGE, weak: 'grammar', levels: { listening: 0.4, speaking: 0.55, reading: 0.65, writing: 0.5, vocab: 0.7, grammar: 0.25 } },
+];
+const LANG_STEPS = [3.2, 3.2, 3.2];
+
+export const MultiLangVisual: React.FC<{ labels: BrainLabels }> = ({ labels }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(LANG_STEPS, play, reduceMotion, 0);
+  const track = LANG_TRACKS[phase];
+
+  return (
+    <div ref={ref} className={`${stageClass} px-4 pt-4 pb-5`} aria-hidden="true">
+      <div className="flex justify-center gap-1.5 mb-3">
+        {LANG_TRACKS.map((l, i) => (
+          <span
+            key={l.name}
+            className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold whitespace-nowrap border transition-colors duration-300"
+            style={
+              i === phase
+                ? { background: l.color, borderColor: l.color, color: 'white' }
+                : { background: 'white', borderColor: '#E7E5E4', color: '#A8A29E' }
+            }
+          >
+            {l.name}
+          </span>
+        ))}
+      </div>
+      <BrainMap levels={track.levels} color={track.color} labels={labels} weak={track.weak} filled />
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// 7. CROSS-DEVICE SYNC
+// Save a word while reading on the computer; it lands on the phone as a flashcard.
+// ---------------------------------------------------------------------------
+
+export interface SyncText {
+  saved: string;
+  meaning: string;
+  laptop: string;
+  phone: string;
+}
+
+const SYNC_WORD = 'ephemeral';
+const SYNC_STEPS = [0.6, 1.3, 1.0, 1.4, 2.2, 0.4]; // idle, save, fly, card front, card back, reset
+
+export const SyncVisual: React.FC<{ text: SyncText }> = ({ text }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(SYNC_STEPS, play, reduceMotion, 4);
+  const saved = phase >= 1 && phase <= 4;
+  const flying = phase === 2;
+  const onPhone = phase === 3 || phase === 4;
+
+  return (
+    <div ref={ref} className={`${stageClass} h-60 px-4 pt-6`} aria-hidden="true">
+      <div className="flex items-end justify-between gap-3 h-40">
+        {/* Laptop */}
+        <div className="flex-1 min-w-0 max-w-[65%] flex flex-col items-center">
+          <div className="w-full h-32 rounded-t-lg overflow-hidden border-[5px] border-b-0 border-stone-700 bg-white px-3 py-2.5 flex flex-col gap-1.5">
+            <div className="h-1.5 w-3/4 rounded bg-stone-200" />
+            <div className="h-1.5 w-full rounded bg-stone-200" />
+            <p className="text-[11px] md:text-xs text-stone-600 leading-snug">
+              Cherry blossoms are{' '}
+              <span className="relative inline-block">
+                <motion.span
+                  className="absolute -inset-x-0.5 inset-y-0 rounded bg-ehyo-coral/25 origin-left"
+                  initial={false}
+                  animate={{ scaleX: saved ? 1 : 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative font-semibold text-ehyo-text">{SYNC_WORD}</span>
+              </span>
+              .
+            </p>
+            <div className="h-1.5 w-5/6 rounded bg-stone-200" />
+            <motion.div
+              className="self-end flex items-center gap-1 text-[10px] font-bold text-ehyo-indigo"
+              initial={false}
+              animate={{ opacity: saved ? 1 : 0, y: saved ? 0 : 4 }}
+              transition={{ delay: saved ? 0.35 : 0 }}
+            >
+              <Bookmark size={11} fill="currentColor" />
+              {text.saved}
+            </motion.div>
+          </div>
+          <div className="w-[108%] h-2.5 rounded-b-lg bg-stone-300" />
+        </div>
+
+        {/* Phone */}
+        <div className="w-[4.75rem] flex-shrink-0 h-36 rounded-2xl border-[5px] border-stone-700 bg-white flex items-center justify-center p-1.5 [perspective:400px]">
+          <AnimatePresence mode="wait">
+            {onPhone && (
+              <motion.div
+                key={phase === 3 ? 'front' : 'back'}
+                className={`w-full h-20 rounded-lg flex flex-col items-center justify-center text-center shadow-sm border ${
+                  phase === 3 ? 'bg-ehyo-indigo/10 border-ehyo-indigo/30' : 'bg-ehyo-sage/15 border-ehyo-sage/40'
+                }`}
+                initial={{ rotateY: -90, opacity: 0.6 }}
+                animate={{ rotateY: 0, opacity: 1 }}
+                exit={{ rotateY: 90, opacity: 0.6 }}
+                transition={{ duration: 0.25 }}
+              >
+                {phase === 3 ? (
+                  <span className="text-[11px] font-bold text-ehyo-text">{SYNC_WORD}</span>
+                ) : (
+                  <>
+                    <span className="text-[11px] font-bold text-ehyo-text leading-tight px-0.5">{text.meaning}</span>
+                    <CheckCircle2 size={14} className="text-ehyo-sage mt-1" />
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <div className="flex justify-between gap-3 mt-3 text-[11px] text-stone-500">
+        <span className="flex-1 max-w-[65%] text-center">{text.laptop}</span>
+        <span className="w-[4.75rem] flex-shrink-0 text-center">{text.phone}</span>
+      </div>
+
+      {/* The saved word travelling to the phone */}
+      <motion.div
+        className="absolute z-20"
+        initial={false}
+        animate={
+          flying
+            ? { left: ['38%', '62%', '84%'], top: ['40%', '12%', '42%'], opacity: [0, 1, 0], scale: [0.9, 1, 0.8] }
+            : { left: '38%', top: '40%', opacity: 0, scale: 0.9 }
+        }
+        transition={flying ? { duration: 1, ease: 'easeInOut' } : { duration: 0 }}
+      >
+        <span className="-translate-x-1/2 -translate-y-1/2 inline-block bg-ehyo-coral text-white text-[11px] font-bold rounded-full px-2.5 py-1 shadow-md">
+          {SYNC_WORD}
+        </span>
       </motion.div>
     </div>
   );

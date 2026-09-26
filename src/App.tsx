@@ -8,7 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { CentralizeVisual } from './components/SolutionVisuals';
+import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, TrackingVisual, MultiLangVisual, SyncVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
@@ -94,6 +94,13 @@ const translations = {
       s6_d: "Keep your languages separate and clutter-free. Confidently learn a new language while maintaining your progress in existing ones.",
       s7_t: "Cross-Device Sync",
       s7_d: "Read and save new words on your computer or tablet, then pick up practice on your phone — anytime, anywhere.",
+    },
+    vis: {
+      time: { example: "Example", exampleText: "He pursued a career in music.", translate: "Translation", translateText: "追求；致力於", grammar: "Grammar", grammarText: "pursue + noun (transitive)" },
+      level: { build: "Build", notes: "Notes", reading: "Reading", notesA1: "decide = to make a choice", notesB2: "decide on / against · syn. resolve, determine" },
+      weak: "Next up: let's strengthen your verb forms!",
+      brain: { listening: "Listening", speaking: "Speaking", reading: "Reading", writing: "Writing", vocab: "Vocab", grammar: "Grammar", weak: "Needs work" },
+      sync: { saved: "Saved", meaning: "short-lived", laptop: "Computer: read & save", phone: "Phone: review" },
     },
     phil: {
       title: "Spending a lot of time on language?",
@@ -260,6 +267,13 @@ const translations = {
       s6_d: "各語言紀錄獨立不互相干擾，讓你安心同時學習新語言、維持舊語言的進度。",
       s7_t: "跨裝置同步",
       s7_d: "你可以在電腦、平板上進行閱讀、記錄下字詞，再到手機上進行練習！",
+    },
+    vis: {
+      time: { example: "造句", exampleText: "He pursued a career in music.", translate: "翻譯", translateText: "追求；致力於", grammar: "文法", grammarText: "pursue + 名詞（及物動詞）" },
+      level: { build: "拼句", notes: "筆記", reading: "閱讀素材", notesA1: "decide ＝ 決定", notesB2: "decide on / against ＝ 選定／決定不⋯；近義：resolve, determine" },
+      weak: "接下來幫你加強動詞變化！",
+      brain: { listening: "聽", speaking: "說", reading: "讀", writing: "寫", vocab: "單字", grammar: "文法", weak: "需要加強" },
+      sync: { saved: "已儲存", meaning: "短暫的", laptop: "電腦：閱讀、存單字", phone: "手機：複習" },
     },
     phil: {
       title: "花很多時間在語言上？",
@@ -559,12 +573,12 @@ const App: React.FC = () => {
 
               <div className="flex flex-col gap-6 md:flex-1">
                 <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual />} />
-                <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} />
-                <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} />
-                <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} />
-                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} />
-                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
-                <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} />
+                <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
+                <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
+                <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
+                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} visual={<TrackingVisual labels={t.vis.brain} />} />
+                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} visual={<MultiLangVisual labels={t.vis.brain} />} />
+                <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
               </div>
             </div>
           </div>
