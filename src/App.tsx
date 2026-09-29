@@ -8,7 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, TrackingVisual, MultiLangVisual, SyncVisual } from './components/SolutionVisuals';
+import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
@@ -576,8 +576,8 @@ const App: React.FC = () => {
                 <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
                 <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
                 <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
-                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} visual={<TrackingVisual labels={t.vis.brain} />} />
-                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} visual={<MultiLangVisual labels={t.vis.brain} />} />
+                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} />
+                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
                 <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
               </div>
             </div>
