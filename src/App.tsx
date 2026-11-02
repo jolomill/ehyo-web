@@ -213,8 +213,9 @@ const translations = {
       p1: "EhYo combines your weak spots, level and interests to plan learning content just for you — from notes on your error patterns and personal podcasts to targeted reading and sentence practice.",
       p2: "No more wondering what to study next. Open EhYo and your learning path is ready.",
       path: {
-        weak: ["Verb forms", "Prepositions", "Articles", "Tenses"],
+        weak: ["Verb forms", "Pronunciation", "Linking ideas", "Prepositions", "Fluency", "Word repetition"],
         generating: "EhYo is building your path",
+        levelUp: "Level Up!",
         steps: ["Notes", "Podcast", "Reading", "Writing"],
       },
     },
@@ -387,8 +388,9 @@ const translations = {
       p1: "EhYo 結合你的弱點、程度與興趣，為你安排專屬的學習內容：從整理錯誤模式的筆記、個人化 Podcast，到針對性的閱讀與造句練習。",
       p2: "不必再煩惱下一步該學什麼。打開 EhYo，屬於你的學習路徑已經準備好了。",
       path: {
-        weak: ["動詞變化", "介係詞", "冠詞", "時態"],
+        weak: ["動詞變化", "發音", "句子連貫", "介係詞", "口說流暢度", "用字重複"],
         generating: "EhYo 正在為你安排學習路徑",
+        levelUp: "Level Up!",
         steps: ["筆記", "Podcast", "閱讀", "造句"],
       },
     },

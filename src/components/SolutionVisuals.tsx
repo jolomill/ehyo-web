@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, Flag, X,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, X, ChevronsUp,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -764,6 +764,7 @@ export interface LearningPathText {
   weak: string[];
   generating: string;
   steps: string[];
+  levelUp: string;
 }
 
 // The two blues of the EhYo logo's open-book arcs
@@ -773,17 +774,23 @@ const LOGO_BLUE = '#5258FA';
 // Positions in % of the stage, which is ASPECT times as tall as it is wide; the road
 // is drawn in a 100 x (100 * ASPECT) viewBox.
 const ASPECT = 1.1;
-const PATH_HUB = { x: 50, y: 30 };
+// EhYo sits mid-stage while it takes in the weak spots, then moves up to head the route.
+const HUB_START = { x: 50, y: 32 };
+const HUB_TOP = { x: 50, y: 9 };
 const PATH_NODES = [
-  { x: 22, y: 47, icon: NotebookPen, color: INDIGO },
-  { x: 78, y: 58, icon: Headphones, color: CORAL },
-  { x: 22, y: 70, icon: BookOpen, color: SAGE },
-  { x: 78, y: 81, icon: PenLine, color: INDIGO },
+  { x: 22, y: 29, icon: NotebookPen, color: INDIGO },
+  { x: 78, y: 43, icon: Headphones, color: CORAL },
+  { x: 22, y: 57, icon: BookOpen, color: SAGE },
+  { x: 78, y: 71, icon: PenLine, color: INDIGO },
 ];
-const PATH_FLAG = { x: 50, y: 93 };
-const PATH_WEAK = [{ x: 15, y: 23 }, { x: 31, y: 6 }, { x: 69, y: 6 }, { x: 85, y: 23 }];
+const PATH_GOAL = { x: 50, y: 87 };
+// Six weak spots spread evenly on an arc around EhYo
+const PATH_WEAK = [
+  { x: 14, y: 32 }, { x: 20, y: 17 }, { x: 34, y: 5 },
+  { x: 66, y: 5 }, { x: 80, y: 17 }, { x: 86, y: 32 },
+];
 
-const ROUTE = [PATH_HUB, ...PATH_NODES, PATH_FLAG];
+const ROUTE = [HUB_TOP, ...PATH_NODES, PATH_GOAL];
 const ROAD = ROUTE.map((p, i) => {
   const y = p.y * ASPECT;
   if (i === 0) return `M${p.x},${y}`;
@@ -793,22 +800,25 @@ const ROAD = ROUTE.map((p, i) => {
   return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
 }).join(' ');
 
-// idle, weak spots, absorb, building the path, road + stops appear, marker travels, hold, fade
-const PATH_STEPS = [0.4, 1.6, 0.8, 1.8, 2.2, 3.2, 1.6, 0.5];
+// idle, weak spots, absorb, building the path, road + stops appear, marker travels, level up, fade
+const PATH_STEPS = [0.4, 1.8, 0.8, 1.8, 2.2, 3.2, 2.2, 0.5];
 const TRAVEL = 3.0;
+const BURST = [0, 60, 120, 180, 240, 300];
 
 export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
   const { ref, play, reduceMotion } = usePlay();
   const phase = usePhase(PATH_STEPS, play, reduceMotion, 6);
   const showWeak = phase === 1;
   const absorbed = phase >= 2 && phase <= 6;
-  const building = phase === 2 || phase === 3;
+  const hubUp = phase >= 3 && phase <= 6;
+  const building = phase === 3;
   const showRoad = phase >= 4 && phase <= 6;
   const traveling = phase === 5;
   const done = phase === 6;
   // Seconds until the marker reaches stop i (it passes ROUTE points at even intervals);
   // -1 means not reached yet. With reduced motion the visual rests in the finished state.
   const ticked = (i: number) => (done ? 0 : traveling ? ((i + 1) * TRAVEL) / (ROUTE.length - 1) : -1);
+  const hub = hubUp ? HUB_TOP : HUB_START;
 
   return (
     <div
@@ -816,7 +826,6 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
       className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-4 py-5 md:px-7 md:py-7"
       aria-hidden="true"
     >
-
       <div className="relative w-full" style={{ aspectRatio: `1 / ${ASPECT}` }}>
         {/* Road */}
         <svg viewBox={`0 0 100 ${100 * ASPECT}`} className="absolute inset-0 w-full h-full overflow-visible" fill="none">
@@ -857,17 +866,17 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
               initial={false}
               animate={
                 absorbed
-                  ? { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, scale: 0.2, opacity: 0 }
+                  ? { left: `${HUB_START.x}%`, top: `${HUB_START.y}%`, scale: 0.2, opacity: 0 }
                   : { left: `${p.x}%`, top: `${p.y}%`, scale: showWeak ? 1 : 0.6, opacity: showWeak ? 1 : 0 }
               }
-              transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.08 : showWeak ? i * 0.18 : 0, ease: 'easeInOut' }}
+              transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.06 : showWeak ? i * 0.15 : 0, ease: 'easeInOut' }}
             >
               <div className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#E5484D]/15 border border-[#E5484D]/35 pl-0.5 pr-2.5 py-0.5">
                 <motion.span
                   className="w-5 h-5 rounded-full bg-[#E5484D] flex items-center justify-center flex-shrink-0"
                   initial={false}
                   animate={{ scale: showWeak ? 1 : 0, rotate: showWeak ? 0 : -90 }}
-                  transition={{ delay: showWeak ? 0.2 + i * 0.18 : 0, type: 'spring', stiffness: 500, damping: 15 }}
+                  transition={{ delay: showWeak ? 0.2 + i * 0.15 : 0, type: 'spring', stiffness: 500, damping: 15 }}
                 >
                   <X size={12} strokeWidth={3.5} className="text-white" />
                 </motion.span>
@@ -877,8 +886,13 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
           );
         })}
 
-        {/* EhYo hub */}
-        <div className="absolute z-20" style={{ left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%` }}>
+        {/* EhYo hub: takes in the weak spots, then moves up to head the route */}
+        <motion.div
+          className="absolute z-20"
+          initial={false}
+          animate={{ left: `${hub.x}%`, top: `${hub.y}%` }}
+          transition={{ duration: 0.7, ease: 'easeInOut' }}
+        >
           <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
             <motion.div
               className="absolute w-28 h-28 rounded-full bg-[#5258FA]/20 blur-2xl"
@@ -894,36 +908,35 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
             >
               <EhYoMark className="w-24 md:w-28" textFill="#FFFFFF" />
             </motion.div>
-          </div>
-        </div>
 
-        {/* "EhYo is building your path" loading state */}
-        <motion.div
-          className="absolute z-20 left-1/2"
-          style={{ top: `${PATH_HUB.y + 12}%` }}
-          initial={false}
-          animate={{ opacity: building ? 1 : 0, y: building ? 0 : 6 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="-translate-x-1/2 flex items-center gap-2 whitespace-nowrap text-sm font-semibold" style={{ color: LOGO_LIGHT }}>
-            <motion.span
-              animate={building ? { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
-              transition={{ duration: 0.8, repeat: building ? Infinity : 0 }}
+            {/* "EhYo is building your path" loading state */}
+            <motion.div
+              className="absolute top-full mt-3 left-1/2"
+              initial={false}
+              animate={{ opacity: building ? 1 : 0, y: building ? 0 : 6 }}
+              transition={{ duration: 0.3, delay: building ? 0.5 : 0 }}
             >
-              <Sparkles size={16} />
-            </motion.span>
-            {text.generating}
-            <span className="flex gap-0.5">
-              {[0, 1, 2].map(d => (
+              <div className="-translate-x-1/2 flex items-center gap-2 whitespace-nowrap text-sm font-semibold" style={{ color: LOGO_LIGHT }}>
                 <motion.span
-                  key={d}
-                  className="w-1 h-1 rounded-full"
-                  style={{ background: LOGO_LIGHT }}
-                  animate={building ? { opacity: [0.2, 1, 0.2] } : { opacity: 0.2 }}
-                  transition={{ duration: 0.9, repeat: building ? Infinity : 0, delay: d * 0.15 }}
-                />
-              ))}
-            </span>
+                  animate={building ? { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
+                  transition={{ duration: 0.8, repeat: building ? Infinity : 0 }}
+                >
+                  <Sparkles size={16} />
+                </motion.span>
+                {text.generating}
+                <span className="flex gap-0.5">
+                  {[0, 1, 2].map(d => (
+                    <motion.span
+                      key={d}
+                      className="w-1 h-1 rounded-full"
+                      style={{ background: LOGO_LIGHT }}
+                      animate={building ? { opacity: [0.2, 1, 0.2] } : { opacity: 0.2 }}
+                      transition={{ duration: 0.9, repeat: building ? Infinity : 0, delay: d * 0.15 }}
+                    />
+                  ))}
+                </span>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
 
@@ -967,22 +980,71 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
           );
         })}
 
-        {/* Finish */}
+        {/* Goal: level up */}
         <motion.div
           className="absolute z-10"
-          style={{ left: `${PATH_FLAG.x}%`, top: `${PATH_FLAG.y}%` }}
+          style={{ left: `${PATH_GOAL.x}%`, top: `${PATH_GOAL.y}%` }}
           initial={false}
           animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
           transition={{ delay: showRoad && phase === 4 ? 1.8 : 0, duration: 0.35 }}
         >
-          <motion.div
-            className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#5258FA]/20 border border-[#AEB3F4]/60 flex items-center justify-center"
-            initial={false}
-            animate={done ? { scale: [1, 1.25, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
-            transition={{ duration: 0.7 }}
-          >
-            <Flag size={20} style={{ color: LOGO_LIGHT }} />
-          </motion.div>
+          <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
+            {/* expanding ring */}
+            <motion.div
+              className="absolute w-12 h-12 rounded-full border-2"
+              style={{ borderColor: LOGO_LIGHT }}
+              initial={false}
+              animate={done ? { scale: [1, 2.2], opacity: [0.8, 0] } : { scale: 1, opacity: 0 }}
+              transition={done ? { duration: 0.9, delay: 0.15 } : { duration: 0 }}
+            />
+            {/* little stars bursting out */}
+            {BURST.map(deg => {
+              const r = (deg * Math.PI) / 180;
+              return (
+                <motion.span
+                  key={deg}
+                  className="absolute w-1.5 h-1.5 rounded-full"
+                  style={{ background: deg % 120 === 0 ? LOGO_LIGHT : CORAL }}
+                  initial={false}
+                  animate={
+                    done
+                      ? { x: [0, Math.cos(r) * 40], y: [0, Math.sin(r) * 40], opacity: [1, 0], scale: [1, 0.4] }
+                      : { x: 0, y: 0, opacity: 0, scale: 1 }
+                  }
+                  transition={done ? { duration: 0.8, delay: 0.2, ease: 'easeOut' } : { duration: 0 }}
+                />
+              );
+            })}
+            <motion.div
+              className="relative w-12 h-12 rounded-full flex items-center justify-center border"
+              initial={false}
+              animate={
+                done
+                  ? { scale: [1, 1.3, 1], backgroundColor: LOGO_BLUE, borderColor: LOGO_LIGHT }
+                  : { scale: 1, backgroundColor: '#3A3632', borderColor: 'rgba(255,255,255,0.12)' }
+              }
+              transition={{ duration: 0.6 }}
+            >
+              <motion.span
+                initial={false}
+                animate={done ? { y: [4, -3, 0] } : { y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <ChevronsUp size={24} strokeWidth={2.5} style={{ color: done ? '#FFFFFF' : LOGO_LIGHT }} />
+              </motion.span>
+            </motion.div>
+            {/* "Level Up!" label */}
+            <motion.div
+              className="absolute top-full mt-1.5 left-1/2"
+              initial={false}
+              animate={done ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -6, scale: 0.8 }}
+              transition={{ delay: done ? 0.3 : 0, type: 'spring', stiffness: 400, damping: 14 }}
+            >
+              <span className="-translate-x-1/2 inline-block whitespace-nowrap text-sm font-extrabold tracking-wide" style={{ color: LOGO_LIGHT }}>
+                {text.levelUp}
+              </span>
+            </motion.div>
+          </div>
         </motion.div>
 
         {/* Marker travelling the route */}
@@ -996,7 +1058,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
                   top: ROUTE.map(p => `${p.y}%`),
                   opacity: [0, 1, 1, 1, 1, 0],
                 }
-              : { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, opacity: 0 }
+              : { left: `${HUB_TOP.x}%`, top: `${HUB_TOP.y}%`, opacity: 0 }
           }
           transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
         >
