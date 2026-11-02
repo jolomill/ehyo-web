@@ -8,7 +8,7 @@ import { HeroScene } from './components/QuantumScene';
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual } from './components/SolutionVisuals';
+import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
 import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
@@ -209,15 +209,21 @@ const translations = {
     },
     engine: {
       tag: "CORE CONCEPT",
-      title: "Progress Visualization",
-      p1: "Intuitively track your brain's growth — see signs of progress every single day. Visualized data makes improvement impossible to miss.",
-      p2: "Perfect for busy professionals, travel enthusiasts, or anyone who wants to stay linguistically sharp without drowning in textbooks.",
-      nodes: [
-        { label: "Literal", text: "Direct meaning" },
-        { label: "Media", text: "Used in Money Heist S3" },
-        { label: "Slang", text: "Colloquial usage in Madrid" },
-        { label: "Music", text: "Lyrics in Bad Bunny song" }
-      ]
+      title: "Your Personal Learning Path",
+      p1: "EhYo combines your weak spots, level and interests to plan learning content just for you — from notes on your error patterns and personal podcasts to targeted reading and sentence practice.",
+      p2: "No more wondering what to study next. Open EhYo and your learning path is ready.",
+      path: {
+        weakTitle: "Your weak spots",
+        weak: ["Verb conjugation", "Prepositions"],
+        generating: "EhYo is building your learning path",
+        tag: "built from your weak spots",
+        steps: [
+          { t: "Error-pattern notes", d: "Your most frequent verb-form mistakes, organized" },
+          { t: "Personal Podcast", d: "Two hosts tell a story that explains why you slip up" },
+          { t: "Targeted reading", d: "A short read at your level, full of the past tense" },
+          { t: "Sentence practice", d: "Use the verbs you just learned, with instant feedback" },
+        ],
+      },
     },
     cta: {
       title: "Sounds great?",
@@ -384,15 +390,21 @@ const translations = {
     },
     engine: {
       tag: "核心概念",
-      title: "進度視覺化",
-      p1: "直觀追蹤你的大腦成長，看見每一天的進步跡象。透過視覺化數據，讓進步不再不可見。",
-      p2: "適合忙碌的上班族、熱愛旅遊的玩家，或是任何想保持語言敏銳度、不想被厚重課本淹沒的學習者。",
-      nodes: [
-        { label: "字面義", text: "直接翻譯" },
-        { label: "媒體", text: "出自《紙房子》第三季" },
-        { label: "俚語", text: "馬德里口語用法" },
-        { label: "音樂", text: "Bad Bunny 歌詞" }
-      ]
+      title: "個人化學習路徑",
+      p1: "EhYo 結合你的弱點、程度與興趣，為你安排專屬的學習內容：從整理錯誤模式的筆記、個人化 Podcast，到針對性的閱讀與造句練習。",
+      p2: "不必再煩惱下一步該學什麼。打開 EhYo，屬於你的學習路徑已經準備好了。",
+      path: {
+        weakTitle: "你的弱點",
+        weak: ["動詞變化", "介係詞"],
+        generating: "EhYo 正在為你安排學習路徑",
+        tag: "依你的弱點生成",
+        steps: [
+          { t: "錯誤模式筆記", d: "整理你最常犯的動詞變化錯誤" },
+          { t: "個人化 Podcast", d: "用兩位主持人的故事，解釋你為什麼會錯" },
+          { t: "針對性閱讀", d: "程度剛好、充滿過去式的短文" },
+          { t: "造句練習", d: "用剛學到的動詞造句，立即批改" },
+        ],
+      },
     },
     cta: {
       title: "聽起來很讚？",
@@ -576,7 +588,11 @@ const App: React.FC = () => {
                 <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
                 <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
                 <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
-                <SolutionCard title={t.prob.s5_t} description={t.prob.s5_d} />
+                <SolutionCard
+                  title={t.prob.s5_t}
+                  description={t.prob.s5_d}
+                  visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="w-full rounded-xl" />}
+                />
                 <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
                 <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
               </div>
@@ -584,7 +600,7 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Culture Engine Section */}
+        {/* Core Concept: Personal Learning Path */}
         <section className="py-24 bg-ehyo-text text-white overflow-hidden relative">
           <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
             <div className="w-[500px] h-[500px] rounded-full bg-ehyo-indigo blur-[120px] absolute top-[-100px] left-[-100px]"></div>
@@ -606,14 +622,7 @@ const App: React.FC = () => {
                 </p>
               </div>
               <div className="flex justify-center">
-                <video
-                  src="/brainxp.mp4"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full max-w-md rounded-2xl shadow-2xl"
-                />
+                <LearningPathVisual text={t.engine.path} />
               </div>
             </div>
           </div>

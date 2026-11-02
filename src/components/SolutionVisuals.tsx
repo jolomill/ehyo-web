@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -750,6 +750,116 @@ export const SyncVisual: React.FC<{ text: SyncText }> = ({ text }) => {
           {SYNC_WORD}
         </span>
       </motion.div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// CORE CONCEPT: PERSONAL LEARNING PATH (dark section)
+// Weak spots go in, EhYo lays out a path of content built for them, step by step.
+// ---------------------------------------------------------------------------
+
+export interface LearningPathText {
+  weakTitle: string;
+  weak: string[];
+  generating: string;
+  tag: string;
+  steps: { t: string; d: string }[];
+}
+
+const PATH_ICONS = [NotebookPen, Headphones, BookOpen, PenLine];
+const PATH_COLORS = [INDIGO, CORAL, SAGE, INDIGO];
+// idle, weak spots, generating, path appears, steps get done, hold, fade
+const PATH_STEPS = [0.5, 1.0, 1.1, 2.4, 2.6, 1.6, 0.5];
+
+export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
+  const { ref, play, reduceMotion } = usePlay();
+  const phase = usePhase(PATH_STEPS, play, reduceMotion, 5);
+  const showWeak = phase >= 1 && phase <= 5;
+  const generating = phase >= 2 && phase <= 5;
+  const showPath = phase >= 3 && phase <= 5;
+  const done = phase >= 4 && phase <= 5;
+
+  return (
+    <div
+      ref={ref}
+      className="w-full max-w-md rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm p-5 md:p-6 text-left"
+      aria-hidden="true"
+    >
+      {/* Weak spots */}
+      <div className="text-[11px] font-bold tracking-widest uppercase text-stone-400 mb-2">{text.weakTitle}</div>
+      <div className="flex flex-wrap gap-2 min-h-[1.75rem]">
+        {text.weak.map((w, i) => (
+          <motion.span
+            key={w}
+            className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#E5484D]/15 text-[#FF8A8E] border border-[#E5484D]/30"
+            initial={false}
+            animate={showWeak ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 6, scale: 0.9 }}
+            transition={{ delay: showWeak ? i * 0.15 : 0, duration: 0.3 }}
+          >
+            {w}
+          </motion.span>
+        ))}
+      </div>
+
+      {/* EhYo builds the path */}
+      <motion.div
+        className="flex items-center gap-2 my-4 text-sm font-semibold text-ehyo-coral"
+        initial={false}
+        animate={{ opacity: generating ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.span
+          animate={generating && !showPath ? { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
+          transition={{ duration: 0.8, repeat: generating && !showPath ? Infinity : 0 }}
+        >
+          <Sparkles size={16} />
+        </motion.span>
+        {text.generating}
+      </motion.div>
+
+      {/* The path */}
+      <div className="relative">
+        <motion.div
+          className="absolute left-[17px] top-4 bottom-4 w-0.5 bg-white/15 origin-top"
+          initial={false}
+          animate={{ scaleY: showPath ? 1 : 0 }}
+          transition={{ duration: showPath ? 1.6 : 0.2, ease: 'easeInOut' }}
+        />
+        <div className="flex flex-col gap-3">
+          {text.steps.map((st, i) => {
+            const Icon = PATH_ICONS[i];
+            return (
+              <motion.div
+                key={i}
+                className="relative flex items-start gap-3"
+                initial={false}
+                animate={showPath ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+                transition={{ delay: showPath ? i * 0.4 : 0, duration: 0.35 }}
+              >
+                <div className="relative z-10 w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center bg-ehyo-text border-2" style={{ borderColor: PATH_COLORS[i] }}>
+                  <Icon size={16} style={{ color: PATH_COLORS[i] }} />
+                  <motion.div
+                    className="absolute -right-1 -bottom-1 w-4 h-4 rounded-full bg-ehyo-sage flex items-center justify-center"
+                    initial={false}
+                    animate={{ scale: done ? 1 : 0 }}
+                    transition={{ delay: done ? i * 0.55 : 0, type: 'spring', stiffness: 500, damping: 18 }}
+                  >
+                    <Check size={10} strokeWidth={3} className="text-white" />
+                  </motion.div>
+                </div>
+                <div className="flex-1 min-w-0 rounded-xl bg-white/[0.05] border border-white/10 px-3 py-2">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <span className="text-sm font-bold text-white">{st.t}</span>
+                    <span className="text-[10px] text-stone-400">· {text.tag}</span>
+                  </div>
+                  <p className="text-xs text-stone-300 leading-snug mt-0.5">{st.d}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
