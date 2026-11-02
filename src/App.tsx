@@ -579,7 +579,7 @@ const App: React.FC = () => {
                 <SolutionCard
                   title={t.prob.s5_t}
                   description={t.prob.s5_d}
-                  visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="w-full rounded-xl" />}
+                  visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[260px] mx-auto rounded-xl" />}
                 />
                 <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
                 <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
