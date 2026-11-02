@@ -10,21 +10,12 @@ import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
-import { ArrowRight, Menu, X, BookOpen, Globe, Heart, Sprout, Mail, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
+import { StudyLoopDiagram, type StudyMode } from './components/StudyModes';
+import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, Target, Sparkles, Map as MapIcon } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
   <div className="flex items-center cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
     <EhYoMark className="h-11 w-auto" />
-  </div>
-);
-
-const FeatureCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
-  <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md hover:border-ehyo-indigo/20 transition-all duration-300">
-    <div className="w-12 h-12 bg-ehyo-bg rounded-xl flex items-center justify-center mb-6 text-ehyo-indigo">
-      <Icon size={24} strokeWidth={1.5} />
-    </div>
-    <h3 className="font-serif text-xl font-bold mb-3 text-ehyo-text">{title}</h3>
-    <p className="text-stone-500 leading-relaxed">{description}</p>
   </div>
 );
 
@@ -120,6 +111,37 @@ const translations = {
       c4_t: "Real-World Practice",
       c4_d: "Join EhYo events like postcard exchanges — connect with native speakers and put your language to real use."
     },
+    study: {
+      tag: "How to learn with EhYo",
+      title: "Every way you learn counts",
+      sub: "Learn from the things you love, or let EhYo lead the way. Mistakes from both are remembered, so every next step fits you better.",
+      tabs: { toolkit: "Self-Study Toolkit", path: "Personal Learning Path" },
+      taglines: { toolkit: "Learn from what you already enjoy", path: "Never wonder what to study next" },
+      loop: {
+        toolkitEyebrow: "Your material",
+        pathEyebrow: "Planned for you",
+        toolkit: "Self-Study Toolkit",
+        path: "Personal Learning Path",
+        center: "Your error patterns",
+        mistakes: "Every mistake is remembered",
+        next: "and turned into a better next step",
+        soon: "Coming soon",
+      },
+      toolkit: {
+        title: "What you love is the best textbook",
+        desc: "Books, articles, videos and lyrics all become study material. Tap anything you don't get and it makes sense; what you learn is organized for you, and the mistakes you make along the way are remembered.",
+      },
+      path: {
+        title: "Every step aimed at your weak spots",
+        desc: "EhYo plans what to read, hear and practice next, based on your level, your interests and your error patterns.",
+        benefits: [
+          { t: "Practice where you slip up", d: "Exercises deliberately include the mistakes you make most, so practice pays off fast.", soon: false },
+          { t: "Understand why you make mistakes", d: "Personal podcasts explain your habits through a story, so you can avoid them next time.", soon: false },
+          { t: "Learn something new every time", d: "Alongside your weak spots, you meet new grammar too, so you never go in circles.", soon: false },
+          { t: "Open the app and know what's next", d: "Your learning path puts everything in order. Just follow along.", soon: true },
+        ],
+      },
+    },
     showcase: {
       tabs: {
         reading: "Reading",
@@ -131,21 +153,20 @@ const translations = {
         slides: [
           {
             image: "/reading.png",
-            title: "Your personal reading library",
+            title: "Turn the books you love into lessons",
             bullets: [
-              "See your weekly reading time at a glance.",
-              "Spot the difference between today and yesterday in seconds.",
-              "Get reading material matched to your level.",
-              "Add EPUB books, articles, song lyrics — anything you want to read."
+              "Read whatever you like: ebooks, articles, song lyrics.",
+              "See how much you read each day and watch the progress add up.",
+              "Get reading picks at just the right level: not too hard, not too easy."
             ]
           },
           {
             image: "/reading2-eng.png",
-            title: "Tap any line for grammar, words, and sentence practice",
+            title: "Stuck? One tap and it clicks",
             bullets: [
-              "Each sentence broken down by structure.",
-              "Plain-language explanations of how words are actually used.",
-              "Write your own sentence and get feedback on the spot."
+              "Long sentences broken down so the structure is obvious.",
+              "Words explained in plain language, so you know how people really use them.",
+              "Use it in a sentence right away and get feedback, so it sticks."
             ]
           }
         ]
@@ -154,11 +175,11 @@ const translations = {
         slides: [
           {
             image: "/voc-eng.png",
-            title: "A research-backed mix of practice modes",
+            title: "Words that stay with you",
             bullets: [
-              "Cloze, sentence-making, flashcards, dictation — every angle covered.",
-              "Every result is recorded, so EhYo keeps adapting to you.",
-              "More practice modes coming soon."
+              "Flashcards, sentence-making and dictation take you from recognizing a word to using it.",
+              "The more you practice, the better EhYo knows what you need.",
+              "More ways to practice are on the way."
             ]
           }
         ]
@@ -167,21 +188,21 @@ const translations = {
         slides: [
           {
             image: "/writing_eg.png",
-            title: "Guided writing, made for you",
+            title: "Write it to own it",
             bullets: [
-              "Prompts shaped by your level, interests, and recent vocabulary.",
-              "Words you've been struggling with show up right under the prompt.",
-              "Grammar slips you tend to repeat get flagged as you write.",
-              "Get suggestions on grammar and phrasing — and write more fluently every time."
+              "Prompts fit your level and interests, so you're never stuck for words.",
+              "The words you need to practice are right there, so writing doubles as review.",
+              "A heads-up on your usual mistakes before you start helps you break old habits.",
+              "Grammar and natural phrasing improve together, so you sound more like a native speaker."
             ]
           },
           {
             image: "/writing2-diary.png",
-            title: "Free writing, your way",
+            title: "Write about anything you like",
             bullets: [
-              "Write a short story, a single line, or a journal entry — no rules.",
-              "Pull from your saved words to keep practice grounded.",
-              "Send it off for feedback whenever you're ready."
+              "A short story, one line or a journal entry: no pressure.",
+              "Use the words you've saved, so practice means something.",
+              "Get feedback the moment you're done."
             ]
           }
         ]
@@ -190,19 +211,19 @@ const translations = {
         slides: [
           {
             image: "/listening-eng.png",
-            title: "Video practice, shaped around you",
+            title: "Watch what you already enjoy",
             bullets: [
-              "Clips native speakers actually watch — recommended based on what you're into.",
-              "Add or remove interests anytime."
+              "Videos native speakers actually watch, picked for your interests.",
+              "When your interests change, so do the picks."
             ]
           },
           {
             image: "/shadowing.png",
-            title: "The most effective way to practice speaking",
+            title: "Speak along and hear yourself improve",
             bullets: [
-              "Shadowing mode highlights each line as it plays.",
-              "Record yourself and compare side by side.",
-              "Loop a tricky line, or play it back against the original."
+              "Shadow line by line and pick up a native speaker's rhythm.",
+              "Record yourself next to the original and hear exactly what's different.",
+              "Replay any line until it flows."
             ]
           }
         ]
@@ -295,6 +316,37 @@ const translations = {
       c4_t: "社交輸出",
       c4_d: "明信片交換等社交功能，讓你跟世界各地的母語者互動，把學到的語言真正用出來。"
     },
+    study: {
+      tag: "如何用 EhYo 自學",
+      title: "怎麼學，都不白費",
+      sub: "用你喜歡的素材自學，或跟著 EhYo 的安排走。兩邊犯過的錯都會被記住，讓接下來的每一步更適合你。",
+      tabs: { toolkit: "自學工具組", path: "個人化學習路徑" },
+      taglines: { toolkit: "用你本來就想看的東西學", path: "不用想下一步該學什麼" },
+      loop: {
+        toolkitEyebrow: "你的素材",
+        pathEyebrow: "為你安排",
+        toolkit: "自學工具組",
+        path: "個人化學習路徑",
+        center: "你的錯誤模式",
+        mistakes: "犯過的錯，EhYo 都記得",
+        next: "換來更適合你的下一步",
+        soon: "即將推出",
+      },
+      toolkit: {
+        title: "喜歡的內容，就是最好的教材",
+        desc: "書、文章、影片、歌詞都能拿來學。看不懂的地方點一下就懂，學到的東西自動整理好，練習時犯的錯也會幫你記下來。",
+      },
+      path: {
+        title: "每一步，都對準你的弱點",
+        desc: "EhYo 依你的程度、興趣和錯誤模式，替你安排要讀、要聽、要練的內容。",
+        benefits: [
+          { t: "專挑你常錯的地方練", d: "練習會刻意放進你最常犯的錯，練一次就有感。", soon: false },
+          { t: "知道自己為什麼會錯", d: "個人化 Podcast 用故事解釋你的錯誤習慣，下次就避得開。", soon: false },
+          { t: "每次都學到新東西", d: "複習弱點的同時，也帶你認識新的文法，不會在原地打轉。", soon: false },
+          { t: "打開就知道今天學什麼", d: "學習路徑把內容排好順序，跟著走就好。", soon: true },
+        ],
+      },
+    },
     showcase: {
       tabs: {
         reading: "閱讀",
@@ -306,21 +358,20 @@ const translations = {
         slides: [
           {
             image: "/reading.png",
-            title: "你的個人閱讀庫",
+            title: "把喜歡的書變成教材",
             bullets: [
-              "一眼掌握本週閱讀時間。",
-              "一目瞭然今天和昨天的閱讀時間差異。",
-              "依照你的程度，提供最合適的閱讀素材。",
-              "新增 epub 書籍、文章、歌詞或其他內容。"
+              "電子書、文章、歌詞，想讀什麼就讀什麼。",
+              "每天讀了多少一看就知道，進步看得見。",
+              "推薦程度剛好的讀物，不會太難也不會太簡單。"
             ]
           },
           {
             image: "/reading2-zh.png",
-            title: "點一下，掌握文法、單字以及造句",
+            title: "看不懂？點一下就懂",
             bullets: [
-              "文法斷句解析結構。",
-              "白話解釋詞彙用法，讓你知道在生活如何使用。",
-              "同步練習造句，得到回饋！"
+              "長句子拆開來看，結構一眼就清楚。",
+              "用白話解釋單字，知道生活中怎麼用。",
+              "馬上造句並得到回饋，學到的當場就會用。"
             ]
           }
         ]
@@ -329,11 +380,11 @@ const translations = {
         slides: [
           {
             image: "/voc-zh.png",
-            title: "科學化的多元練習",
+            title: "單字不再背了就忘",
             bullets: [
-              "綜合練習、造句、閃卡、聽寫，補齊所有漏洞。",
-              "所有的練習結果都會被記錄，讓 EhYo 更加個人化。",
-              "即將推出更多練習！"
+              "閃卡、造句、聽寫輪流練，從認得到會用。",
+              "練得越多，EhYo 越知道你需要什麼。",
+              "更多練習方式陸續加入。"
             ]
           }
         ]
@@ -342,21 +393,21 @@ const translations = {
         slides: [
           {
             image: "/writing-zh.png",
-            title: "個人化的引導寫作練習",
+            title: "寫出來，才是真的會",
             bullets: [
-              "根據你的程度、興趣與近期單字，產生量身訂做的題目。",
-              "下方展示最近格外需要練習的單字。",
-              "寫作時會提示最近常錯的文法。",
-              "給予文法與自然表達的建議，幫你越寫越順。"
+              "題目配合你的程度和興趣，寫起來不卡。",
+              "該練的單字就在眼前，寫作的同時順便複習。",
+              "下筆前先提醒你常犯的錯，避開老毛病。",
+              "文法和自然說法一起改，越寫越像母語者。"
             ]
           },
           {
             image: "/writing2-diary.png",
-            title: "自由書寫，想寫什麼就寫什麼",
+            title: "想寫什麼就寫什麼",
             bullets: [
-              "寫個小故事、一句話、或是當作日記，沒有任何限制。",
-              "從你收藏的單字中挑選使用，讓練習更有意義。",
-              "寫完隨時送出，馬上得到回饋。"
+              "小故事、一句話、日記都可以，沒有壓力。",
+              "用上自己收藏的單字，練習更有意義。",
+              "寫完馬上得到回饋。"
             ]
           }
         ]
@@ -365,20 +416,20 @@ const translations = {
         slides: [
           {
             image: "/listening-zh.png",
-            title: "屬於你的影片練習",
+            title: "看你本來就想看的影片",
             bullets: [
-              "依據你感興趣的主題，推薦母語者會看的影片。",
-              "隨時可以新增或減少興趣。",
+              "依你的興趣，推薦母語者真正在看的影片。",
+              "興趣變了，推薦也跟著變。",
 
             ]
           },
           {
             image: "/shadowing.png",
-            title: "最有效的口說練習方式",
+            title: "跟著說，口說進步聽得見",
             bullets: [
-              "跟讀模式逐句標示。",
-              "錄下自己的聲音比對。",
-              "單句循環播放和單句比對原音。"
+              "逐句跟讀，跟上母語者的節奏。",
+              "錄下自己的聲音和原音比對，聽得出差在哪。",
+              "任何一句都能重複播放，練到順為止。"
             ]
           }
         ]
@@ -426,6 +477,7 @@ const App: React.FC = () => {
   const [page, setPage] = useState<Page>('home');
   type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
   const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
+  const [studyMode, setStudyMode] = useState<StudyMode>('toolkit');
   const [imageIdx, setImageIdx] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
 
@@ -624,159 +676,172 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* How to study with EhYo: toolkit vs personal learning path, sharing one mistake loop */}
         <section id="features" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 max-w-2xl mx-auto">
-              <h2 className="font-serif text-4xl mb-4">{t.feat.title}</h2>
-              <p className="text-stone-500">{t.feat.sub}</p>
+            <div className="text-center mb-12 max-w-2xl mx-auto">
+              <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.study.tag}</div>
+              <h2 className="font-serif text-4xl mb-4">{t.study.title}</h2>
+              <p className="text-stone-500 leading-relaxed">{t.study.sub}</p>
             </div>
 
-            <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-4">
-              <div className="flex-1">
-                <FeatureCard
-                  icon={Globe}
-                  title={t.feat.c1_t}
-                  description={t.feat.c1_d}
-                />
-              </div>
-              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
-                <ArrowRight size={28} />
-              </div>
-              <div className="flex-1">
-                <FeatureCard
-                  icon={Heart}
-                  title={t.feat.c2_t}
-                  description={t.feat.c2_d}
-                />
-              </div>
-              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
-                <ArrowRight size={28} />
-              </div>
-              <div className="flex-1">
-                <FeatureCard
-                  icon={BookOpen}
-                  title={t.feat.c3_t}
-                  description={t.feat.c3_d}
-                />
-              </div>
-              <div className="flex items-center justify-center text-ehyo-indigo/40 rotate-90 lg:rotate-0">
-                <ArrowRight size={28} />
-              </div>
-              <div className="flex-1">
-                <FeatureCard
-                  icon={Mail}
-                  title={t.feat.c4_t}
-                  description={t.feat.c4_d}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Feature Showcase (continues Effortless Maintenance section) */}
-        <section className="pt-4 pb-24 bg-[#FBFAF6]">
-          <div className="container mx-auto px-6">
-            {/* Tab Pills */}
-            <div className="flex flex-wrap justify-center gap-3 mb-16">
-              {featureTabs.map(({ id, icon: Icon }) => {
-                const active = activeFeature === id;
+            {/* Mode tabs */}
+            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mb-12 p-1.5 rounded-2xl bg-stone-100">
+              {(['toolkit', 'path'] as const).map((m) => {
+                const active = studyMode === m;
                 return (
                   <button
-                    key={id}
-                    onClick={() => { setActiveFeature(id); setImageIdx(0); }}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
-                      ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
-                      : 'bg-white text-stone-500 hover:bg-stone-100'
-                      }`}
+                    key={m}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setStudyMode(m)}
+                    className={`rounded-xl px-3 py-3 text-center transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}
                   >
-                    <Icon size={16} strokeWidth={2} />
-                    {t.showcase.tabs[id]}
+                    <span className={`block font-serif text-base md:text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{t.study.tabs[m]}</span>
+                    <span className="block text-xs text-stone-500 mt-0.5">{t.study.taglines[m]}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Tab Content */}
-            {(() => {
-              const feat = t.showcase[activeFeature];
-              const slides = feat.slides;
-              const slide = slides[imageIdx];
-              const hasMany = slides.length > 1;
-              const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
-              const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
-              const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
-              const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
-              return (
-                <div className="max-w-5xl mx-auto">
-                  <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
-                    {/* Left arrow */}
-                    <button
-                      onClick={prev}
-                      aria-label="Previous"
-                      disabled={!hasMany}
-                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                        }`}
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
+            <StudyLoopDiagram active={studyMode} text={t.study.loop} onSelect={setStudyMode} />
 
-                    {/* Image + Description */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                      <div className="flex justify-center overflow-hidden">
-                        <img
-                          key={slide.image}
-                          src={slide.image}
-                          alt={slide.title}
-                          className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
-                        />
-                      </div>
-                      <div key={slide.title} className={animClass}>
-                        <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
-                          {slide.title}
-                        </h3>
-                        <ul className="space-y-3">
-                          {slide.bullets.map((b, i) => (
-                            <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
-                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
-                                <Check size={12} strokeWidth={3} />
-                              </span>
-                              <span>{b}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Right arrow */}
-                    <button
-                      onClick={next}
-                      aria-label="Next"
-                      disabled={!hasMany}
-                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                        }`}
-                    >
-                      <ChevronRight size={20} />
-                    </button>
+            <div className="mt-20">
+              {studyMode === 'toolkit' ? (
+                <div key="toolkit" className="animate-fade-in-up">
+                  <div className="text-center max-w-2xl mx-auto mb-10">
+                    <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.toolkit.title}</h3>
+                    <p className="text-stone-500 leading-relaxed">{t.study.toolkit.desc}</p>
                   </div>
-
-                  {/* Dot indicator */}
-                  {hasMany && (
-                    <div className="flex justify-center gap-1.5 mt-10">
-                      {slides.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => goTo(i)}
-                          aria-label={`Go to slide ${i + 1}`}
-                          className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
-                            }`}
-                        />
-                      ))}
-                    </div>
-                  )}
+                {/* Tab Pills */}
+                <div className="flex flex-wrap justify-center gap-3 mb-16">
+                  {featureTabs.map(({ id, icon: Icon }) => {
+                    const active = activeFeature === id;
+                    return (
+                      <button
+                        key={id}
+                        onClick={() => { setActiveFeature(id); setImageIdx(0); }}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
+                          ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
+                          : 'bg-white text-stone-500 hover:bg-stone-100'
+                          }`}
+                      >
+                        <Icon size={16} strokeWidth={2} />
+                        {t.showcase.tabs[id]}
+                      </button>
+                    );
+                  })}
                 </div>
-              );
-            })()}
+
+                {/* Tab Content */}
+                {(() => {
+                  const feat = t.showcase[activeFeature];
+                  const slides = feat.slides;
+                  const slide = slides[imageIdx];
+                  const hasMany = slides.length > 1;
+                  const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
+                  const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
+                  const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
+                  const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+                  return (
+                    <div className="max-w-5xl mx-auto">
+                      <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
+                        {/* Left arrow */}
+                        <button
+                          onClick={prev}
+                          aria-label="Previous"
+                          disabled={!hasMany}
+                          className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                            }`}
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+
+                        {/* Image + Description */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                          <div className="flex justify-center overflow-hidden">
+                            <img
+                              key={slide.image}
+                              src={slide.image}
+                              alt={slide.title}
+                              className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
+                            />
+                          </div>
+                          <div key={slide.title} className={animClass}>
+                            <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
+                              {slide.title}
+                            </h3>
+                            <ul className="space-y-3">
+                              {slide.bullets.map((b, i) => (
+                                <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
+                                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
+                                    <Check size={12} strokeWidth={3} />
+                                  </span>
+                                  <span>{b}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* Right arrow */}
+                        <button
+                          onClick={next}
+                          aria-label="Next"
+                          disabled={!hasMany}
+                          className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                            }`}
+                        >
+                          <ChevronRight size={20} />
+                        </button>
+                      </div>
+
+                      {/* Dot indicator */}
+                      {hasMany && (
+                        <div className="flex justify-center gap-1.5 mt-10">
+                          {slides.map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => goTo(i)}
+                              aria-label={`Go to slide ${i + 1}`}
+                              className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
+                                }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+                </div>
+              ) : (
+                <div key="path" className="animate-fade-in-up">
+                  <div className="text-center max-w-2xl mx-auto mb-10">
+                    <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.path.title}</h3>
+                    <p className="text-stone-500 leading-relaxed">{t.study.path.desc}</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+                    {t.study.path.benefits.map((bf, i) => {
+                      const Icon = [Target, Headphones, Sparkles, MapIcon][i];
+                      return (
+                        <div key={i} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm">
+                          <div className="flex items-center justify-between mb-5">
+                            <div className="w-11 h-11 bg-ehyo-bg rounded-xl flex items-center justify-center text-ehyo-indigo">
+                              <Icon size={22} strokeWidth={1.5} />
+                            </div>
+                            {bf.soon && (
+                              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#D9577A]">{t.study.loop.soon}</span>
+                            )}
+                          </div>
+                          <h4 className="font-serif text-lg font-bold mb-2 text-ehyo-text">{bf.t}</h4>
+                          <p className="text-stone-500 text-sm leading-relaxed">{bf.d}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
