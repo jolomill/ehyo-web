@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, X, ChevronsUp,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, X, Brain,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -800,9 +800,9 @@ const ROAD = ROUTE.map((p, i) => {
   return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
 }).join(' ');
 
-// idle, weak spots, absorb, building the path, road + stops appear, marker travels, level up, fade
-const PATH_STEPS = [0.4, 1.8, 0.8, 1.8, 2.2, 3.2, 2.2, 0.5];
-const TRAVEL = 3.0;
+// idle, weak spots, absorb, building the path, road + stops appear, stops ticked off, level up, fade
+const PATH_STEPS = [0.4, 1.8, 0.8, 1.8, 2.2, 1.7, 2.2, 0.5];
+const TICK_GAP = 0.35;
 const BURST = [0, 60, 120, 180, 240, 300];
 
 export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
@@ -813,11 +813,11 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
   const hubUp = phase >= 3 && phase <= 6;
   const building = phase === 3;
   const showRoad = phase >= 4 && phase <= 6;
-  const traveling = phase === 5;
+  const ticking = phase === 5;
   const done = phase === 6;
-  // Seconds until the marker reaches stop i (it passes ROUTE points at even intervals);
-  // -1 means not reached yet. With reduced motion the visual rests in the finished state.
-  const ticked = (i: number) => (done ? 0 : traveling ? ((i + 1) * TRAVEL) / (ROUTE.length - 1) : -1);
+  // Seconds until stop i is ticked off; -1 means not yet. With reduced motion the
+  // visual rests in the finished state.
+  const ticked = (i: number) => (done ? 0 : ticking ? 0.2 + i * TICK_GAP : -1);
   const hub = hubUp ? HUB_TOP : HUB_START;
 
   return (
@@ -1030,7 +1030,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
                 animate={done ? { y: [4, -3, 0] } : { y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <ChevronsUp size={24} strokeWidth={2.5} style={{ color: done ? '#FFFFFF' : LOGO_LIGHT }} />
+                <Brain size={24} strokeWidth={2} style={{ color: done ? '#FFFFFF' : LOGO_LIGHT }} />
               </motion.span>
             </motion.div>
             {/* "Level Up!" label */}
@@ -1047,23 +1047,6 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
           </div>
         </motion.div>
 
-        {/* Marker travelling the route */}
-        <motion.div
-          className="absolute z-30"
-          initial={false}
-          animate={
-            traveling
-              ? {
-                  left: ROUTE.map(p => `${p.x}%`),
-                  top: ROUTE.map(p => `${p.y}%`),
-                  opacity: [0, 1, 1, 1, 1, 0],
-                }
-              : { left: `${HUB_TOP.x}%`, top: `${HUB_TOP.y}%`, opacity: 0 }
-          }
-          transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
-        >
-          <div className="-translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white ring-4 ring-[#5258FA]/40" />
-        </motion.div>
       </div>
     </div>
   );
