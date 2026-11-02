@@ -214,6 +214,7 @@ const translations = {
       p2: "No more wondering what to study next. Open EhYo and your learning path is ready.",
       path: {
         weak: ["Verb forms", "Prepositions", "Articles", "Tenses"],
+        generating: "EhYo is building your path",
         steps: ["Notes", "Podcast", "Reading", "Writing"],
       },
     },
@@ -387,6 +388,7 @@ const translations = {
       p2: "不必再煩惱下一步該學什麼。打開 EhYo，屬於你的學習路徑已經準備好了。",
       path: {
         weak: ["動詞變化", "介係詞", "冠詞", "時態"],
+        generating: "EhYo 正在為你安排學習路徑",
         steps: ["筆記", "Podcast", "閱讀", "造句"],
       },
     },

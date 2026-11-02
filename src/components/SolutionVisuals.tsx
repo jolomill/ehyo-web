@@ -762,19 +762,24 @@ export const SyncVisual: React.FC<{ text: SyncText }> = ({ text }) => {
 
 export interface LearningPathText {
   weak: string[];
+  generating: string;
   steps: string[];
 }
+
+// The two blues of the EhYo logo's open-book arcs
+const LOGO_LIGHT = '#AEB3F4';
+const LOGO_BLUE = '#5258FA';
 
 // Positions in % of a 4:5 stage; the road is drawn in a 100 x 125 viewBox.
 const PATH_HUB = { x: 50, y: 34 };
 const PATH_NODES = [
-  { x: 22, y: 51, icon: NotebookPen, color: INDIGO },
-  { x: 78, y: 61, icon: Headphones, color: CORAL },
-  { x: 22, y: 72, icon: BookOpen, color: SAGE },
-  { x: 78, y: 82, icon: PenLine, color: INDIGO },
+  { x: 22, y: 51, icon: NotebookPen },
+  { x: 78, y: 61, icon: Headphones },
+  { x: 22, y: 72, icon: BookOpen },
+  { x: 78, y: 82, icon: PenLine },
 ];
 const PATH_FLAG = { x: 50, y: 92 };
-const PATH_WEAK = [{ x: 27, y: 4 }, { x: 73, y: 4 }, { x: 27, y: 14 }, { x: 73, y: 14 }];
+const PATH_WEAK = [{ x: 15, y: 27 }, { x: 31, y: 10 }, { x: 69, y: 10 }, { x: 85, y: 27 }];
 
 const ROUTE = [PATH_HUB, ...PATH_NODES, PATH_FLAG];
 const ROAD = ROUTE.map((p, i) => {
@@ -786,18 +791,19 @@ const ROAD = ROUTE.map((p, i) => {
   return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
 }).join(' ');
 
-// idle, weak spots, absorb, road + stops appear, marker travels, hold, fade
-const PATH_STEPS = [0.4, 1.8, 0.9, 2.2, 3.2, 1.6, 0.5];
+// idle, weak spots, absorb, building the path, road + stops appear, marker travels, hold, fade
+const PATH_STEPS = [0.4, 1.6, 0.8, 1.8, 2.2, 3.2, 1.6, 0.5];
 const TRAVEL = 3.0;
 
 export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
   const { ref, play, reduceMotion } = usePlay();
-  const phase = usePhase(PATH_STEPS, play, reduceMotion, 5);
+  const phase = usePhase(PATH_STEPS, play, reduceMotion, 6);
   const showWeak = phase === 1;
-  const absorbed = phase >= 2 && phase <= 5;
-  const showRoad = phase >= 3 && phase <= 5;
-  const traveling = phase === 4;
-  const done = phase === 5;
+  const absorbed = phase >= 2 && phase <= 6;
+  const building = phase === 2 || phase === 3;
+  const showRoad = phase >= 4 && phase <= 6;
+  const traveling = phase === 5;
+  const done = phase === 6;
   // Seconds until the marker reaches stop i (it passes ROUTE points at even intervals);
   // -1 means not reached yet. With reduced motion the visual rests in the finished state.
   const ticked = (i: number) => (done ? 0 : traveling ? ((i + 1) * TRAVEL) / (ROUTE.length - 1) : -1);
@@ -814,9 +820,8 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
         <svg viewBox="0 0 100 125" className="absolute inset-0 w-full h-full overflow-visible" fill="none">
           <defs>
             <linearGradient id="path-road" x1="0" y1="0" x2="0" y2="125" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor={INDIGO} />
-              <stop offset="55%" stopColor={CORAL} />
-              <stop offset="100%" stopColor={SAGE} />
+              <stop offset="0%" stopColor={LOGO_LIGHT} />
+              <stop offset="100%" stopColor={LOGO_BLUE} />
             </linearGradient>
           </defs>
           <motion.path
@@ -855,22 +860,17 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
               }
               transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.08 : showWeak ? i * 0.18 : 0, ease: 'easeInOut' }}
             >
-              <motion.div
-                className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#E5484D]/15 border border-[#E5484D]/35 pl-1 pr-3.5 py-1"
-                initial={false}
-                animate={showWeak ? { x: [0, -4, 4, -3, 3, 0] } : { x: 0 }}
-                transition={{ delay: showWeak ? 0.35 + i * 0.18 : 0, duration: 0.45 }}
-              >
+              <div className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#E5484D]/15 border border-[#E5484D]/35 pl-0.5 pr-2.5 py-0.5">
                 <motion.span
-                  className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#E5484D] flex items-center justify-center flex-shrink-0"
+                  className="w-5 h-5 rounded-full bg-[#E5484D] flex items-center justify-center flex-shrink-0"
                   initial={false}
                   animate={{ scale: showWeak ? 1 : 0, rotate: showWeak ? 0 : -90 }}
                   transition={{ delay: showWeak ? 0.2 + i * 0.18 : 0, type: 'spring', stiffness: 500, damping: 15 }}
                 >
-                  <X size={18} strokeWidth={3.5} className="text-white" />
+                  <X size={12} strokeWidth={3.5} className="text-white" />
                 </motion.span>
-                <span className="text-sm md:text-base font-bold text-[#FF9EA1]">{w}</span>
-              </motion.div>
+                <span className="text-xs font-bold text-[#FF9EA1]">{w}</span>
+              </div>
             </motion.div>
           );
         })}
@@ -879,7 +879,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
         <div className="absolute z-20" style={{ left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%` }}>
           <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
             <motion.div
-              className="absolute w-28 h-28 rounded-full bg-ehyo-indigo/20 blur-2xl"
+              className="absolute w-28 h-28 rounded-full bg-[#5258FA]/20 blur-2xl"
               initial={false}
               animate={{ opacity: absorbed ? [0.3, 1, 0.5] : 0.25, scale: absorbed ? [1, 1.3, 1] : 1 }}
               transition={{ duration: 1 }}
@@ -892,16 +892,38 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
             >
               <EhYoMark className="w-24 md:w-28" textFill="#FFFFFF" />
             </motion.div>
-            <motion.div
-              className="absolute -right-3 -top-2 text-ehyo-coral"
-              initial={false}
-              animate={{ opacity: phase === 2 || phase === 3 ? 1 : 0, rotate: phase === 2 || phase === 3 ? [0, 20, -20, 0] : 0 }}
-              transition={{ duration: 0.8, repeat: phase === 2 || phase === 3 ? Infinity : 0 }}
-            >
-              <Sparkles size={18} />
-            </motion.div>
           </div>
         </div>
+
+        {/* "EhYo is building your path" loading state */}
+        <motion.div
+          className="absolute z-20 left-1/2"
+          style={{ top: `${PATH_HUB.y + 12}%` }}
+          initial={false}
+          animate={{ opacity: building ? 1 : 0, y: building ? 0 : 6 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="-translate-x-1/2 flex items-center gap-2 whitespace-nowrap text-sm font-semibold" style={{ color: LOGO_LIGHT }}>
+            <motion.span
+              animate={building ? { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
+              transition={{ duration: 0.8, repeat: building ? Infinity : 0 }}
+            >
+              <Sparkles size={16} />
+            </motion.span>
+            {text.generating}
+            <span className="flex gap-0.5">
+              {[0, 1, 2].map(d => (
+                <motion.span
+                  key={d}
+                  className="w-1 h-1 rounded-full"
+                  style={{ background: LOGO_LIGHT }}
+                  animate={building ? { opacity: [0.2, 1, 0.2] } : { opacity: 0.2 }}
+                  transition={{ duration: 0.9, repeat: building ? Infinity : 0, delay: d * 0.15 }}
+                />
+              ))}
+            </span>
+          </div>
+        </motion.div>
 
         {/* Stops on the route */}
         {PATH_NODES.map((n, i) => {
@@ -914,21 +936,21 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
               style={{ left: `${n.x}%`, top: `${n.y}%` }}
               initial={false}
               animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
-              transition={{ duration: 0.35, delay: showRoad && phase === 3 ? 0.35 + i * 0.35 : 0 }}
+              transition={{ duration: 0.35, delay: showRoad && phase === 4 ? 0.35 + i * 0.35 : 0 }}
             >
               <div className="-translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
                 <motion.div
                   className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center border"
                   initial={false}
                   animate={{
-                    backgroundColor: tick >= 0 ? `${n.color}33` : '#3A3632',
-                    borderColor: tick >= 0 ? `${n.color}99` : 'rgba(255,255,255,0.12)',
+                    backgroundColor: tick >= 0 ? `${LOGO_BLUE}40` : '#3A3632',
+                    borderColor: tick >= 0 ? `${LOGO_LIGHT}cc` : 'rgba(255,255,255,0.12)',
                   }}
                   transition={{ delay: tick > 0 ? tick : 0, duration: 0.3 }}
                 >
-                  <Icon size={24} style={{ color: n.color }} strokeWidth={1.75} />
+                  <Icon size={24} style={{ color: LOGO_LIGHT }} strokeWidth={1.75} />
                   <motion.div
-                    className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-ehyo-sage flex items-center justify-center ring-2 ring-ehyo-text"
+                    className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-[#5258FA] flex items-center justify-center ring-2 ring-ehyo-text"
                     initial={false}
                     animate={{ scale: tick >= 0 ? 1 : 0 }}
                     transition={{ delay: tick > 0 ? tick : 0, type: 'spring', stiffness: 500, damping: 16 }}
@@ -948,15 +970,15 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
           style={{ left: `${PATH_FLAG.x}%`, top: `${PATH_FLAG.y}%` }}
           initial={false}
           animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
-          transition={{ delay: showRoad && phase === 3 ? 1.8 : 0, duration: 0.35 }}
+          transition={{ delay: showRoad && phase === 4 ? 1.8 : 0, duration: 0.35 }}
         >
           <motion.div
-            className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ehyo-coral/15 border border-ehyo-coral/50 flex items-center justify-center"
+            className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#5258FA]/20 border border-[#AEB3F4]/60 flex items-center justify-center"
             initial={false}
             animate={done ? { scale: [1, 1.25, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <Flag size={20} className="text-ehyo-coral" />
+            <Flag size={20} style={{ color: LOGO_LIGHT }} />
           </motion.div>
         </motion.div>
 
@@ -975,7 +997,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
           }
           transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
         >
-          <div className="-translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white ring-4 ring-white/20" />
+          <div className="-translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white ring-4 ring-[#5258FA]/40" />
         </motion.div>
       </div>
     </div>
