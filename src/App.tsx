@@ -210,8 +210,8 @@ const translations = {
     engine: {
       tag: "CORE CONCEPT",
       title: "Your Personal Learning Path",
-      p1: "EhYo combines your weak spots, level and interests to plan learning content just for you — from notes on your error patterns and personal podcasts to targeted reading and sentence practice.",
-      p2: "No more wondering what to study next. Open EhYo and your learning path is ready.",
+      p1: "Built from your weak spots and error patterns, EhYo plans learning content just for you.",
+      p2: "Don't spend time figuring out what to do next. Open EhYo and your learning path is ready.",
       path: {
         weak: ["Verb forms", "Pronunciation", "Linking ideas", "Prepositions", "Fluency", "Word repetition"],
         generating: "EhYo is building your path",
@@ -385,8 +385,8 @@ const translations = {
     engine: {
       tag: "核心概念",
       title: "個人化學習路徑",
-      p1: "EhYo 結合你的弱點、程度與興趣，為你安排專屬的學習內容：從整理錯誤模式的筆記、個人化 Podcast，到針對性的閱讀與造句練習。",
-      p2: "不必再煩惱下一步該學什麼。打開 EhYo，屬於你的學習路徑已經準備好了。",
+      p1: "結合你的弱點、錯誤模式，為你安排專屬的學習內容。",
+      p2: "不用花時間思考下一步，打開 EhYo，屬於你的學習路徑已經準備好了。",
       path: {
         weak: ["動詞變化", "發音", "句子連貫", "介係詞", "口說流暢度", "用字重複"],
         generating: "EhYo 正在為你安排學習路徑",
