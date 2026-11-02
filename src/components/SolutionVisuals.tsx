@@ -790,14 +790,21 @@ const PATH_WEAK = [
   { x: 66, y: 5 }, { x: 80, y: 17 }, { x: 86, y: 32 },
 ];
 
-const ROUTE = [HUB_TOP, ...PATH_NODES, PATH_GOAL];
+// The road starts just under the logo, drops into the first stop from above, then
+// weaves between stops leaving and entering each one from the side, so it never
+// runs under the logo, an icon or a label.
+const ROUTE = [{ x: HUB_TOP.x, y: HUB_TOP.y + 8 }, ...PATH_NODES, PATH_GOAL];
 const ROAD = ROUTE.map((p, i) => {
   const y = p.y * ASPECT;
   if (i === 0) return `M${p.x},${y}`;
   const prev = ROUTE[i - 1];
   const py = prev.y * ASPECT;
-  const mid = (py + y) / 2;
-  return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
+  if (i === 1) {
+    const midY = (py + y) / 2;
+    return `C${prev.x},${midY} ${p.x},${midY} ${p.x},${y}`;
+  }
+  const midX = (prev.x + p.x) / 2;
+  return `C${midX},${py} ${midX},${y} ${p.x},${y}`;
 }).join(' ');
 
 // idle, weak spots, absorb, building the path, road + stops appear, stops ticked off, level up, fade
@@ -954,6 +961,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
               transition={{ duration: 0.35, delay: showRoad && phase === 4 ? 0.35 + i * 0.35 : 0 }}
             >
               <div className="-translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
+                <div className="relative rounded-xl bg-[#3A3632]">
                 <motion.div
                   className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center border"
                   initial={false}
@@ -974,6 +982,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
                     <Check size={12} strokeWidth={3} className="text-white" />
                   </motion.div>
                 </motion.div>
+                </div>
                 <span className="text-xs md:text-sm font-semibold text-stone-300 whitespace-nowrap">{text.steps[i]}</span>
               </div>
             </motion.div>
