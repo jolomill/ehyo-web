@@ -790,21 +790,19 @@ const PATH_WEAK = [
   { x: 66, y: 5 }, { x: 80, y: 17 }, { x: 86, y: 32 },
 ];
 
-// The road starts just under the logo, drops into the first stop from above, then
-// weaves between stops leaving and entering each one from the side, so it never
-// runs under the logo, an icon or a label.
+// The road starts just under the logo and snakes down through every stop as one
+// smooth ribbon: it passes each stop heading straight down and swings across to the
+// other side in between, so its direction never jumps. Stop tiles and their labels
+// sit on top of it.
 const ROUTE = [{ x: HUB_TOP.x, y: HUB_TOP.y + 8 }, ...PATH_NODES, PATH_GOAL];
 const ROAD = ROUTE.map((p, i) => {
   const y = p.y * ASPECT;
   if (i === 0) return `M${p.x},${y}`;
   const prev = ROUTE[i - 1];
   const py = prev.y * ASPECT;
-  if (i === 1) {
-    const midY = (py + y) / 2;
-    return `C${prev.x},${midY} ${p.x},${midY} ${p.x},${y}`;
-  }
-  const midX = (prev.x + p.x) / 2;
-  return `C${midX},${py} ${midX},${y} ${p.x},${y}`;
+  // Long vertical handles make each leg a full, rounded S instead of a near-straight diagonal.
+  const k = 0.9 * (y - py);
+  return `C${prev.x},${py + k} ${p.x},${y - k} ${p.x},${y}`;
 }).join(' ');
 
 // idle, weak spots, absorb, building the path, road + stops appear, stops ticked off, level up, fade
@@ -983,7 +981,7 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
                   </motion.div>
                 </motion.div>
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-stone-300 whitespace-nowrap">{text.steps[i]}</span>
+                <span className="relative rounded-md bg-[#3A3632] px-1.5 py-0.5 text-xs md:text-sm font-semibold text-stone-300 whitespace-nowrap">{text.steps[i]}</span>
               </div>
             </motion.div>
           );
