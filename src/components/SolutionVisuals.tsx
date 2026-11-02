@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, Flag,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, Flag, X,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -766,15 +766,15 @@ export interface LearningPathText {
 }
 
 // Positions in % of a 4:5 stage; the road is drawn in a 100 x 125 viewBox.
-const PATH_HUB = { x: 50, y: 24 };
+const PATH_HUB = { x: 50, y: 34 };
 const PATH_NODES = [
-  { x: 22, y: 44, icon: NotebookPen, color: INDIGO },
-  { x: 78, y: 54, icon: Headphones, color: CORAL },
-  { x: 22, y: 68, icon: BookOpen, color: SAGE },
-  { x: 78, y: 80, icon: PenLine, color: INDIGO },
+  { x: 22, y: 51, icon: NotebookPen, color: INDIGO },
+  { x: 78, y: 61, icon: Headphones, color: CORAL },
+  { x: 22, y: 72, icon: BookOpen, color: SAGE },
+  { x: 78, y: 82, icon: PenLine, color: INDIGO },
 ];
-const PATH_FLAG = { x: 50, y: 93 };
-const PATH_WEAK = [{ x: 30, y: 6 }, { x: 70, y: 6 }];
+const PATH_FLAG = { x: 50, y: 92 };
+const PATH_WEAK = [{ x: 27, y: 4 }, { x: 73, y: 4 }, { x: 27, y: 14 }, { x: 73, y: 14 }];
 
 const ROUTE = [PATH_HUB, ...PATH_NODES, PATH_FLAG];
 const ROAD = ROUTE.map((p, i) => {
@@ -787,7 +787,7 @@ const ROAD = ROUTE.map((p, i) => {
 }).join(' ');
 
 // idle, weak spots, absorb, road + stops appear, marker travels, hold, fade
-const PATH_STEPS = [0.4, 1.1, 0.9, 2.2, 3.2, 1.6, 0.5];
+const PATH_STEPS = [0.4, 1.8, 0.9, 2.2, 3.2, 1.6, 0.5];
 const TRAVEL = 3.0;
 
 export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
@@ -803,160 +803,174 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
   const ticked = (i: number) => (done ? 0 : traveling ? ((i + 1) * TRAVEL) / (ROUTE.length - 1) : -1);
 
   return (
-    <div ref={ref} className="relative w-full max-w-md aspect-[4/5]" aria-hidden="true">
-      {/* Road */}
-      <svg viewBox="0 0 100 125" className="absolute inset-0 w-full h-full overflow-visible" fill="none">
-        <defs>
-          <linearGradient id="path-road" x1="0" y1="0" x2="0" y2="125" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor={INDIGO} />
-            <stop offset="55%" stopColor={CORAL} />
-            <stop offset="100%" stopColor={SAGE} />
-          </linearGradient>
-        </defs>
-        <motion.path
-          d={ROAD}
-          stroke="white"
-          strokeOpacity={0.1}
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          initial={false}
-          animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
-          transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
-        />
-        <motion.path
-          d={ROAD}
-          stroke="url(#path-road)"
-          strokeWidth={0.8}
-          strokeLinecap="round"
-          initial={false}
-          animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
-          transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
-        />
-      </svg>
-
-      {/* Weak spots, which fly into EhYo */}
-      {text.weak.map((w, i) => {
-        const p = PATH_WEAK[i];
-        return (
-          <motion.div
-            key={w}
-            className="absolute z-10"
+    <div ref={ref} className="w-full max-w-lg rounded-3xl bg-white shadow-2xl px-4 pt-4 pb-7 md:px-7 md:pt-7 md:pb-9" aria-hidden="true">
+      <div className="relative w-full aspect-[4/5]">
+        {/* Road */}
+        <svg viewBox="0 0 100 125" className="absolute inset-0 w-full h-full overflow-visible" fill="none">
+          <defs>
+            <linearGradient id="path-road" x1="0" y1="0" x2="0" y2="125" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor={INDIGO} />
+              <stop offset="55%" stopColor={CORAL} />
+              <stop offset="100%" stopColor={SAGE} />
+            </linearGradient>
+          </defs>
+          <motion.path
+            d={ROAD}
+            stroke="#2D2A26"
+            strokeOpacity={0.06}
+            strokeWidth={2.4}
+            strokeLinecap="round"
             initial={false}
-            animate={
-              absorbed
-                ? { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, scale: 0.2, opacity: 0 }
-                : { left: `${p.x}%`, top: `${p.y}%`, scale: showWeak ? 1 : 0.6, opacity: showWeak ? 1 : 0 }
-            }
-            transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.1 : showWeak ? i * 0.2 : 0, ease: 'easeInOut' }}
-          >
-            <div className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#E5484D]/15 border border-[#E5484D]/40 pl-1.5 pr-3 py-1">
-              <XCircle size={16} color={RED} />
-              <span className="text-xs font-bold text-[#FF8A8E]">{w}</span>
-            </div>
-          </motion.div>
-        );
-      })}
-
-      {/* EhYo hub */}
-      <div className="absolute z-20" style={{ left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%` }}>
-        <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
-          <motion.div
-            className="absolute w-28 h-28 rounded-full bg-ehyo-indigo/40 blur-2xl"
-            initial={false}
-            animate={{ opacity: absorbed ? [0.4, 1, 0.6] : 0.35, scale: absorbed ? [1, 1.3, 1] : 1 }}
-            transition={{ duration: 1 }}
+            animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
+            transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
           />
-          <motion.div
-            className="relative"
+          <motion.path
+            d={ROAD}
+            stroke="url(#path-road)"
+            strokeWidth={0.8}
+            strokeLinecap="round"
             initial={false}
-            animate={{ scale: phase === 2 ? [1, 1.15, 1] : 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <EhYoMark className="w-24 md:w-28" textFill="#FFFFFF" />
-          </motion.div>
-          <motion.div
-            className="absolute -right-3 -top-2 text-ehyo-coral"
-            initial={false}
-            animate={{ opacity: phase === 2 || phase === 3 ? 1 : 0, rotate: phase === 2 || phase === 3 ? [0, 20, -20, 0] : 0 }}
-            transition={{ duration: 0.8, repeat: phase === 2 || phase === 3 ? Infinity : 0 }}
-          >
-            <Sparkles size={18} />
-          </motion.div>
-        </div>
-      </div>
+            animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
+            transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
+          />
+        </svg>
 
-      {/* Stops on the route */}
-      {PATH_NODES.map((n, i) => {
-        const Icon = n.icon;
-        const tick = ticked(i);
-        return (
-          <motion.div
-            key={i}
-            className="absolute z-10"
-            style={{ left: `${n.x}%`, top: `${n.y}%` }}
-            initial={false}
-            animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
-            transition={{ duration: 0.35, delay: showRoad && phase === 3 ? 0.35 + i * 0.35 : 0 }}
-          >
-            <div className="-translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
-              <motion.div
-                className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center border-2"
-                style={{ borderColor: n.color }}
-                initial={false}
-                animate={{ backgroundColor: tick >= 0 ? `${n.color}40` : '#2D2A26' }}
-                transition={{ delay: tick > 0 ? tick : 0, duration: 0.3 }}
-              >
-                <Icon size={24} style={{ color: n.color }} strokeWidth={1.75} />
-                <motion.div
-                  className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-ehyo-sage flex items-center justify-center ring-2 ring-ehyo-text"
-                  initial={false}
-                  animate={{ scale: tick >= 0 ? 1 : 0 }}
-                  transition={{ delay: tick > 0 ? tick : 0, type: 'spring', stiffness: 500, damping: 16 }}
-                >
-                  <Check size={12} strokeWidth={3} className="text-white" />
-                </motion.div>
-              </motion.div>
-              <span className="text-[11px] md:text-xs font-semibold text-stone-300 whitespace-nowrap">{text.steps[i]}</span>
-            </div>
-          </motion.div>
-        );
-      })}
-
-      {/* Finish */}
-      <motion.div
-        className="absolute z-10"
-        style={{ left: `${PATH_FLAG.x}%`, top: `${PATH_FLAG.y}%` }}
-        initial={false}
-        animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
-        transition={{ delay: showRoad && phase === 3 ? 1.8 : 0, duration: 0.35 }}
-      >
-        <motion.div
-          className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ehyo-coral/20 border-2 border-ehyo-coral flex items-center justify-center"
-          initial={false}
-          animate={done ? { scale: [1, 1.25, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <Flag size={20} className="text-ehyo-coral" />
-        </motion.div>
-      </motion.div>
-
-      {/* Marker travelling the route */}
-      <motion.div
-        className="absolute z-30"
-        initial={false}
-        animate={
-          traveling
-            ? {
-                left: ROUTE.map(p => `${p.x}%`),
-                top: ROUTE.map(p => `${p.y}%`),
-                opacity: [0, 1, 1, 1, 1, 0],
+        {/* Weak spots, which fly into EhYo */}
+        {text.weak.map((w, i) => {
+          const p = PATH_WEAK[i];
+          return (
+            <motion.div
+              key={w}
+              className="absolute z-10"
+              initial={false}
+              animate={
+                absorbed
+                  ? { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, scale: 0.2, opacity: 0 }
+                  : { left: `${p.x}%`, top: `${p.y}%`, scale: showWeak ? 1 : 0.6, opacity: showWeak ? 1 : 0 }
               }
-            : { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, opacity: 0 }
-        }
-        transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
-      >
-        <div className="-translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_14px_4px_rgba(255,143,171,0.7)]" />
-      </motion.div>
+              transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.08 : showWeak ? i * 0.18 : 0, ease: 'easeInOut' }}
+            >
+              <motion.div
+                className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-2 whitespace-nowrap rounded-full bg-[#FDECEC] border-2 border-[#E5484D]/50 pl-1 pr-3.5 py-1 shadow-sm"
+                initial={false}
+                animate={showWeak ? { x: [0, -4, 4, -3, 3, 0] } : { x: 0 }}
+                transition={{ delay: showWeak ? 0.35 + i * 0.18 : 0, duration: 0.45 }}
+              >
+                <motion.span
+                  className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#E5484D] flex items-center justify-center flex-shrink-0"
+                  initial={false}
+                  animate={{ scale: showWeak ? 1 : 0, rotate: showWeak ? 0 : -90 }}
+                  transition={{ delay: showWeak ? 0.2 + i * 0.18 : 0, type: 'spring', stiffness: 500, damping: 15 }}
+                >
+                  <X size={18} strokeWidth={3.5} className="text-white" />
+                </motion.span>
+                <span className="text-sm md:text-base font-bold text-[#C2272D]">{w}</span>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+
+        {/* EhYo hub */}
+        <div className="absolute z-20" style={{ left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%` }}>
+          <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
+            <motion.div
+              className="absolute w-28 h-28 rounded-full bg-ehyo-indigo/25 blur-2xl"
+              initial={false}
+              animate={{ opacity: absorbed ? [0.3, 1, 0.5] : 0.25, scale: absorbed ? [1, 1.3, 1] : 1 }}
+              transition={{ duration: 1 }}
+            />
+            <motion.div
+              className="relative"
+              initial={false}
+              animate={{ scale: phase === 2 ? [1, 1.15, 1] : 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <EhYoMark className="w-24 md:w-28" />
+            </motion.div>
+            <motion.div
+              className="absolute -right-3 -top-2 text-ehyo-coral"
+              initial={false}
+              animate={{ opacity: phase === 2 || phase === 3 ? 1 : 0, rotate: phase === 2 || phase === 3 ? [0, 20, -20, 0] : 0 }}
+              transition={{ duration: 0.8, repeat: phase === 2 || phase === 3 ? Infinity : 0 }}
+            >
+              <Sparkles size={18} />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Stops on the route */}
+        {PATH_NODES.map((n, i) => {
+          const Icon = n.icon;
+          const tick = ticked(i);
+          return (
+            <motion.div
+              key={i}
+              className="absolute z-10"
+              style={{ left: `${n.x}%`, top: `${n.y}%` }}
+              initial={false}
+              animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
+              transition={{ duration: 0.35, delay: showRoad && phase === 3 ? 0.35 + i * 0.35 : 0 }}
+            >
+              <div className="-translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
+                <motion.div
+                  className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center border-2 shadow-sm"
+                  style={{ borderColor: n.color }}
+                  initial={false}
+                  animate={{ backgroundColor: tick >= 0 ? `${n.color}33` : '#FFFFFF' }}
+                  transition={{ delay: tick > 0 ? tick : 0, duration: 0.3 }}
+                >
+                  <Icon size={24} style={{ color: n.color }} strokeWidth={1.75} />
+                  <motion.div
+                    className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-ehyo-sage flex items-center justify-center ring-2 ring-white"
+                    initial={false}
+                    animate={{ scale: tick >= 0 ? 1 : 0 }}
+                    transition={{ delay: tick > 0 ? tick : 0, type: 'spring', stiffness: 500, damping: 16 }}
+                  >
+                    <Check size={12} strokeWidth={3} className="text-white" />
+                  </motion.div>
+                </motion.div>
+                <span className="text-xs md:text-sm font-semibold text-stone-600 whitespace-nowrap">{text.steps[i]}</span>
+              </div>
+            </motion.div>
+          );
+        })}
+
+        {/* Finish */}
+        <motion.div
+          className="absolute z-10"
+          style={{ left: `${PATH_FLAG.x}%`, top: `${PATH_FLAG.y}%` }}
+          initial={false}
+          animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
+          transition={{ delay: showRoad && phase === 3 ? 1.8 : 0, duration: 0.35 }}
+        >
+          <motion.div
+            className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ehyo-coral/15 border-2 border-ehyo-coral flex items-center justify-center"
+            initial={false}
+            animate={done ? { scale: [1, 1.25, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            <Flag size={20} className="text-ehyo-coral" />
+          </motion.div>
+        </motion.div>
+
+        {/* Marker travelling the route */}
+        <motion.div
+          className="absolute z-30"
+          initial={false}
+          animate={
+            traveling
+              ? {
+                  left: ROUTE.map(p => `${p.x}%`),
+                  top: ROUTE.map(p => `${p.y}%`),
+                  opacity: [0, 1, 1, 1, 1, 0],
+                }
+              : { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, opacity: 0 }
+          }
+          transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
+        >
+          <div className="-translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-ehyo-coral ring-4 ring-white shadow-[0_0_14px_4px_rgba(255,143,171,0.7)]" />
+        </motion.div>
+      </div>
     </div>
   );
 };
