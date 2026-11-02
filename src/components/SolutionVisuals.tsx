@@ -770,23 +770,25 @@ export interface LearningPathText {
 const LOGO_LIGHT = '#AEB3F4';
 const LOGO_BLUE = '#5258FA';
 
-// Positions in % of a 4:5 stage; the road is drawn in a 100 x 125 viewBox.
-const PATH_HUB = { x: 50, y: 34 };
+// Positions in % of the stage, which is ASPECT times as tall as it is wide; the road
+// is drawn in a 100 x (100 * ASPECT) viewBox.
+const ASPECT = 1.1;
+const PATH_HUB = { x: 50, y: 30 };
 const PATH_NODES = [
-  { x: 22, y: 51, icon: NotebookPen },
-  { x: 78, y: 61, icon: Headphones },
-  { x: 22, y: 72, icon: BookOpen },
-  { x: 78, y: 82, icon: PenLine },
+  { x: 22, y: 47, icon: NotebookPen, color: INDIGO },
+  { x: 78, y: 58, icon: Headphones, color: CORAL },
+  { x: 22, y: 70, icon: BookOpen, color: SAGE },
+  { x: 78, y: 81, icon: PenLine, color: INDIGO },
 ];
-const PATH_FLAG = { x: 50, y: 92 };
-const PATH_WEAK = [{ x: 15, y: 27 }, { x: 31, y: 10 }, { x: 69, y: 10 }, { x: 85, y: 27 }];
+const PATH_FLAG = { x: 50, y: 93 };
+const PATH_WEAK = [{ x: 15, y: 23 }, { x: 31, y: 6 }, { x: 69, y: 6 }, { x: 85, y: 23 }];
 
 const ROUTE = [PATH_HUB, ...PATH_NODES, PATH_FLAG];
 const ROAD = ROUTE.map((p, i) => {
-  const y = p.y * 1.25;
+  const y = p.y * ASPECT;
   if (i === 0) return `M${p.x},${y}`;
   const prev = ROUTE[i - 1];
-  const py = prev.y * 1.25;
+  const py = prev.y * ASPECT;
   const mid = (py + y) / 2;
   return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
 }).join(' ');
@@ -811,15 +813,15 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
   return (
     <div
       ref={ref}
-      className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-4 pt-4 pb-7 md:px-7 md:pt-7 md:pb-9"
+      className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-4 py-5 md:px-7 md:py-7"
       aria-hidden="true"
     >
 
-      <div className="relative w-full aspect-[4/5]">
+      <div className="relative w-full" style={{ aspectRatio: `1 / ${ASPECT}` }}>
         {/* Road */}
-        <svg viewBox="0 0 100 125" className="absolute inset-0 w-full h-full overflow-visible" fill="none">
+        <svg viewBox={`0 0 100 ${100 * ASPECT}`} className="absolute inset-0 w-full h-full overflow-visible" fill="none">
           <defs>
-            <linearGradient id="path-road" x1="0" y1="0" x2="0" y2="125" gradientUnits="userSpaceOnUse">
+            <linearGradient id="path-road" x1="0" y1="0" x2="0" y2={100 * ASPECT} gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor={LOGO_LIGHT} />
               <stop offset="100%" stopColor={LOGO_BLUE} />
             </linearGradient>
@@ -943,14 +945,15 @@ export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text 
                   className="relative w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center border"
                   initial={false}
                   animate={{
-                    backgroundColor: tick >= 0 ? `${LOGO_BLUE}40` : '#3A3632',
-                    borderColor: tick >= 0 ? `${LOGO_LIGHT}cc` : 'rgba(255,255,255,0.12)',
+                    backgroundColor: tick >= 0 ? `${n.color}33` : '#3A3632',
+                    borderColor: tick >= 0 ? `${n.color}99` : 'rgba(255,255,255,0.12)',
                   }}
                   transition={{ delay: tick > 0 ? tick : 0, duration: 0.3 }}
                 >
-                  <Icon size={24} style={{ color: LOGO_LIGHT }} strokeWidth={1.75} />
+                  <Icon size={24} style={{ color: n.color }} strokeWidth={1.75} />
                   <motion.div
-                    className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-[#5258FA] flex items-center justify-center ring-2 ring-ehyo-text"
+                    className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full flex items-center justify-center ring-2 ring-ehyo-text"
+                    style={{ background: n.color }}
                     initial={false}
                     animate={{ scale: tick >= 0 ? 1 : 0 }}
                     transition={{ delay: tick > 0 ? tick : 0, type: 'spring', stiffness: 500, damping: 16 }}
