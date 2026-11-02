@@ -10,7 +10,7 @@ import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
-import { StudyJourney, type StudyMode } from './components/StudyModes';
+import { StudyDiagram, type StudyMode } from './components/StudyModes';
 import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
@@ -117,31 +117,19 @@ const translations = {
       sub: "Just starting out or already on your way, EhYo has a way of learning that fits. Its two parts strengthen each other, so nothing you learn goes to waste.",
       tabs: { beginner: "I'm a beginner", experienced: "I already know some" },
       taglines: { beginner: "Build a solid foundation, step by step", experienced: "Keep improving with what you already read and watch" },
-      journey: {
-        multi: "Learning more than one language? Each keeps its own record, so you can be a beginner in one and experienced in another:",
-        chips: [
-          { lang: "日本語", level: "Beginner", mode: "beginner" as const },
-          { lang: "English", level: "Experienced", mode: "experienced" as const },
-        ],
-        cards: {
-          path: { eyebrow: "Planned for you", title: "Personal Learning Path" },
-          toolkit: { eyebrow: "Your own material", title: "Self-Study Toolkit" },
-          start: "Start here",
-          then: "Then",
-          soon: "Coming soon",
-        },
-        beginner: {
-          pathLine: "A clear structure takes you step by step, so you never have to work out what comes first.",
-          toolkitLine: "Review what you've learned with books and videos you enjoy.",
-          forward: "Review what you learn with material you love",
-          back: "Where you get stuck, the path helps you catch up",
-        },
-        experienced: {
-          toolkitLine: "Keep improving with the books, videos and articles you already enjoy.",
-          pathLine: "What you're unsure of, plus your old repeat mistakes, becomes a path made for you.",
-          forward: "Whatever you're unsure of becomes your learning path",
-          back: "Once it sticks, use it in real content",
-        },
+      diagram: {
+        toolkit: { eyebrow: "Learn from your own material", title: "Self-Study Toolkit" },
+        path: { eyebrow: "A course built just for you", title: "Personal Learning Path" },
+        soon: "Coming soon",
+      },
+      multi: "Learning more than one language? Each keeps its own record, so you can be a beginner in one and experienced in another:",
+      chips: [
+        { lang: "日本語", level: "Beginner", mode: "beginner" as const },
+        { lang: "English", level: "Experienced", mode: "experienced" as const },
+      ],
+      lead: {
+        beginner: "Start with your Personal Learning Path to build a solid foundation, then use the Self-Study Toolkit to review with material you love.",
+        experienced: "Start with the Self-Study Toolkit and learn from what you already read and watch. Whatever you're unsure of, EhYo turns into your Personal Learning Path.",
       },
       steps: {
         beginner: [
@@ -341,31 +329,19 @@ const translations = {
       sub: "剛起步或已經有基礎，EhYo 都有適合你的學法。兩種方式互相補強，學過的都不會白費。",
       tabs: { beginner: "我是初學者", experienced: "我已經有基礎" },
       taglines: { beginner: "有系統地打好基礎", experienced: "用你在看的東西繼續進步" },
-      journey: {
-        multi: "同時學好幾種語言？每個語言各自記錄，你可以同時是初學者，也是老手：",
-        chips: [
-          { lang: "日本語", level: "初學者", mode: "beginner" as const },
-          { lang: "English", level: "有基礎", mode: "experienced" as const },
-        ],
-        cards: {
-          path: { eyebrow: "EhYo 為你安排", title: "個人化學習路徑" },
-          toolkit: { eyebrow: "用你的素材", title: "自學工具組" },
-          start: "從這裡開始",
-          then: "接著",
-          soon: "即將推出",
-        },
-        beginner: {
-          pathLine: "有系統的架構，一步步打好基礎，不用自己摸索該先學什麼。",
-          toolkitLine: "用喜歡的書和影片，複習學過的內容。",
-          forward: "學到的，用喜歡的素材複習",
-          back: "複習時卡住的地方，路徑幫你補強",
-        },
-        experienced: {
-          toolkitLine: "用你本來就在看的書、影片、文章繼續進步。",
-          pathLine: "不熟的新內容，加上常錯的老問題，排成你的專屬路徑。",
-          forward: "不熟的內容，自動變成學習路徑",
-          back: "練熟了，回到真實內容裡用出來",
-        },
+      diagram: {
+        toolkit: { eyebrow: "用你的素材學", title: "自學工具組" },
+        path: { eyebrow: "幫你打造專屬課程", title: "個人化學習路徑" },
+        soon: "即將推出",
+      },
+      multi: "同時學好幾種語言？每個語言各自記錄，你可以同時是初學者，也是老手：",
+      chips: [
+        { lang: "日本語", level: "初學者", mode: "beginner" as const },
+        { lang: "English", level: "有基礎", mode: "experienced" as const },
+      ],
+      lead: {
+        beginner: "從個人化學習路徑開始，有系統地打好基礎；再用自學工具組，拿喜歡的素材複習。",
+        experienced: "從自學工具組開始，用你本來就在看的東西學；不熟的內容，EhYo 幫你排進個人化學習路徑。",
       },
       steps: {
         beginner: [
@@ -724,8 +700,11 @@ const App: React.FC = () => {
               <p className="text-stone-500 leading-relaxed">{t.study.sub}</p>
             </div>
 
-            {/* Who are you? */}
-            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mb-6 p-1.5 rounded-2xl bg-stone-100">
+            {/* Fixed: self-study toolkit, EhYo, personal learning path */}
+            <StudyDiagram text={t.study.diagram} />
+
+            {/* Who are you? Picks the content below */}
+            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mt-14 mb-4 p-1.5 rounded-2xl bg-stone-100">
               {(['beginner', 'experienced'] as const).map((m) => {
                 const active = studyMode === m;
                 return (
@@ -743,10 +722,33 @@ const App: React.FC = () => {
               })}
             </div>
 
-            <StudyJourney mode={studyMode} text={t.study.journey} onSelect={setStudyMode} />
+            {/* One account, a different starting point per language */}
+            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-stone-500 text-center">
+              <span className="w-full md:w-auto">{t.study.multi}</span>
+              {t.study.chips.map((c) => {
+                const on = c.mode === studyMode;
+                return (
+                  <button
+                    key={c.lang}
+                    type="button"
+                    onClick={() => setStudyMode(c.mode)}
+                    aria-pressed={on}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${on ? 'border-ehyo-indigo/40 bg-ehyo-indigo/10 text-ehyo-text' : 'border-stone-200 bg-white text-stone-500 hover:border-stone-300'}`}
+                  >
+                    <span className="font-semibold">{c.lang}</span>
+                    <span className="text-stone-300">·</span>
+                    <span>{c.level}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <p key={`lead-${studyMode}`} className="text-center text-ehyo-text font-medium max-w-2xl mx-auto mt-10 leading-relaxed animate-fade-in-up">
+              {t.study.lead[studyMode]}
+            </p>
 
             {/* How it goes, step by step */}
-            <ol key={studyMode} className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mt-14 animate-fade-in-up">
+            <ol key={studyMode} className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mt-8 animate-fade-in-up">
               {t.study.steps[studyMode].map((st, i) => (
                 <li key={i} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm">
                   <div className="w-8 h-8 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo font-bold flex items-center justify-center mb-4">{i + 1}</div>
