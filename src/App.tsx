@@ -68,6 +68,7 @@ const translations = {
     },
     prob: {
       title: "EhYo solves these problems",
+      sol_title: "How EhYo helps",
       c1_t: "Learning material scattered everywhere",
       c1_d: "Articles, ebooks, and web pages are all over the place. Even looking up grammar and vocabulary eats into your time.",
       c2_t: "Wasting precious time",
@@ -241,6 +242,7 @@ const translations = {
     },
     prob: {
       title: "EhYo 解決這些問題",
+      sol_title: "EhYo 這樣幫你",
       c1_t: "學習資料散落各處",
       c1_d: "文章、電子書、其他讀物分散四處，光是查文法、查單字用法就花掉不少時間。",
       c2_t: "花費許多時間",
@@ -557,33 +559,39 @@ const App: React.FC = () => {
         {/* Problems Section */}
         <section id="problems" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-16 max-w-2xl mx-auto">
-              <h2 className="font-serif text-4xl mb-4">{t.prob.title}</h2>
+            <div className="text-center mb-12 max-w-2xl mx-auto">
+              <h2 className="font-serif text-4xl">{t.prob.title}</h2>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex flex-col gap-6 md:flex-1 md:mt-[4.5rem]">
-                <ProblemOnlyCard icon={FolderOpen} title={t.prob.c1_t} description={t.prob.c1_d} />
-                <ProblemOnlyCard icon={Clock} title={t.prob.c2_t} description={t.prob.c2_d} />
-                <ProblemOnlyCard icon={Lightbulb} title={t.prob.c3_t} description={t.prob.c3_d} />
-                <ProblemOnlyCard icon={RotateCcw} title={t.prob.c4_t} description={t.prob.c4_d} />
-                <ProblemOnlyCard icon={Scale} title={t.prob.c5_t} description={t.prob.c5_d} />
-                <ProblemOnlyCard icon={Hourglass} title={t.prob.c6_t} description={t.prob.c6_d} />
-              </div>
+            {/* The problems, as a compact grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <ProblemOnlyCard icon={FolderOpen} title={t.prob.c1_t} description={t.prob.c1_d} />
+              <ProblemOnlyCard icon={Clock} title={t.prob.c2_t} description={t.prob.c2_d} />
+              <ProblemOnlyCard icon={Lightbulb} title={t.prob.c3_t} description={t.prob.c3_d} />
+              <ProblemOnlyCard icon={RotateCcw} title={t.prob.c4_t} description={t.prob.c4_d} />
+              <ProblemOnlyCard icon={Scale} title={t.prob.c5_t} description={t.prob.c5_d} />
+              <ProblemOnlyCard icon={Hourglass} title={t.prob.c6_t} description={t.prob.c6_d} />
+            </div>
 
-              <div className="flex flex-col gap-6 md:flex-1">
-                <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual />} />
-                <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
-                <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
-                <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
-                <SolutionCard
-                  title={t.prob.s5_t}
-                  description={t.prob.s5_d}
-                  visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[260px] mx-auto rounded-xl" />}
-                />
-                <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
-                <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
-              </div>
+            <div className="flex items-center gap-4 my-14 max-w-xl mx-auto">
+              <div className="h-px flex-1 bg-stone-200" />
+              <h3 className="font-serif text-2xl text-ehyo-text whitespace-nowrap">{t.prob.sol_title}</h3>
+              <div className="h-px flex-1 bg-stone-200" />
+            </div>
+
+            {/* How EhYo solves them: two-column masonry so cards of different heights pack without gaps */}
+            <div className="columns-1 md:columns-2 gap-6 [&>*]:break-inside-avoid [&>*]:mb-6">
+              <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual />} />
+              <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
+              <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
+              <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
+              <SolutionCard
+                title={t.prob.s5_t}
+                description={t.prob.s5_d}
+                visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[260px] mx-auto rounded-xl" />}
+              />
+              <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
+              <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
             </div>
           </div>
         </section>
