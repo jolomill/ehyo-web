@@ -10,8 +10,8 @@ import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
-import { StudyLoopDiagram, type StudyMode } from './components/StudyModes';
-import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, Target, Sparkles, Map as MapIcon } from 'lucide-react';
+import { StudyJourney, type StudyMode } from './components/StudyModes';
+import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
   <div className="flex items-center cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
@@ -114,32 +114,51 @@ const translations = {
     study: {
       tag: "How to learn with EhYo",
       title: "Every way you learn counts",
-      sub: "Learn from the things you love, or let EhYo lead the way. Mistakes from both are remembered, so every next step fits you better.",
-      tabs: { toolkit: "Self-Study Toolkit", path: "Personal Learning Path" },
-      taglines: { toolkit: "Learn from what you already enjoy", path: "Never wonder what to study next" },
-      loop: {
-        toolkitEyebrow: "Your material",
-        pathEyebrow: "Planned for you",
-        toolkit: "Self-Study Toolkit",
-        path: "Personal Learning Path",
-        center: "Your error patterns",
-        mistakes: "Every mistake is remembered",
-        next: "and turned into a better next step",
-        soon: "Coming soon",
+      sub: "Just starting out or already on your way, EhYo has a way of learning that fits. Its two parts strengthen each other, so nothing you learn goes to waste.",
+      tabs: { beginner: "I'm a beginner", experienced: "I already know some" },
+      taglines: { beginner: "Build a solid foundation, step by step", experienced: "Keep improving with what you already read and watch" },
+      journey: {
+        multi: "Learning more than one language? Each keeps its own record, so you can be a beginner in one and experienced in another:",
+        chips: [
+          { lang: "日本語", level: "Beginner", mode: "beginner" as const },
+          { lang: "English", level: "Experienced", mode: "experienced" as const },
+        ],
+        cards: {
+          path: { eyebrow: "Planned for you", title: "Personal Learning Path" },
+          toolkit: { eyebrow: "Your own material", title: "Self-Study Toolkit" },
+          start: "Start here",
+          then: "Then",
+          soon: "Coming soon",
+        },
+        beginner: {
+          pathLine: "A clear structure takes you step by step, so you never have to work out what comes first.",
+          toolkitLine: "Review what you've learned with books and videos you enjoy.",
+          forward: "Review what you learn with material you love",
+          back: "Where you get stuck, the path helps you catch up",
+        },
+        experienced: {
+          toolkitLine: "Keep improving with the books, videos and articles you already enjoy.",
+          pathLine: "What you're unsure of, plus your old repeat mistakes, becomes a path made for you.",
+          forward: "Whatever you're unsure of becomes your learning path",
+          back: "Once it sticks, use it in real content",
+        },
+      },
+      steps: {
+        beginner: [
+          { t: "Build your foundation on the path", d: "EhYo lines up grammar, words and practice in order, so you never wonder what to learn first." },
+          { t: "Review with material you love", d: "Read an article or watch a video and use what you just learned on real content." },
+          { t: "Weak spots get fixed for you", d: "Mistakes you make while reviewing go back into your path, and the next step helps you master them." },
+        ],
+        experienced: [
+          { t: "Learn from what interests you", d: "Read and watch whatever you like. Anything you don't get makes sense with one tap." },
+          { t: "Turn the unfamiliar into a path", d: "New things you meet and your old repeat mistakes are lined up in one path for you." },
+          { t: "Come back fluent", d: "When it shows up in real content again, you already know how to use it." },
+        ],
       },
       toolkit: {
+        tag: "Self-Study Toolkit",
         title: "What you love is the best textbook",
-        desc: "Books, articles, videos and lyrics all become study material. Tap anything you don't get and it makes sense; what you learn is organized for you, and the mistakes you make along the way are remembered.",
-      },
-      path: {
-        title: "Every step aimed at your weak spots",
-        desc: "EhYo plans what to read, hear and practice next, based on your level, your interests and your error patterns.",
-        benefits: [
-          { t: "Practice where you slip up", d: "Exercises deliberately include the mistakes you make most, so practice pays off fast.", soon: false },
-          { t: "Understand why you make mistakes", d: "Personal podcasts explain your habits through a story, so you can avoid them next time.", soon: false },
-          { t: "Learn something new every time", d: "Alongside your weak spots, you meet new grammar too, so you never go in circles.", soon: false },
-          { t: "Open the app and know what's next", d: "Your learning path puts everything in order. Just follow along.", soon: true },
-        ],
+        desc: "Books, articles, videos and lyrics all become study material. Tap anything you don't get and it makes sense, and what you learn is organized for you.",
       },
     },
     showcase: {
@@ -319,32 +338,51 @@ const translations = {
     study: {
       tag: "如何用 EhYo 自學",
       title: "怎麼學，都不白費",
-      sub: "用你喜歡的素材自學，或跟著 EhYo 的安排走。兩邊犯過的錯都會被記住，讓接下來的每一步更適合你。",
-      tabs: { toolkit: "自學工具組", path: "個人化學習路徑" },
-      taglines: { toolkit: "用你本來就想看的東西學", path: "不用想下一步該學什麼" },
-      loop: {
-        toolkitEyebrow: "你的素材",
-        pathEyebrow: "為你安排",
-        toolkit: "自學工具組",
-        path: "個人化學習路徑",
-        center: "你的錯誤模式",
-        mistakes: "犯過的錯，EhYo 都記得",
-        next: "換來更適合你的下一步",
-        soon: "即將推出",
+      sub: "剛起步或已經有基礎，EhYo 都有適合你的學法。兩種方式互相補強，學過的都不會白費。",
+      tabs: { beginner: "我是初學者", experienced: "我已經有基礎" },
+      taglines: { beginner: "有系統地打好基礎", experienced: "用你在看的東西繼續進步" },
+      journey: {
+        multi: "同時學好幾種語言？每個語言各自記錄，你可以同時是初學者，也是老手：",
+        chips: [
+          { lang: "日本語", level: "初學者", mode: "beginner" as const },
+          { lang: "English", level: "有基礎", mode: "experienced" as const },
+        ],
+        cards: {
+          path: { eyebrow: "EhYo 為你安排", title: "個人化學習路徑" },
+          toolkit: { eyebrow: "用你的素材", title: "自學工具組" },
+          start: "從這裡開始",
+          then: "接著",
+          soon: "即將推出",
+        },
+        beginner: {
+          pathLine: "有系統的架構，一步步打好基礎，不用自己摸索該先學什麼。",
+          toolkitLine: "用喜歡的書和影片，複習學過的內容。",
+          forward: "學到的，用喜歡的素材複習",
+          back: "複習時卡住的地方，路徑幫你補強",
+        },
+        experienced: {
+          toolkitLine: "用你本來就在看的書、影片、文章繼續進步。",
+          pathLine: "不熟的新內容，加上常錯的老問題，排成你的專屬路徑。",
+          forward: "不熟的內容，自動變成學習路徑",
+          back: "練熟了，回到真實內容裡用出來",
+        },
+      },
+      steps: {
+        beginner: [
+          { t: "跟著路徑打基礎", d: "EhYo 依序安排文法、單字和練習，不用煩惱先學什麼。" },
+          { t: "用喜歡的素材複習", d: "讀一篇文章、看一支影片，把剛學的東西用在真實內容裡。" },
+          { t: "卡住的地方自動補強", d: "複習時犯的錯會回到學習路徑，下一步就幫你練到會。" },
+        ],
+        experienced: [
+          { t: "照你的興趣自學", d: "讀你想讀的、看你想看的，看不懂的地方點一下就懂。" },
+          { t: "不熟的變成學習路徑", d: "新遇到的內容和常犯的老毛病，EhYo 幫你排進同一條路徑。" },
+          { t: "練熟了再回到素材", d: "在真實內容裡再遇到時，你已經會用了。" },
+        ],
       },
       toolkit: {
+        tag: "自學工具組",
         title: "喜歡的內容，就是最好的教材",
-        desc: "書、文章、影片、歌詞都能拿來學。看不懂的地方點一下就懂，學到的東西自動整理好，練習時犯的錯也會幫你記下來。",
-      },
-      path: {
-        title: "每一步，都對準你的弱點",
-        desc: "EhYo 依你的程度、興趣和錯誤模式，替你安排要讀、要聽、要練的內容。",
-        benefits: [
-          { t: "專挑你常錯的地方練", d: "練習會刻意放進你最常犯的錯，練一次就有感。", soon: false },
-          { t: "知道自己為什麼會錯", d: "個人化 Podcast 用故事解釋你的錯誤習慣，下次就避得開。", soon: false },
-          { t: "每次都學到新東西", d: "複習弱點的同時，也帶你認識新的文法，不會在原地打轉。", soon: false },
-          { t: "打開就知道今天學什麼", d: "學習路徑把內容排好順序，跟著走就好。", soon: true },
-        ],
+        desc: "書、文章、影片、歌詞都能拿來學。看不懂的地方點一下就懂，學到的東西自動整理好。",
       },
     },
     showcase: {
@@ -477,7 +515,7 @@ const App: React.FC = () => {
   const [page, setPage] = useState<Page>('home');
   type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
   const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
-  const [studyMode, setStudyMode] = useState<StudyMode>('toolkit');
+  const [studyMode, setStudyMode] = useState<StudyMode>('beginner');
   const [imageIdx, setImageIdx] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
 
@@ -676,7 +714,8 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* How to study with EhYo: toolkit vs personal learning path, sharing one mistake loop */}
+        {/* How to study with EhYo: beginners start on the learning path, experienced learners with
+            their own material; both parts feed each other. */}
         <section id="features" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 max-w-2xl mx-auto">
@@ -685,9 +724,9 @@ const App: React.FC = () => {
               <p className="text-stone-500 leading-relaxed">{t.study.sub}</p>
             </div>
 
-            {/* Mode tabs */}
-            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mb-12 p-1.5 rounded-2xl bg-stone-100">
-              {(['toolkit', 'path'] as const).map((m) => {
+            {/* Who are you? */}
+            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mb-6 p-1.5 rounded-2xl bg-stone-100">
+              {(['beginner', 'experienced'] as const).map((m) => {
                 const active = studyMode === m;
                 return (
                   <button
@@ -704,143 +743,126 @@ const App: React.FC = () => {
               })}
             </div>
 
-            <StudyLoopDiagram active={studyMode} text={t.study.loop} onSelect={setStudyMode} />
+            <StudyJourney mode={studyMode} text={t.study.journey} onSelect={setStudyMode} />
 
-            <div className="mt-20">
-              {studyMode === 'toolkit' ? (
-                <div key="toolkit" className="animate-fade-in-up">
-                  <div className="text-center max-w-2xl mx-auto mb-10">
-                    <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.toolkit.title}</h3>
-                    <p className="text-stone-500 leading-relaxed">{t.study.toolkit.desc}</p>
-                  </div>
-                {/* Tab Pills */}
-                <div className="flex flex-wrap justify-center gap-3 mb-16">
-                  {featureTabs.map(({ id, icon: Icon }) => {
-                    const active = activeFeature === id;
-                    return (
-                      <button
-                        key={id}
-                        onClick={() => { setActiveFeature(id); setImageIdx(0); }}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
-                          ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
-                          : 'bg-white text-stone-500 hover:bg-stone-100'
-                          }`}
-                      >
-                        <Icon size={16} strokeWidth={2} />
-                        {t.showcase.tabs[id]}
-                      </button>
-                    );
-                  })}
-                </div>
+            {/* How it goes, step by step */}
+            <ol key={studyMode} className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mt-14 animate-fade-in-up">
+              {t.study.steps[studyMode].map((st, i) => (
+                <li key={i} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo font-bold flex items-center justify-center mb-4">{i + 1}</div>
+                  <h4 className="font-serif text-lg font-bold mb-2 text-ehyo-text">{st.t}</h4>
+                  <p className="text-stone-500 text-sm leading-relaxed">{st.d}</p>
+                </li>
+              ))}
+            </ol>
 
-                {/* Tab Content */}
-                {(() => {
-                  const feat = t.showcase[activeFeature];
-                  const slides = feat.slides;
-                  const slide = slides[imageIdx];
-                  const hasMany = slides.length > 1;
-                  const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
-                  const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
-                  const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
-                  const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
-                  return (
-                    <div className="max-w-5xl mx-auto">
-                      <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
-                        {/* Left arrow */}
-                        <button
-                          onClick={prev}
-                          aria-label="Previous"
-                          disabled={!hasMany}
-                          className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                            }`}
-                        >
-                          <ChevronLeft size={20} />
-                        </button>
+            {/* The toolkit, for everyone */}
+            <div className="mt-24">
+              <div className="text-center max-w-2xl mx-auto mb-10">
+                <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.study.toolkit.tag}</div>
+                <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.toolkit.title}</h3>
+                <p className="text-stone-500 leading-relaxed">{t.study.toolkit.desc}</p>
+              </div>
+            {/* Tab Pills */}
+            <div className="flex flex-wrap justify-center gap-3 mb-16">
+              {featureTabs.map(({ id, icon: Icon }) => {
+                const active = activeFeature === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => { setActiveFeature(id); setImageIdx(0); }}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
+                      ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
+                      : 'bg-white text-stone-500 hover:bg-stone-100'
+                      }`}
+                  >
+                    <Icon size={16} strokeWidth={2} />
+                    {t.showcase.tabs[id]}
+                  </button>
+                );
+              })}
+            </div>
 
-                        {/* Image + Description */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                          <div className="flex justify-center overflow-hidden">
-                            <img
-                              key={slide.image}
-                              src={slide.image}
-                              alt={slide.title}
-                              className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
-                            />
-                          </div>
-                          <div key={slide.title} className={animClass}>
-                            <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
-                              {slide.title}
-                            </h3>
-                            <ul className="space-y-3">
-                              {slide.bullets.map((b, i) => (
-                                <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
-                                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
-                                    <Check size={12} strokeWidth={3} />
-                                  </span>
-                                  <span>{b}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+            {/* Tab Content */}
+            {(() => {
+              const feat = t.showcase[activeFeature];
+              const slides = feat.slides;
+              const slide = slides[imageIdx];
+              const hasMany = slides.length > 1;
+              const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
+              const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
+              const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
+              const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+              return (
+                <div className="max-w-5xl mx-auto">
+                  <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
+                    {/* Left arrow */}
+                    <button
+                      onClick={prev}
+                      aria-label="Previous"
+                      disabled={!hasMany}
+                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                        }`}
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
 
-                        {/* Right arrow */}
-                        <button
-                          onClick={next}
-                          aria-label="Next"
-                          disabled={!hasMany}
-                          className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                            }`}
-                        >
-                          <ChevronRight size={20} />
-                        </button>
+                    {/* Image + Description */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                      <div className="flex justify-center overflow-hidden">
+                        <img
+                          key={slide.image}
+                          src={slide.image}
+                          alt={slide.title}
+                          className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
+                        />
                       </div>
-
-                      {/* Dot indicator */}
-                      {hasMany && (
-                        <div className="flex justify-center gap-1.5 mt-10">
-                          {slides.map((_, i) => (
-                            <button
-                              key={i}
-                              onClick={() => goTo(i)}
-                              aria-label={`Go to slide ${i + 1}`}
-                              className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
-                                }`}
-                            />
+                      <div key={slide.title} className={animClass}>
+                        <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
+                          {slide.title}
+                        </h3>
+                        <ul className="space-y-3">
+                          {slide.bullets.map((b, i) => (
+                            <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
+                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
+                                <Check size={12} strokeWidth={3} />
+                              </span>
+                              <span>{b}</span>
+                            </li>
                           ))}
-                        </div>
-                      )}
+                        </ul>
+                      </div>
                     </div>
-                  );
-                })()}
-                </div>
-              ) : (
-                <div key="path" className="animate-fade-in-up">
-                  <div className="text-center max-w-2xl mx-auto mb-10">
-                    <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.path.title}</h3>
-                    <p className="text-stone-500 leading-relaxed">{t.study.path.desc}</p>
+
+                    {/* Right arrow */}
+                    <button
+                      onClick={next}
+                      aria-label="Next"
+                      disabled={!hasMany}
+                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
+                        }`}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-                    {t.study.path.benefits.map((bf, i) => {
-                      const Icon = [Target, Headphones, Sparkles, MapIcon][i];
-                      return (
-                        <div key={i} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm">
-                          <div className="flex items-center justify-between mb-5">
-                            <div className="w-11 h-11 bg-ehyo-bg rounded-xl flex items-center justify-center text-ehyo-indigo">
-                              <Icon size={22} strokeWidth={1.5} />
-                            </div>
-                            {bf.soon && (
-                              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#D9577A]">{t.study.loop.soon}</span>
-                            )}
-                          </div>
-                          <h4 className="font-serif text-lg font-bold mb-2 text-ehyo-text">{bf.t}</h4>
-                          <p className="text-stone-500 text-sm leading-relaxed">{bf.d}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
+
+                  {/* Dot indicator */}
+                  {hasMany && (
+                    <div className="flex justify-center gap-1.5 mt-10">
+                      {slides.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => goTo(i)}
+                          aria-label={`Go to slide ${i + 1}`}
+                          className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
+                            }`}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              );
+            })()}
             </div>
           </div>
         </section>
