@@ -213,16 +213,8 @@ const translations = {
       p1: "EhYo combines your weak spots, level and interests to plan learning content just for you — from notes on your error patterns and personal podcasts to targeted reading and sentence practice.",
       p2: "No more wondering what to study next. Open EhYo and your learning path is ready.",
       path: {
-        weakTitle: "Your weak spots",
-        weak: ["Verb conjugation", "Prepositions"],
-        generating: "EhYo is building your learning path",
-        tag: "built from your weak spots",
-        steps: [
-          { t: "Error-pattern notes", d: "Your most frequent verb-form mistakes, organized" },
-          { t: "Personal Podcast", d: "Two hosts tell a story that explains why you slip up" },
-          { t: "Targeted reading", d: "A short read at your level, full of the past tense" },
-          { t: "Sentence practice", d: "Use the verbs you just learned, with instant feedback" },
-        ],
+        weak: ["Verb forms", "Prepositions"],
+        steps: ["Notes", "Podcast", "Reading", "Writing"],
       },
     },
     cta: {
@@ -394,16 +386,8 @@ const translations = {
       p1: "EhYo 結合你的弱點、程度與興趣，為你安排專屬的學習內容：從整理錯誤模式的筆記、個人化 Podcast，到針對性的閱讀與造句練習。",
       p2: "不必再煩惱下一步該學什麼。打開 EhYo，屬於你的學習路徑已經準備好了。",
       path: {
-        weakTitle: "你的弱點",
         weak: ["動詞變化", "介係詞"],
-        generating: "EhYo 正在為你安排學習路徑",
-        tag: "依你的弱點生成",
-        steps: [
-          { t: "錯誤模式筆記", d: "整理你最常犯的動詞變化錯誤" },
-          { t: "個人化 Podcast", d: "用兩位主持人的故事，解釋你為什麼會錯" },
-          { t: "針對性閱讀", d: "程度剛好、充滿過去式的短文" },
-          { t: "造句練習", d: "用剛學到的動詞造句，立即批改" },
-        ],
+        steps: ["筆記", "Podcast", "閱讀", "造句"],
       },
     },
     cta: {

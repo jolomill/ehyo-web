@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion';
 import {
   BookOpen, Newspaper, PlayCircle, Layers, NotebookPen, MousePointer2, PenLine, Languages,
-  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check,
+  BookText, XCircle, Bookmark, CheckCircle2, Mic, RotateCcw, FolderOpen, Headphones, Sparkles, Check, Flag,
 } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
@@ -756,110 +756,207 @@ export const SyncVisual: React.FC<{ text: SyncText }> = ({ text }) => {
 
 // ---------------------------------------------------------------------------
 // CORE CONCEPT: PERSONAL LEARNING PATH (dark section)
-// Weak spots go in, EhYo lays out a path of content built for them, step by step.
+// Weak spots flow into EhYo, which lays out a winding route of content made for
+// them; a marker travels the route, ticking off each stop until the finish flag.
 // ---------------------------------------------------------------------------
 
 export interface LearningPathText {
-  weakTitle: string;
   weak: string[];
-  generating: string;
-  tag: string;
-  steps: { t: string; d: string }[];
+  steps: string[];
 }
 
-const PATH_ICONS = [NotebookPen, Headphones, BookOpen, PenLine];
-const PATH_COLORS = [INDIGO, CORAL, SAGE, INDIGO];
-// idle, weak spots, generating, path appears, steps get done, hold, fade
-const PATH_STEPS = [0.5, 1.0, 1.1, 2.4, 2.6, 1.6, 0.5];
+// Positions in % of a 4:5 stage; the road is drawn in a 100 x 125 viewBox.
+const PATH_HUB = { x: 50, y: 24 };
+const PATH_NODES = [
+  { x: 22, y: 44, icon: NotebookPen, color: INDIGO },
+  { x: 78, y: 54, icon: Headphones, color: CORAL },
+  { x: 22, y: 68, icon: BookOpen, color: SAGE },
+  { x: 78, y: 80, icon: PenLine, color: INDIGO },
+];
+const PATH_FLAG = { x: 50, y: 93 };
+const PATH_WEAK = [{ x: 30, y: 6 }, { x: 70, y: 6 }];
+
+const ROUTE = [PATH_HUB, ...PATH_NODES, PATH_FLAG];
+const ROAD = ROUTE.map((p, i) => {
+  const y = p.y * 1.25;
+  if (i === 0) return `M${p.x},${y}`;
+  const prev = ROUTE[i - 1];
+  const py = prev.y * 1.25;
+  const mid = (py + y) / 2;
+  return `C${prev.x},${mid} ${p.x},${mid} ${p.x},${y}`;
+}).join(' ');
+
+// idle, weak spots, absorb, road + stops appear, marker travels, hold, fade
+const PATH_STEPS = [0.4, 1.1, 0.9, 2.2, 3.2, 1.6, 0.5];
+const TRAVEL = 3.0;
 
 export const LearningPathVisual: React.FC<{ text: LearningPathText }> = ({ text }) => {
   const { ref, play, reduceMotion } = usePlay();
   const phase = usePhase(PATH_STEPS, play, reduceMotion, 5);
-  const showWeak = phase >= 1 && phase <= 5;
-  const generating = phase >= 2 && phase <= 5;
-  const showPath = phase >= 3 && phase <= 5;
-  const done = phase >= 4 && phase <= 5;
+  const showWeak = phase === 1;
+  const absorbed = phase >= 2 && phase <= 5;
+  const showRoad = phase >= 3 && phase <= 5;
+  const traveling = phase === 4;
+  const done = phase === 5;
+  // Seconds until the marker reaches stop i (it passes ROUTE points at even intervals);
+  // -1 means not reached yet. With reduced motion the visual rests in the finished state.
+  const ticked = (i: number) => (done ? 0 : traveling ? ((i + 1) * TRAVEL) / (ROUTE.length - 1) : -1);
 
   return (
-    <div
-      ref={ref}
-      className="w-full max-w-md rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm p-5 md:p-6 text-left"
-      aria-hidden="true"
-    >
-      {/* Weak spots */}
-      <div className="text-[11px] font-bold tracking-widest uppercase text-stone-400 mb-2">{text.weakTitle}</div>
-      <div className="flex flex-wrap gap-2 min-h-[1.75rem]">
-        {text.weak.map((w, i) => (
-          <motion.span
-            key={w}
-            className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#E5484D]/15 text-[#FF8A8E] border border-[#E5484D]/30"
-            initial={false}
-            animate={showWeak ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 6, scale: 0.9 }}
-            transition={{ delay: showWeak ? i * 0.15 : 0, duration: 0.3 }}
-          >
-            {w}
-          </motion.span>
-        ))}
-      </div>
-
-      {/* EhYo builds the path */}
-      <motion.div
-        className="flex items-center gap-2 my-4 text-sm font-semibold text-ehyo-coral"
-        initial={false}
-        animate={{ opacity: generating ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <motion.span
-          animate={generating && !showPath ? { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] } : { rotate: 0, scale: 1 }}
-          transition={{ duration: 0.8, repeat: generating && !showPath ? Infinity : 0 }}
-        >
-          <Sparkles size={16} />
-        </motion.span>
-        {text.generating}
-      </motion.div>
-
-      {/* The path */}
-      <div className="relative">
-        <motion.div
-          className="absolute left-[17px] top-4 bottom-4 w-0.5 bg-white/15 origin-top"
+    <div ref={ref} className="relative w-full max-w-md aspect-[4/5]" aria-hidden="true">
+      {/* Road */}
+      <svg viewBox="0 0 100 125" className="absolute inset-0 w-full h-full overflow-visible" fill="none">
+        <defs>
+          <linearGradient id="path-road" x1="0" y1="0" x2="0" y2="125" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor={INDIGO} />
+            <stop offset="55%" stopColor={CORAL} />
+            <stop offset="100%" stopColor={SAGE} />
+          </linearGradient>
+        </defs>
+        <motion.path
+          d={ROAD}
+          stroke="white"
+          strokeOpacity={0.1}
+          strokeWidth={2.4}
+          strokeLinecap="round"
           initial={false}
-          animate={{ scaleY: showPath ? 1 : 0 }}
-          transition={{ duration: showPath ? 1.6 : 0.2, ease: 'easeInOut' }}
+          animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
+          transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
         />
-        <div className="flex flex-col gap-3">
-          {text.steps.map((st, i) => {
-            const Icon = PATH_ICONS[i];
-            return (
-              <motion.div
-                key={i}
-                className="relative flex items-start gap-3"
-                initial={false}
-                animate={showPath ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-                transition={{ delay: showPath ? i * 0.4 : 0, duration: 0.35 }}
-              >
-                <div className="relative z-10 w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center bg-ehyo-text border-2" style={{ borderColor: PATH_COLORS[i] }}>
-                  <Icon size={16} style={{ color: PATH_COLORS[i] }} />
-                  <motion.div
-                    className="absolute -right-1 -bottom-1 w-4 h-4 rounded-full bg-ehyo-sage flex items-center justify-center"
-                    initial={false}
-                    animate={{ scale: done ? 1 : 0 }}
-                    transition={{ delay: done ? i * 0.55 : 0, type: 'spring', stiffness: 500, damping: 18 }}
-                  >
-                    <Check size={10} strokeWidth={3} className="text-white" />
-                  </motion.div>
-                </div>
-                <div className="flex-1 min-w-0 rounded-xl bg-white/[0.05] border border-white/10 px-3 py-2">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                    <span className="text-sm font-bold text-white">{st.t}</span>
-                    <span className="text-[10px] text-stone-400">· {text.tag}</span>
-                  </div>
-                  <p className="text-xs text-stone-300 leading-snug mt-0.5">{st.d}</p>
-                </div>
-              </motion.div>
-            );
-          })}
+        <motion.path
+          d={ROAD}
+          stroke="url(#path-road)"
+          strokeWidth={0.8}
+          strokeLinecap="round"
+          initial={false}
+          animate={{ pathLength: showRoad ? 1 : 0, opacity: showRoad ? 1 : 0 }}
+          transition={{ duration: showRoad ? 1.8 : 0.3, ease: 'easeInOut' }}
+        />
+      </svg>
+
+      {/* Weak spots, which fly into EhYo */}
+      {text.weak.map((w, i) => {
+        const p = PATH_WEAK[i];
+        return (
+          <motion.div
+            key={w}
+            className="absolute z-10"
+            initial={false}
+            animate={
+              absorbed
+                ? { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, scale: 0.2, opacity: 0 }
+                : { left: `${p.x}%`, top: `${p.y}%`, scale: showWeak ? 1 : 0.6, opacity: showWeak ? 1 : 0 }
+            }
+            transition={{ duration: absorbed ? 0.7 : 0.35, delay: absorbed ? i * 0.1 : showWeak ? i * 0.2 : 0, ease: 'easeInOut' }}
+          >
+            <div className="-translate-x-1/2 -translate-y-1/2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#E5484D]/15 border border-[#E5484D]/40 pl-1.5 pr-3 py-1">
+              <XCircle size={16} color={RED} />
+              <span className="text-xs font-bold text-[#FF8A8E]">{w}</span>
+            </div>
+          </motion.div>
+        );
+      })}
+
+      {/* EhYo hub */}
+      <div className="absolute z-20" style={{ left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%` }}>
+        <div className="-translate-x-1/2 -translate-y-1/2 relative flex items-center justify-center">
+          <motion.div
+            className="absolute w-28 h-28 rounded-full bg-ehyo-indigo/40 blur-2xl"
+            initial={false}
+            animate={{ opacity: absorbed ? [0.4, 1, 0.6] : 0.35, scale: absorbed ? [1, 1.3, 1] : 1 }}
+            transition={{ duration: 1 }}
+          />
+          <motion.div
+            className="relative"
+            initial={false}
+            animate={{ scale: phase === 2 ? [1, 1.15, 1] : 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <EhYoMark className="w-24 md:w-28" textFill="#FFFFFF" />
+          </motion.div>
+          <motion.div
+            className="absolute -right-3 -top-2 text-ehyo-coral"
+            initial={false}
+            animate={{ opacity: phase === 2 || phase === 3 ? 1 : 0, rotate: phase === 2 || phase === 3 ? [0, 20, -20, 0] : 0 }}
+            transition={{ duration: 0.8, repeat: phase === 2 || phase === 3 ? Infinity : 0 }}
+          >
+            <Sparkles size={18} />
+          </motion.div>
         </div>
       </div>
+
+      {/* Stops on the route */}
+      {PATH_NODES.map((n, i) => {
+        const Icon = n.icon;
+        const tick = ticked(i);
+        return (
+          <motion.div
+            key={i}
+            className="absolute z-10"
+            style={{ left: `${n.x}%`, top: `${n.y}%` }}
+            initial={false}
+            animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
+            transition={{ duration: 0.35, delay: showRoad && phase === 3 ? 0.35 + i * 0.35 : 0 }}
+          >
+            <div className="-translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
+              <motion.div
+                className="relative w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center border-2"
+                style={{ borderColor: n.color }}
+                initial={false}
+                animate={{ backgroundColor: tick >= 0 ? `${n.color}40` : '#2D2A26' }}
+                transition={{ delay: tick > 0 ? tick : 0, duration: 0.3 }}
+              >
+                <Icon size={24} style={{ color: n.color }} strokeWidth={1.75} />
+                <motion.div
+                  className="absolute -right-1.5 -top-1.5 w-5 h-5 rounded-full bg-ehyo-sage flex items-center justify-center ring-2 ring-ehyo-text"
+                  initial={false}
+                  animate={{ scale: tick >= 0 ? 1 : 0 }}
+                  transition={{ delay: tick > 0 ? tick : 0, type: 'spring', stiffness: 500, damping: 16 }}
+                >
+                  <Check size={12} strokeWidth={3} className="text-white" />
+                </motion.div>
+              </motion.div>
+              <span className="text-[11px] md:text-xs font-semibold text-stone-300 whitespace-nowrap">{text.steps[i]}</span>
+            </div>
+          </motion.div>
+        );
+      })}
+
+      {/* Finish */}
+      <motion.div
+        className="absolute z-10"
+        style={{ left: `${PATH_FLAG.x}%`, top: `${PATH_FLAG.y}%` }}
+        initial={false}
+        animate={{ opacity: showRoad ? 1 : 0, scale: showRoad ? 1 : 0.5 }}
+        transition={{ delay: showRoad && phase === 3 ? 1.8 : 0, duration: 0.35 }}
+      >
+        <motion.div
+          className="-translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-ehyo-coral/20 border-2 border-ehyo-coral flex items-center justify-center"
+          initial={false}
+          animate={done ? { scale: [1, 1.25, 1], rotate: [0, -10, 10, 0] } : { scale: 1, rotate: 0 }}
+          transition={{ duration: 0.7 }}
+        >
+          <Flag size={20} className="text-ehyo-coral" />
+        </motion.div>
+      </motion.div>
+
+      {/* Marker travelling the route */}
+      <motion.div
+        className="absolute z-30"
+        initial={false}
+        animate={
+          traveling
+            ? {
+                left: ROUTE.map(p => `${p.x}%`),
+                top: ROUTE.map(p => `${p.y}%`),
+                opacity: [0, 1, 1, 1, 1, 0],
+              }
+            : { left: `${PATH_HUB.x}%`, top: `${PATH_HUB.y}%`, opacity: 0 }
+        }
+        transition={traveling ? { duration: TRAVEL, ease: 'easeInOut' } : { duration: 0 }}
+      >
+        <div className="-translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_14px_4px_rgba(255,143,171,0.7)]" />
+      </motion.div>
     </div>
   );
 };
