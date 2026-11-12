@@ -5,7 +5,7 @@
 
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { BookOpen, ChevronDown, Route, Sparkles, ArrowRight, ArrowDown, Check } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronRight, Route, Sparkles, Check } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
 // "Describe yourself, see how EhYo fits": the visitor fills in one sentence and the
@@ -204,73 +204,135 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
 // ---------------------------------------------------------------------------
 // One of the three parts, in the place this visitor's order puts it
 // ---------------------------------------------------------------------------
-const PartIcon: React.FC<{ part: Part }> = ({ part }) => {
-  if (part === 'ehyo') return <EhYoMark className="w-12" />;
+export type StudyPart = Part;
+export type StudyDetailContext = { goal: Goal; level: Level; lang: Lang };
+type RenderDetail = (part: Part, ctx: StudyDetailContext) => React.ReactNode;
+
+const PartIcon: React.FC<{ part: Part; size?: 'sm' | 'md' }> = ({ part, size = 'md' }) => {
+  if (part === 'ehyo') return <EhYoMark className={size === 'sm' ? 'w-9' : 'w-12'} />;
   const Icon = part === 'path' ? Route : BookOpen;
-  return <Icon size={22} strokeWidth={1.75} />;
+  return <Icon size={size === 'sm' ? 18 : 22} strokeWidth={1.75} />;
 };
 
-const StageCard: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; step: number }> = ({ part, level, goal, lang, step }) => {
+const Badges: React.FC<{ part: Part; level: Level; lang: Lang }> = ({ part, level, lang }) => {
+  const t = TEXT[lang];
+  if (part !== 'path') return null;
+  return (
+    <>
+      {level === 'experienced' && <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>}
+      <span className="text-xs font-semibold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#B23A5E]">{t.soon}</span>
+    </>
+  );
+};
+
+const cardText = (part: Part, level: Level, goal: Goal, lang: Lang) => {
   const t = TEXT[lang];
   const c = t.cards[level][part];
-  const d = typeof c.d === 'function' ? c.d(t.material[goal]) : c.d;
+  return { title: c.t, desc: typeof c.d === 'function' ? c.d(t.material[goal]) : c.d };
+};
+
+// The open part: what it is for this visitor, then its own material
+const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; renderDetail?: RenderDetail }> = ({ part, level, goal, lang, renderDetail }) => {
+  const t = TEXT[lang];
+  const { title, desc } = cardText(part, level, goal, lang);
   const st = PART_STYLE[part];
   return (
-    <div className="h-full bg-white rounded-3xl border border-stone-100 shadow-sm p-6 flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <span className={`h-12 min-w-12 px-2 rounded-2xl flex items-center justify-center ${st.soft} ${st.text}`}>
-          <PartIcon part={part} />
-        </span>
-        <span className="font-serif text-4xl text-stone-200 leading-none" aria-hidden="true">{step}</span>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
+    <div>
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
-        {part === 'path' && level === 'experienced' && (
-          <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>
-        )}
-        {part === 'path' && <span className="text-xs font-semibold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#B23A5E]">{t.soon}</span>}
+        <Badges part={part} level={level} lang={lang} />
       </div>
-      <h4 className="font-serif text-xl font-bold text-ehyo-text leading-snug">{c.t}</h4>
-      <p className="text-stone-600 leading-relaxed text-[15px]">{d}</p>
+      <h4 className="font-serif text-2xl md:text-3xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+      <p className="text-stone-600 leading-relaxed">{desc}</p>
       {part === 'toolkit' && (
-        <div className="mt-auto pt-2 flex flex-wrap items-center gap-2 text-sm">
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-stone-500">{t.focus}</span>
           {t.tools[goal].map((x) => (
             <span key={x} className="rounded-full px-2.5 py-1 bg-ehyo-bg text-ehyo-text border border-stone-100">{x}</span>
           ))}
         </div>
       )}
+      {renderDetail && <div className="mt-8">{renderDetail(part, { goal, level, lang })}</div>}
     </div>
   );
 };
 
-// One language's route: three cards that slide into this visitor's order
-const Lane: React.FC<{ id: string; who: string; level: Level; goal: Goal; lang: Lang; reduce: boolean }> = ({ id, who, level, goal, lang, reduce }) => {
+// One language's route, top to bottom: the three parts in this visitor's order.
+// Picking a part opens its detail beside the list (under it on small screens).
+const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce: boolean; renderDetail?: RenderDetail }> = ({ id, level, goal, lang, reduce, renderDetail }) => {
   const t = TEXT[lang];
   const order = ORDER[level];
+  const [sel, setSel] = useState<Part>(order[0]);
+  // A new order starts from its first step
+  useEffect(() => { setSel(ORDER[level][0]); }, [level]);
   return (
-    <div>
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-4">
-        <h3 className="font-serif text-2xl font-bold text-ehyo-text">{who}</h3>
-        <span className="text-stone-500">{t.route[level]}</span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <div className="lg:col-span-5">
+        <p className="text-stone-500 mb-5">{t.route[level]}</p>
+        <LayoutGroup id={id}>
+          <ol role="tablist" aria-orientation="vertical" className="list-none p-0 m-0">
+            {order.map((part, i) => {
+              const active = sel === part;
+              const st = PART_STYLE[part];
+              const { title, desc } = cardText(part, level, goal, lang);
+              const last = i === order.length - 1;
+              return (
+                <motion.li key={part} layout={!reduce} layoutId={`${id}-${part}`} transition={{ type: 'spring', stiffness: 260, damping: 30 }} className="flex gap-4">
+                  {/* the step and the line down to the next one */}
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <span className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
+                    {!last && <span className="w-px flex-1 min-h-6 bg-stone-200 my-1" aria-hidden="true" />}
+                  </div>
+                  <div className={`flex-1 min-w-0 ${last ? '' : 'pb-4'}`}>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setSel(part)}
+                      className={`w-full text-left rounded-2xl p-4 md:p-5 border transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white border-stone-100 shadow-sm' : 'border-transparent hover:bg-white/60'}`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className={`h-10 min-w-10 px-1.5 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><PartIcon part={part} size="sm" /></span>
+                        <span className="flex-1 min-w-0">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
+                            <Badges part={part} level={level} lang={lang} />
+                          </span>
+                          <span className={`block font-serif text-lg font-bold leading-snug ${active ? 'text-ehyo-text' : 'text-stone-600'}`}>{title}</span>
+                        </span>
+                        <ChevronDown size={18} className={`lg:hidden flex-shrink-0 transition-transform duration-200 ${active ? 'text-ehyo-indigo rotate-180' : 'text-stone-300'}`} aria-hidden="true" />
+                        <ChevronRight size={18} className={`hidden lg:block flex-shrink-0 transition-colors duration-200 ${active ? 'text-ehyo-indigo' : 'text-stone-300'}`} aria-hidden="true" />
+                      </span>
+                      {!active && <span className="block mt-2 text-sm text-stone-500 leading-relaxed line-clamp-2">{desc}</span>}
+                    </button>
+                    {/* small screens: the detail opens right here */}
+                    {active && (
+                      <div className="lg:hidden mt-3 bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+                        <Detail part={part} level={level} goal={goal} lang={lang} renderDetail={renderDetail} />
+                      </div>
+                    )}
+                  </div>
+                </motion.li>
+              );
+            })}
+          </ol>
+        </LayoutGroup>
       </div>
-      <LayoutGroup id={id}>
-        <ol className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] gap-3 md:gap-2 items-stretch list-none p-0 m-0">
-          {order.map((part, i) => (
-            <React.Fragment key={part}>
-              <motion.li layout={!reduce} layoutId={`${id}-${part}`} transition={{ type: 'spring', stiffness: 260, damping: 30 }} className="min-w-0">
-                <StageCard part={part} level={level} goal={goal} lang={lang} step={i + 1} />
-              </motion.li>
-              {i < order.length - 1 && (
-                <li aria-hidden="true" className="flex items-center justify-center text-stone-300">
-                  <ArrowRight className="hidden md:block" size={20} />
-                  <ArrowDown className="md:hidden" size={20} />
-                </li>
-              )}
-            </React.Fragment>
-          ))}
-        </ol>
-      </LayoutGroup>
+      <div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-24">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`${id}-${level}-${sel}`}
+            role="tabpanel"
+            initial={reduce ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="bg-white rounded-3xl border border-stone-100 shadow-sm p-8 min-h-[480px]"
+          >
+            <Detail part={sel} level={level} goal={goal} lang={lang} renderDetail={renderDetail} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -318,7 +380,7 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
 };
 
 // ---------------------------------------------------------------------------
-export const StudyBuilder: React.FC<{ lang: Lang }> = ({ lang }) => {
+export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }> = ({ lang, renderDetail }) => {
   const t = TEXT[lang];
   const reduce = !!useReducedMotion();
   const [count, setCount] = useState<Count>(2);
@@ -328,6 +390,10 @@ export const StudyBuilder: React.FC<{ lang: Lang }> = ({ lang }) => {
   const [levelB, setLevelB] = useState<Level>('experienced');
   const [time, setTime] = useState<Time>(30);
   const [goal, setGoal] = useState<Goal>('content');
+  const [laneSel, setLaneSel] = useState<'a' | 'b'>('a');
+  const lane = count === 2 ? laneSel : 'a';
+  const laneLevel = lane === 'a' ? levelA : levelB;
+  const laneLang = lane === 'a' ? langA : langB;
 
   // The two languages always differ
   const pickA = (v: LangKey) => { if (v === langB) setLangB(langA); setLangA(v); };
@@ -362,27 +428,36 @@ export const StudyBuilder: React.FC<{ lang: Lang }> = ({ lang }) => {
         <span className="whitespace-nowrap"><Choice label={s.for} value={goal} options={GOALS} onChange={setGoal} render={(v) => t.goal[v]} />{s.end}</span>
       </p>
 
-      {/* What fits: one route per language, then the day */}
+      {/* What fits: the route for the chosen language, then the day */}
       <div className="mt-14 md:mt-20 space-y-12" aria-live="polite">
-        <Lane id="a" who={`${L(langA)} · ${t.level[levelA]}`} level={levelA} goal={goal} lang={lang} reduce={reduce} />
-        <AnimatePresence initial={false}>
-          {count === 2 && (
-            <motion.div
-              key="b"
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? undefined : { opacity: 0, y: 16 }}
-              transition={{ duration: 0.35 }}
-            >
-              <Lane id="b" who={`${L(langB)} · ${t.level[levelB]}`} level={levelB} goal={goal} lang={lang} reduce={reduce} />
-              <p className="mt-6 flex items-center gap-2 text-stone-500">
+        <div>
+          {count === 2 ? (
+            <div className="mb-8">
+              <div role="tablist" aria-label={t.s.learning} className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-100">
+                {(['a', 'b'] as const).map((k) => {
+                  const active = laneSel === k;
+                  const key = k === 'a' ? langA : langB;
+                  const lev = k === 'a' ? levelA : levelB;
+                  return (
+                    <button key={k} type="button" role="tab" aria-selected={active} onClick={() => setLaneSel(k)}
+                      className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}>
+                      <span className={`font-serif text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(key)}</span>
+                      <span className="ml-2 text-sm text-stone-500">{t.level[lev]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-4 flex items-center gap-2 text-stone-500">
                 <Sparkles size={16} className="text-ehyo-indigo flex-shrink-0" aria-hidden="true" />
                 {t.multiNote}
               </p>
-            </motion.div>
+            </div>
+          ) : (
+            <h3 className="font-serif text-2xl font-bold text-ehyo-text mb-2">{L(langA)} · {t.level[levelA]}</h3>
           )}
-        </AnimatePresence>
-        <DayPlan time={time} level={levelA} lang={lang} who={L(langA)} reduce={reduce} />
+          <Lane key={lane} id={lane} level={laneLevel} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
+        </div>
+        <DayPlan time={time} level={laneLevel} lang={lang} who={L(laneLang)} reduce={reduce} />
       </div>
     </div>
   );
