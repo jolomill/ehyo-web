@@ -11,7 +11,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
 import { StudyDiagram, type StudyMode } from './components/StudyModes';
-import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock } from 'lucide-react';
+import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, RefreshCw, type LucideIcon } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
   <div className="flex items-center cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
@@ -19,33 +19,32 @@ const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
   </div>
 );
 
-const ProblemOnlyCard = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
-  <div className="bg-stone-50/70 p-8 rounded-2xl border border-stone-100">
-    <div className="flex items-start gap-4">
-      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-stone-400 flex-shrink-0">
-        <Icon size={24} strokeWidth={1.5} />
-      </div>
-      <div>
-        <h3 className="font-serif text-lg font-bold text-stone-500 leading-snug">{title}</h3>
-        <p className="text-sm text-stone-400 leading-relaxed mt-1">{description}</p>
-      </div>
-    </div>
-  </div>
-);
-
-const SolutionCard = ({ title, description, visual }: { title: string, description: string, visual?: React.ReactNode }) => (
-  <div className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md hover:border-ehyo-indigo/20 transition-all duration-300">
-    <div className="flex items-center gap-2 mb-3 text-ehyo-sage">
-      <Check size={20} strokeWidth={2.5} />
-      <span className="font-serif text-lg font-bold text-ehyo-text">{title}</span>
-    </div>
-    <p className="text-stone-600 leading-relaxed">{description}</p>
-    {visual && <div className="mt-6">{visual}</div>}
-  </div>
-);
-
 type Language = 'en' | 'zh';
 type Page = 'home' | 'changelog' | 'roadmap' | 'privacy';
+
+type ProblemItem = {
+  icon: LucideIcon;
+  problem?: string;
+  problemDetail?: string;
+  title: string;
+  description: string;
+  visual?: React.ReactNode;
+};
+
+// The answer to one problem: what used to go wrong, how EhYo handles it, and its animation.
+const ProblemAnswer = ({ item }: { item: ProblemItem }) => (
+  <div>
+    {item.problem && (
+      <div className="mb-6 pb-6 border-b border-stone-100">
+        <div className="text-sm font-bold text-stone-400 line-through decoration-ehyo-coral/70">{item.problem}</div>
+        {item.problemDetail && <p className="text-sm text-stone-500 leading-relaxed mt-1">{item.problemDetail}</p>}
+      </div>
+    )}
+    <h3 className="font-serif text-2xl font-bold text-ehyo-text mb-3">{item.title}</h3>
+    <p className="text-stone-600 leading-relaxed">{item.description}</p>
+    {item.visual && <div className="mt-6">{item.visual}</div>}
+  </div>
+);
 
 const translations = {
   en: {
@@ -492,6 +491,7 @@ const App: React.FC = () => {
   type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
   const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
   const [studyMode, setStudyMode] = useState<StudyMode>('beginner');
+  const [probIdx, setProbIdx] = useState(0);
   const [imageIdx, setImageIdx] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
 
@@ -509,6 +509,15 @@ const App: React.FC = () => {
   };
 
   const t = translations[lang];
+  const problems: ProblemItem[] = [
+    { icon: FolderOpen, problem: t.prob.c1_t, problemDetail: t.prob.c1_d, title: t.prob.s1_t, description: t.prob.s1_d, visual: <CentralizeVisual /> },
+    { icon: Clock, problem: t.prob.c2_t, problemDetail: t.prob.c2_d, title: t.prob.s2_t, description: t.prob.s2_d, visual: <TimeSaveVisual text={t.vis.time} /> },
+    { icon: Lightbulb, problem: t.prob.c3_t, problemDetail: t.prob.c3_d, title: t.prob.s3_t, description: t.prob.s3_d, visual: <LevelVisual text={t.vis.level} /> },
+    { icon: RotateCcw, problem: t.prob.c4_t, problemDetail: t.prob.c4_d, title: t.prob.s4_t, description: t.prob.s4_d, visual: <WeaknessVisual bubble={t.vis.weak} /> },
+    { icon: Scale, problem: t.prob.c5_t, problemDetail: t.prob.c5_d, title: t.prob.s5_t, description: t.prob.s5_d, visual: <video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[260px] mx-auto rounded-xl" /> },
+    { icon: Hourglass, problem: t.prob.c6_t, problemDetail: t.prob.c6_d, title: t.prob.s6_t, description: t.prob.s6_d },
+    { icon: RefreshCw, title: t.prob.s7_t, description: t.prob.s7_d, visual: <SyncVisual text={t.vis.sync} /> },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -629,35 +638,42 @@ const App: React.FC = () => {
               <h2 className="font-serif text-4xl">{t.prob.title}</h2>
             </div>
 
-            {/* The problems, as a compact grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <ProblemOnlyCard icon={FolderOpen} title={t.prob.c1_t} description={t.prob.c1_d} />
-              <ProblemOnlyCard icon={Clock} title={t.prob.c2_t} description={t.prob.c2_d} />
-              <ProblemOnlyCard icon={Lightbulb} title={t.prob.c3_t} description={t.prob.c3_d} />
-              <ProblemOnlyCard icon={RotateCcw} title={t.prob.c4_t} description={t.prob.c4_d} />
-              <ProblemOnlyCard icon={Scale} title={t.prob.c5_t} description={t.prob.c5_d} />
-              <ProblemOnlyCard icon={Hourglass} title={t.prob.c6_t} description={t.prob.c6_d} />
-            </div>
-
-            <div className="flex items-center gap-4 my-14 max-w-xl mx-auto">
-              <div className="h-px flex-1 bg-stone-200" />
-              <h3 className="font-serif text-2xl text-ehyo-text whitespace-nowrap">{t.prob.sol_title}</h3>
-              <div className="h-px flex-1 bg-stone-200" />
-            </div>
-
-            {/* How EhYo solves them: two-column masonry so cards of different heights pack without gaps */}
-            <div className="columns-1 md:columns-2 gap-6 [&>*]:break-inside-avoid [&>*]:mb-6">
-              <SolutionCard title={t.prob.s1_t} description={t.prob.s1_d} visual={<CentralizeVisual />} />
-              <SolutionCard title={t.prob.s2_t} description={t.prob.s2_d} visual={<TimeSaveVisual text={t.vis.time} />} />
-              <SolutionCard title={t.prob.s3_t} description={t.prob.s3_d} visual={<LevelVisual text={t.vis.level} />} />
-              <SolutionCard title={t.prob.s4_t} description={t.prob.s4_d} visual={<WeaknessVisual bubble={t.vis.weak} />} />
-              <SolutionCard
-                title={t.prob.s5_t}
-                description={t.prob.s5_d}
-                visual={<video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[260px] mx-auto rounded-xl" />}
-              />
-              <SolutionCard title={t.prob.s6_t} description={t.prob.s6_d} />
-              <SolutionCard title={t.prob.s7_t} description={t.prob.s7_d} visual={<SyncVisual text={t.vis.sync} />} />
+            {/* Each problem beside how EhYo solves it: pick a row, the card on the right shows the answer.
+                On small screens the answer opens under the chosen row instead. */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start max-w-6xl mx-auto">
+              <ul role="tablist" aria-label={t.prob.title} className="lg:col-span-5 border-t border-stone-200">
+                {problems.map((item, i) => {
+                  const active = probIdx === i;
+                  return (
+                    <li key={i} className="border-b border-stone-200">
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => setProbIdx(i)}
+                        className={`w-full flex items-center gap-4 text-left px-4 py-4 my-1 rounded-2xl transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}
+                      >
+                        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${active ? 'bg-ehyo-indigo/10 text-ehyo-indigo' : 'bg-stone-100 text-stone-400'}`}>
+                          <item.icon size={20} />
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          {item.problem && (
+                            <span className="block text-sm text-stone-400 line-through decoration-ehyo-coral/70">{item.problem}</span>
+                          )}
+                          <span className={`block font-serif text-lg font-bold ${active ? 'text-ehyo-indigo' : 'text-ehyo-text'}`}>{item.title}</span>
+                        </span>
+                        <ArrowRight size={18} className={`flex-shrink-0 transition-all duration-200 ${active ? 'text-ehyo-indigo translate-x-0' : 'text-stone-300 -translate-x-1'}`} />
+                      </button>
+                      {active && <div className="lg:hidden px-1 pb-6 pt-2"><ProblemAnswer item={item} /></div>}
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-28">
+                <div key={`${lang}-${probIdx}`} role="tabpanel" className="bg-white p-8 rounded-3xl border border-stone-100 shadow-sm min-h-[520px] motion-safe-fade animate-[fadeUp_0.35s_ease-out]">
+                  <ProblemAnswer item={problems[probIdx]} />
+                </div>
+              </div>
             </div>
           </div>
         </section>
