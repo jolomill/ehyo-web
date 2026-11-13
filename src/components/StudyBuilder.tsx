@@ -5,7 +5,7 @@
 
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { BookOpen, ChevronDown, ChevronRight, Route, Sparkles, Check } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronRight, Route, Sparkles, Check, Laptop, Smartphone, RefreshCw } from 'lucide-react';
 import { EhYoMark } from './EhYoMark';
 
 // "Describe yourself, see how EhYo fits": the visitor fills in one sentence and the
@@ -80,8 +80,13 @@ const TEXT = {
       content: ['閱讀', '聽力'], travel: ['聽力', '跟讀'], exam: ['寫作批改', '單字'], work: ['寫作', '閱讀'], maintain: ['單字複習', '跨裝置同步'],
     } as Record<Goal, string[]>,
     acts: {
-      path: '學習路徑的一個單元', read: '讀或看喜歡的素材', write: '寫一段，馬上批改', shadow: '跟讀練口說', review: '單字複習', boost: '學習路徑：補強弱點',
+      path: '學習路徑的一個單元', read: '讀文章、看影片', note: '邊讀邊存單字、做筆記', write: '寫一段，馬上批改', boost: '學習路徑：補強弱點', review: '單字複習', shadow: '跟讀練口說',
     },
+    device: {
+      desk: { name: '電腦', role: '專心學', hint: '大螢幕讀得久，筆記和單字順手存' },
+      phone: { name: '手機', role: '隨時複習', hint: '通勤、排隊的空檔，複習剛存的內容' },
+    },
+    synced: '自動同步',
   },
   en: {
     title: 'How EhYo fits you',
@@ -130,19 +135,38 @@ const TEXT = {
       content: ['Reading', 'Listening'], travel: ['Listening', 'Shadowing'], exam: ['Writing feedback', 'Vocabulary'], work: ['Writing', 'Reading'], maintain: ['Vocabulary review', 'Sync across devices'],
     } as Record<Goal, string[]>,
     acts: {
-      path: 'One learning path unit', read: 'Read or watch what you love', write: 'Write a paragraph, get feedback', shadow: 'Shadow to practise speaking', review: 'Vocabulary review', boost: 'Learning path: fix weak spots',
+      path: 'One learning path unit', read: 'Read articles, watch videos', note: 'Save words and take notes as you read', write: 'Write a paragraph, get feedback', boost: 'Learning path: fix weak spots', review: 'Vocabulary review', shadow: 'Shadow to practise speaking',
     },
+    device: {
+      desk: { name: 'Computer', role: 'Focused study', hint: 'A big screen for long reads; notes and words saved as you go' },
+      phone: { name: 'Phone', role: 'Review anywhere', hint: "On the commute or in a queue, go over what you just saved" },
+    },
+    synced: 'Synced automatically',
   },
 };
 
 type Act = keyof typeof TEXT.zh.acts;
+type Device = 'desk' | 'phone';
+// Long, focused study happens at the computer; the phone is for review in spare moments
+const ACT_DEVICE: Record<Act, Device> = { path: 'desk', read: 'desk', note: 'desk', write: 'desk', boost: 'desk', review: 'phone', shadow: 'phone' };
 // A day's plan: activity and minutes, by time and level
 const DAY: Record<Time, Record<Level, [Act, number][]>> = {
-  15: { beginner: [['path', 10], ['review', 5]], experienced: [['read', 10], ['review', 5]], advanced: [['read', 10], ['boost', 5]] },
-  30: { beginner: [['path', 15], ['read', 10], ['review', 5]], experienced: [['read', 15], ['write', 10], ['review', 5]], advanced: [['read', 15], ['write', 10], ['boost', 5]] },
-  60: { beginner: [['path', 25], ['read', 20], ['write', 10], ['review', 5]], experienced: [['read', 25], ['write', 15], ['shadow', 10], ['boost', 10]], advanced: [['read', 25], ['write', 20], ['shadow', 10], ['boost', 5]] },
+  15: {
+    beginner: [['path', 10], ['review', 5]],
+    experienced: [['read', 10], ['review', 5]],
+    advanced: [['read', 10], ['review', 5]],
+  },
+  30: {
+    beginner: [['path', 15], ['note', 5], ['review', 10]],
+    experienced: [['read', 15], ['note', 5], ['review', 10]],
+    advanced: [['read', 15], ['write', 5], ['review', 10]],
+  },
+  60: {
+    beginner: [['path', 25], ['read', 10], ['note', 5], ['review', 10], ['shadow', 10]],
+    experienced: [['read', 25], ['write', 15], ['review', 10], ['shadow', 10]],
+    advanced: [['read', 20], ['write', 15], ['boost', 10], ['review', 5], ['shadow', 10]],
+  },
 };
-const ACT_PART: Record<Act, Part> = { path: 'path', boost: 'path', read: 'toolkit', write: 'toolkit', shadow: 'toolkit', review: 'ehyo' };
 const PART_STYLE: Record<Part, { bar: string; soft: string; text: string }> = {
   path: { bar: 'bg-ehyo-indigo', soft: 'bg-ehyo-indigo/10', text: 'text-ehyo-indigo' },
   ehyo: { bar: 'bg-ehyo-sage', soft: 'bg-ehyo-sage/15', text: 'text-[#5E6B45]' },
@@ -358,43 +382,73 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
 };
 
 // The day plan: one bar split by minutes, coloured by which part each activity uses
+const DEVICE_STYLE: Record<Device, { bar: string; soft: string; text: string }> = {
+  desk: { bar: 'bg-ehyo-indigo', soft: 'bg-ehyo-indigo/10', text: 'text-ehyo-indigo' },
+  phone: { bar: 'bg-ehyo-coral', soft: 'bg-ehyo-coral/15', text: 'text-[#B23A5E]' },
+};
+
+// One device's share of the day
+const DeviceColumn: React.FC<{ d: Device; items: [Act, number][]; lang: Lang }> = ({ d, items, lang }) => {
+  const t = TEXT[lang];
+  const Icon = d === 'desk' ? Laptop : Smartphone;
+  const st = DEVICE_STYLE[d];
+  return (
+    <div className="min-w-0">
+      <div className="flex items-center gap-3 mb-4">
+        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><Icon size={20} strokeWidth={1.75} /></span>
+        <span className="min-w-0">
+          <span className="block font-semibold text-ehyo-text">{t.device[d].name} · {t.device[d].role}<span className="ml-2 text-sm font-normal text-stone-500">{items.reduce((n, [, m]) => n + m, 0)} {t.min}</span></span>
+          <span className="block text-sm text-stone-500">{t.device[d].hint}</span>
+        </span>
+      </div>
+      <ol className="list-none p-0 m-0 space-y-2">
+        {items.map(([a, m], i) => (
+          <li key={i} className="flex items-baseline justify-between gap-4 rounded-xl bg-ehyo-bg px-4 py-3">
+            <span className="text-ehyo-text">{t.acts[a]}</span>
+            <span className="text-sm text-stone-500 whitespace-nowrap tabular-nums">{m} {t.min}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+};
+
+// The day plan, split by device: study at the computer, review on the phone, one record across both
 const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; reduce: boolean }> = ({ time, level, lang, who, reduce }) => {
   const t = TEXT[lang];
   const plan = DAY[time][level];
-  const total = plan.reduce((s, [, m]) => s + m, 0);
+  const total = plan.reduce((n, [, m]) => n + m, 0);
+  const of = (d: Device) => plan.filter(([a]) => ACT_DEVICE[a] === d);
+  // the bar runs computer first, then phone
+  const ordered = [...of('desk'), ...of('phone')];
   return (
     <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
         <h3 className="font-sans text-xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
         <span className="text-sm text-stone-500">{t.dayFor(who)}</span>
       </div>
-      <div className="flex h-4 rounded-full overflow-hidden bg-stone-100 gap-0.5" aria-hidden="true">
-        {plan.map(([a, m], i) => (
+      <div className="flex h-3 rounded-full overflow-hidden bg-stone-100 gap-0.5 mb-8" aria-hidden="true">
+        {ordered.map(([a, m], i) => (
           <motion.span
             key={`${time}-${level}-${i}`}
-            className={`h-full ${PART_STYLE[ACT_PART[a]].bar}`}
+            className={`h-full ${DEVICE_STYLE[ACT_DEVICE[a]].bar} ${i > 0 && ACT_DEVICE[a] === ACT_DEVICE[ordered[i - 1][0]] ? 'opacity-80' : ''}`}
             initial={reduce ? false : { width: 0 }}
             animate={{ width: `${(m / total) * 100}%` }}
             transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.08, ease: [0.16, 1, 0.3, 1] }}
           />
         ))}
       </div>
-      <ol className="mt-6 grid gap-4 sm:gap-6 sm:[grid-template-columns:var(--cols)] list-none p-0 m-0" style={{ ['--cols' as string]: `repeat(${plan.length}, minmax(0, 1fr))` }}>
-        {plan.map(([a, m], i) => {
-          const part = ACT_PART[a];
-          return (
-            <li key={i} className="flex items-start gap-3">
-              <span className={`mt-1.5 w-2.5 h-2.5 rounded-full flex-shrink-0 ${PART_STYLE[part].bar}`} aria-hidden="true" />
-              <span>
-                <span className="block text-ehyo-text font-semibold">{t.acts[a]}</span>
-                <span className="block text-sm text-stone-500">
-                  {m} {t.min}
-                </span>
-              </span>
-            </li>
-          );
-        })}
-      </ol>
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-6 md:gap-8 items-start">
+        <DeviceColumn d="desk" items={of('desk')} lang={lang} />
+        {/* one record across both devices */}
+        <div className="flex md:flex-col items-center justify-center gap-2 text-ehyo-indigo md:pt-2" aria-hidden="true">
+          <motion.span animate={reduce ? undefined : { rotate: 360 }} transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: 'linear' }} className="w-10 h-10 rounded-full bg-ehyo-indigo/10 flex items-center justify-center">
+            <RefreshCw size={18} />
+          </motion.span>
+          <span className="text-xs font-semibold whitespace-nowrap">{t.synced}</span>
+        </div>
+        <DeviceColumn d="phone" items={of('phone')} lang={lang} />
+      </div>
     </div>
   );
 };
