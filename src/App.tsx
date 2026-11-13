@@ -754,34 +754,6 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Core Concept: Personal Learning Path */}
-        <section className="py-24 bg-ehyo-text text-white overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-indigo blur-[120px] absolute top-[-100px] left-[-100px]"></div>
-            <div className="w-[500px] h-[500px] rounded-full bg-ehyo-coral blur-[120px] absolute bottom-[-100px] right-[-100px]"></div>
-          </div>
-
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 text-ehyo-coral text-xs font-bold tracking-widest uppercase rounded-full mb-6 border border-white/10">
-                  {t.engine.tag}
-                </div>
-                <h2 className="font-serif text-4xl md:text-5xl mb-6">{t.engine.title}</h2>
-                <p className="text-lg text-stone-300 mb-6 leading-relaxed">
-                  {t.engine.p1}
-                </p>
-                <p className="text-lg text-stone-300 leading-relaxed">
-                  {t.engine.p2}
-                </p>
-              </div>
-              <div className="flex justify-center">
-                <LearningPathVisual text={t.engine.path} />
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="py-32 bg-white text-center">
           <div className="container mx-auto px-6">
