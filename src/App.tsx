@@ -10,7 +10,7 @@ import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
-import { StudyDiagram, type StudyMode } from './components/StudyModes';
+import { StudyBuilder, type StudyPart, type StudyDetailContext } from './components/StudyBuilder';
 import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, RefreshCw, type LucideIcon } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
@@ -109,6 +109,11 @@ const translations = {
       c3_d: "Find your weak spots and conquer them. EhYo helps move them into long-term memory.",
       c4_t: "Real-World Practice",
       c4_d: "Join EhYo events like postcard exchanges — connect with native speakers and put your language to real use."
+    },
+    builder: {
+      tag: "How to learn with EhYo",
+      title: "How EhYo fits you",
+      sub: "Tap the underlined words to describe yourself. EhYo lines up the way that suits you below.",
     },
     study: {
       tag: "How to learn with EhYo",
@@ -322,6 +327,11 @@ const translations = {
       c4_t: "社交輸出",
       c4_d: "明信片交換等社交功能，讓你跟世界各地的母語者互動，把學到的語言真正用出來。"
     },
+    builder: {
+      tag: "如何用 EhYo 自學",
+      title: "你的 EhYo 學習方式",
+      sub: "點一下句子裡的底線，換成你的狀況。下面會排出最適合你的學法。",
+    },
     study: {
       tag: "如何用 EhYo 自學",
       title: "怎麼學，都不白費",
@@ -474,6 +484,51 @@ const translations = {
 };
 
 
+// What each step of "How EhYo fits you" opens: the site's own screens, animations and copy
+type Showcase = (typeof translations)['zh']['showcase'];
+type ToolTab = 'listening' | 'reading' | 'vocabulary' | 'writing';
+const TOOL_ORDER: ToolTab[] = ['listening', 'reading', 'vocabulary', 'writing'];
+// the tool a goal uses most opens first
+const GOAL_TOOL: Record<StudyDetailContext['goal'], ToolTab> = { content: 'reading', travel: 'listening', exam: 'writing', work: 'writing', maintain: 'vocabulary' };
+
+const ToolkitDetail: React.FC<{ showcase: Showcase; goal: StudyDetailContext['goal'] }> = ({ showcase, goal }) => {
+  const [tool, setTool] = useState<ToolTab>(GOAL_TOOL[goal]);
+  const [idx, setIdx] = useState(0);
+  const slides = showcase[tool].slides;
+  const slide = slides[Math.min(idx, slides.length - 1)];
+  return (
+    <div>
+      <div role="tablist" className="flex flex-wrap gap-2 mb-6">
+        {TOOL_ORDER.map((k) => (
+          <button key={k} type="button" role="tab" aria-selected={tool === k} onClick={() => { setTool(k); setIdx(0); }}
+            className={`rounded-full px-4 py-2 text-sm border transition-colors duration-200 ${tool === k ? 'bg-ehyo-indigo/10 border-ehyo-indigo/30 text-ehyo-indigo font-semibold' : 'bg-white border-stone-200 text-stone-600 hover:border-ehyo-indigo/40'}`}>
+            {showcase.tabs[k]}
+          </button>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,200px)_minmax(0,1fr)] gap-6 items-start">
+        <img key={slide.image} src={slide.image} alt={slide.title} loading="lazy" className="w-full max-w-[200px] mx-auto rounded-[22px] shadow-lg border border-stone-100" />
+        <div>
+          <h5 className="text-xl font-bold text-ehyo-text mb-3">{slide.title}</h5>
+          <ul className="space-y-2 text-stone-600 list-none p-0 m-0">
+            {slide.bullets.map((b, i) => (
+              <li key={i} className="flex gap-2"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-ehyo-indigo flex-shrink-0" />{b}</li>
+            ))}
+          </ul>
+          {slides.length > 1 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {slides.map((sl, i) => (
+                <button key={i} type="button" onClick={() => setIdx(i)} aria-pressed={idx === i}
+                  className={`text-sm rounded-full px-3 py-1.5 border ${idx === i ? 'border-ehyo-indigo/40 text-ehyo-indigo bg-ehyo-indigo/5' : 'border-stone-200 text-stone-500'}`}>{sl.title}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -490,7 +545,6 @@ const App: React.FC = () => {
   const [page, setPage] = useState<Page>('home');
   type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
   const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
-  const [studyMode, setStudyMode] = useState<StudyMode>('beginner');
   const [probIdx, setProbIdx] = useState(0);
   const [imageIdx, setImageIdx] = useState(0);
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
@@ -509,6 +563,27 @@ const App: React.FC = () => {
   };
 
   const t = translations[lang];
+  const renderStudyDetail = (part: StudyPart, ctx: StudyDetailContext) => {
+    if (part === 'toolkit') return <ToolkitDetail key={`${ctx.goal}-${lang}`} showcase={t.showcase} goal={ctx.goal} />;
+    if (part === 'sync') return <SyncVisual text={t.vis.sync} />;
+    if (part === 'path') return (
+      <div className="rounded-2xl bg-ehyo-text p-4 md:p-6 flex justify-center overflow-hidden"><LearningPathVisual text={t.engine.path} /></div>
+    );
+    return (
+      <div className="grid gap-6">
+        <div>
+          <h5 className="text-lg font-bold text-ehyo-text mb-1">{t.prob.s4_t}</h5>
+          <p className="text-stone-600 text-[15px] leading-relaxed mb-4">{t.prob.s4_d}</p>
+          <WeaknessVisual bubble={t.vis.weak} />
+        </div>
+        <div>
+          <h5 className="text-lg font-bold text-ehyo-text mb-1">{t.prob.s5_t}</h5>
+          <p className="text-stone-600 text-[15px] leading-relaxed mb-4">{t.prob.s5_d}</p>
+          <video src="/brainxp.mp4" autoPlay loop muted playsInline className="block w-full max-w-[240px] mx-auto rounded-xl" />
+        </div>
+      </div>
+    );
+  };
   const problems: ProblemItem[] = [
     { icon: FolderOpen, problem: t.prob.c1_t, problemDetail: t.prob.c1_d, title: t.prob.s1_t, description: t.prob.s1_d, visual: <CentralizeVisual /> },
     { icon: Clock, problem: t.prob.c2_t, problemDetail: t.prob.c2_d, title: t.prob.s2_t, description: t.prob.s2_d, visual: <TimeSaveVisual text={t.vis.time} /> },
@@ -631,6 +706,18 @@ const App: React.FC = () => {
           </div>
         </section>
 
+        {/* How EhYo fits you: the visitor describes themselves, EhYo lines up the route */}
+        <section id="how" className="py-24 md:py-28 bg-[#FBFAF6]">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-10 md:mb-14 max-w-2xl mx-auto">
+              <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.builder.tag}</div>
+              <h2 className="font-sans font-bold tracking-tight text-4xl md:text-5xl mb-4">{t.builder.title}</h2>
+              <p className="text-stone-500 leading-relaxed">{t.builder.sub}</p>
+            </div>
+            <StudyBuilder key={lang} lang={lang} renderDetail={renderStudyDetail} />
+          </div>
+        </section>
+
         {/* Problems Section */}
         <section id="problems" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
@@ -710,72 +797,8 @@ const App: React.FC = () => {
             their own material; both parts feed each other. */}
         <section id="features" className="py-24 bg-[#FBFAF6]">
           <div className="container mx-auto px-6">
-            <div className="text-center mb-12 max-w-2xl mx-auto">
-              <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.study.tag}</div>
-              <h2 className="font-serif text-4xl mb-4">{t.study.title}</h2>
-              <p className="text-stone-500 leading-relaxed">{t.study.sub}</p>
-            </div>
-
-            {/* Fixed: self-study toolkit, EhYo, personal learning path */}
-            <StudyDiagram text={t.study.diagram} />
-
-            {/* Who are you? Picks the content below */}
-            <div role="tablist" className="grid grid-cols-2 gap-2 max-w-xl mx-auto mt-14 mb-4 p-1.5 rounded-2xl bg-stone-100">
-              {(['beginner', 'experienced'] as const).map((m) => {
-                const active = studyMode === m;
-                return (
-                  <button
-                    key={m}
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setStudyMode(m)}
-                    className={`rounded-xl px-3 py-3 text-center transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}
-                  >
-                    <span className={`block font-serif text-base md:text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{t.study.tabs[m]}</span>
-                    <span className="block text-xs text-stone-500 mt-0.5">{t.study.taglines[m]}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* One account, a different starting point per language */}
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-stone-500 text-center">
-              <span className="w-full md:w-auto">{t.study.multi}</span>
-              {t.study.chips.map((c) => {
-                const on = c.mode === studyMode;
-                return (
-                  <button
-                    key={c.lang}
-                    type="button"
-                    onClick={() => setStudyMode(c.mode)}
-                    aria-pressed={on}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${on ? 'border-ehyo-indigo/40 bg-ehyo-indigo/10 text-ehyo-text' : 'border-stone-200 bg-white text-stone-500 hover:border-stone-300'}`}
-                  >
-                    <span className="font-semibold">{c.lang}</span>
-                    <span className="text-stone-300">·</span>
-                    <span>{c.level}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <p key={`lead-${studyMode}`} className="text-center text-ehyo-text font-medium max-w-2xl mx-auto mt-10 leading-relaxed animate-fade-in-up">
-              {t.study.lead[studyMode]}
-            </p>
-
-            {/* How it goes, step by step */}
-            <ol key={studyMode} className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mt-8 animate-fade-in-up">
-              {t.study.steps[studyMode].map((st, i) => (
-                <li key={i} className="bg-white p-6 rounded-2xl border border-stone-100 shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo font-bold flex items-center justify-center mb-4">{i + 1}</div>
-                  <h4 className="font-serif text-lg font-bold mb-2 text-ehyo-text">{st.t}</h4>
-                  <p className="text-stone-500 text-sm leading-relaxed">{st.d}</p>
-                </li>
-              ))}
-            </ol>
-
             {/* The toolkit, for everyone */}
-            <div className="mt-24">
+            <div>
               <div className="text-center max-w-2xl mx-auto mb-10">
                 <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.study.toolkit.tag}</div>
                 <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.toolkit.title}</h3>
