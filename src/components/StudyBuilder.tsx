@@ -448,6 +448,9 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
               {i < picks.length - 1 ? s.and : s.comma}{sp}
             </span>
           ))}
+        </p>
+        {/* the time and the goal start their own line */}
+        <p>
           {s.perDay}{sp}
           <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} placeholder={t.ph.time} />{sp}{s.canLearn}{s.comma}</span>
           {sp}{s.for}{sp}
