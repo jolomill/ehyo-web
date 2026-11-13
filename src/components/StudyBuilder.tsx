@@ -43,7 +43,6 @@ const TEXT = {
     level: { beginner: '初學者', experienced: '有基礎', advanced: '進階想要更好' } as Record<Level, string>,
     time: { 15: '15 分鐘以內', 30: '30 分鐘左右', 60: '一小時以上' } as Record<Time, string>,
     goal: { content: '看懂喜歡的內容', travel: '旅行與日常會話', exam: '考試或檢定', work: '工作需要', maintain: '維持不退步' } as Record<Goal, string>,
-    soon: '即將推出',
     boost: '補強',
     focus: '最常用',
     route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
@@ -94,7 +93,6 @@ const TEXT = {
     level: { beginner: 'beginner level', experienced: 'intermediate level', advanced: 'advanced level, aiming higher' } as Record<Level, string>,
     time: { 15: '15 minutes or less', 30: 'about 30 minutes', 60: 'an hour or more' } as Record<Time, string>,
     goal: { content: 'enjoy content I love', travel: 'travel and chat', exam: 'pass an exam', work: 'use it at work', maintain: 'keep what I know' } as Record<Goal, string>,
-    soon: 'Coming soon',
     boost: 'Fix weak spots',
     focus: 'Use most',
     route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
@@ -230,20 +228,15 @@ export type StudyDetailContext = { goal: Goal; level: Level; lang: Lang };
 type RenderDetail = (part: Part, ctx: StudyDetailContext) => React.ReactNode;
 
 const PartIcon: React.FC<{ part: Part; size?: 'sm' | 'md' }> = ({ part, size = 'md' }) => {
-  if (part === 'ehyo') return <EhYoMark className={size === 'sm' ? 'w-9' : 'w-12'} />;
+  if (part === 'ehyo') return <EhYoMark className={size === 'sm' ? 'w-7' : 'w-12'} />;
   const Icon = part === 'path' ? Route : BookOpen;
   return <Icon size={size === 'sm' ? 18 : 22} strokeWidth={1.75} />;
 };
 
 const Badges: React.FC<{ part: Part; level: Level; lang: Lang }> = ({ part, level, lang }) => {
   const t = TEXT[lang];
-  if (part !== 'path') return null;
-  return (
-    <>
-      {level !== 'beginner' && <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>}
-      <span className="text-xs font-semibold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#B23A5E]">{t.soon}</span>
-    </>
-  );
+  if (part !== 'path' || level === 'beginner') return null;
+  return <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>;
 };
 
 const cardText = (part: Part, level: Level, goal: Goal, lang: Lang) => {
@@ -253,17 +246,22 @@ const cardText = (part: Part, level: Level, goal: Goal, lang: Lang) => {
 };
 
 // The open part: what it is for this visitor, then its own material
-const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; renderDetail?: RenderDetail }> = ({ part, level, goal, lang, renderDetail }) => {
+// `inline`: opened under its own card on small screens, where the card already shows the name and title
+const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; renderDetail?: RenderDetail; inline?: boolean }> = ({ part, level, goal, lang, renderDetail, inline }) => {
   const t = TEXT[lang];
   const { title, desc } = cardText(part, level, goal, lang);
   const st = PART_STYLE[part];
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-2 mb-2">
-        <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
-        <Badges part={part} level={level} lang={lang} />
-      </div>
-      <h4 className="font-sans text-xl md:text-2xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+      {!inline && (
+        <>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
+            <Badges part={part} level={level} lang={lang} />
+          </div>
+          <h4 className="font-sans text-xl md:text-2xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+        </>
+      )}
       <p className="text-stone-600 leading-relaxed">{desc}</p>
       {part === 'toolkit' && (
         <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
@@ -289,7 +287,6 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
       <div className="lg:col-span-5">
-        <p className="text-stone-500 mb-5">{t.route[level]}</p>
         <LayoutGroup id={id}>
           <ol role="tablist" aria-orientation="vertical" className="list-none p-0 m-0">
             {order.map((part, i) => {
@@ -300,7 +297,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
               return (
                 <motion.li key={part} layout={!reduce} layoutId={`${id}-${part}`} transition={{ type: 'spring', stiffness: 260, damping: 30 }} className="flex gap-4">
                   {/* the step and the line down to the next one */}
-                  <div className="flex flex-col items-center flex-shrink-0">
+                  <div className="flex flex-col items-center flex-shrink-0 pt-4 md:pt-5">
                     <span className={`w-12 h-12 rounded-full flex items-center justify-center font-sans text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
                     {!last && <span className="w-px flex-1 min-h-6 bg-stone-200 my-1" aria-hidden="true" />}
                   </div>
@@ -313,7 +310,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                       className={`w-full text-left rounded-2xl p-4 md:p-5 border transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white border-stone-100 shadow-sm' : 'border-transparent hover:bg-white/60'}`}
                     >
                       <span className="flex items-center gap-3">
-                        <span className={`h-10 min-w-10 px-1.5 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><PartIcon part={part} size="sm" /></span>
+                        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><PartIcon part={part} size="sm" /></span>
                         <span className="flex-1 min-w-0">
                           <span className="flex flex-wrap items-center gap-2">
                             <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
@@ -329,7 +326,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                     {/* small screens: the detail opens right here */}
                     {active && (
                       <div className="lg:hidden mt-3 bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
-                        <Detail part={part} level={level} goal={goal} lang={lang} renderDetail={renderDetail} />
+                        <Detail part={part} level={level} goal={goal} lang={lang} renderDetail={renderDetail} inline />
                       </div>
                     )}
                   </div>
@@ -380,7 +377,7 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
           />
         ))}
       </div>
-      <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 list-none p-0 m-0">
+      <ol className="mt-6 grid gap-4 sm:gap-6 sm:[grid-template-columns:var(--cols)] list-none p-0 m-0" style={{ ['--cols' as string]: `repeat(${plan.length}, minmax(0, 1fr))` }}>
         {plan.map(([a, m], i) => {
           const part = ACT_PART[a];
           return (
@@ -389,7 +386,7 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
               <span>
                 <span className="block text-ehyo-text font-semibold">{t.acts[a]}</span>
                 <span className="block text-sm text-stone-500">
-                  {m} {t.min}{(a === 'path' || a === 'boost') && ` · ${t.soon}`}
+                  {m} {t.min}
                 </span>
               </span>
             </li>
@@ -517,11 +514,11 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
         animate={{ opacity: 1, y: 0 }}
         exit={reduce ? undefined : { opacity: 0, y: 12 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-14 md:mt-20 space-y-12"
+        className="mt-16 md:mt-24 space-y-12 md:space-y-16"
       >
         <div>
           {/* One tab per language, even with one; adding a language splits a new tab off the last one */}
-          <div className="mb-8">
+          <div className="mb-10 md:mb-12 flex flex-col items-center text-center gap-4">
             <LayoutGroup id="lang-tabs">
               <div role="tablist" aria-label={s.learning} className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-100">
                 <AnimatePresence initial={false}>
@@ -552,9 +549,10 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
                 </AnimatePresence>
               </div>
             </LayoutGroup>
+            <p className="text-ehyo-text font-medium">{t.route[cur.level]}</p>
             {picks.length > 1 && (
-              <p className="mt-4 flex items-center gap-2 text-stone-500">
-                <Sparkles size={16} className="text-ehyo-indigo flex-shrink-0" aria-hidden="true" />
+              <p className="-mt-2 text-sm text-stone-500 text-balance max-w-md">
+                <Sparkles size={14} className="inline-block align-[-2px] mr-1.5 text-ehyo-indigo" aria-hidden="true" />
                 {t.multiNote}
               </p>
             )}
