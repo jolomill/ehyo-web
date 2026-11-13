@@ -466,8 +466,10 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
   const full = picks.filter(done);
-  const lane = Math.min(laneSel, Math.max(full.length - 1, 0));
-  const cur = full[lane];
+  // The open tab, by position in the sentence; an unfinished language falls back to the first finished one
+  const sel = picks[laneSel];
+  const lane = sel && done(sel) ? laneSel : picks.findIndex(done);
+  const cur = full.length ? (picks[lane] as Pick) : undefined;
 
   const L = (k: LangKey) => t.lang[k];
   const lv = (v: Level) => t.level[v];
@@ -518,29 +520,45 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
         className="mt-14 md:mt-20 space-y-12"
       >
         <div>
-          {full.length > 1 ? (
-            <div className="mb-8">
+          {/* One tab per language, even with one; adding a language splits a new tab off the last one */}
+          <div className="mb-8">
+            <LayoutGroup id="lang-tabs">
               <div role="tablist" aria-label={s.learning} className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-100">
-                {full.map((p, i) => {
-                  const active = lane === i;
-                  return (
-                    <motion.button key={`${i}-${p.key}`} layout={!reduce} initial={reduce ? false : { opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}
-                      type="button" role="tab" aria-selected={active} onClick={() => setLaneSel(i)}
-                      className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}>
-                      <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key)}</span>
-                      <span className="ml-2 text-sm text-stone-500">{t.level[p.level]}</span>
-                    </motion.button>
-                  );
-                })}
+                <AnimatePresence initial={false}>
+                  {picks.map((p, i) => {
+                    const ok = done(p);
+                    const active = ok && lane === i;
+                    return (
+                      <motion.button
+                        key={i}
+                        layout={!reduce}
+                        initial={reduce ? false : { opacity: 0, x: -28, scale: 0.85 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={reduce ? undefined : { opacity: 0, x: -28, scale: 0.85 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                        type="button" role="tab" aria-selected={active} disabled={!ok} onClick={() => setLaneSel(i)}
+                        className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : ok ? 'hover:bg-white/60' : 'border border-dashed border-stone-300 cursor-default'}`}>
+                        {ok ? (
+                          <>
+                            <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key!)}</span>
+                            <span className="ml-2 text-sm text-stone-500">{t.level[p.level!]}</span>
+                          </>
+                        ) : (
+                          <span className="font-sans text-lg font-bold text-stone-300" aria-label={`${s.langsUnit || 'Language'} ${i + 1}`}>？</span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
+            </LayoutGroup>
+            {picks.length > 1 && (
               <p className="mt-4 flex items-center gap-2 text-stone-500">
                 <Sparkles size={16} className="text-ehyo-indigo flex-shrink-0" aria-hidden="true" />
                 {t.multiNote}
               </p>
-            </div>
-          ) : (
-            <h3 className="font-sans text-xl font-bold text-ehyo-text mb-2">{L(cur.key)} · {t.level[cur.level]}</h3>
-          )}
+            )}
+          </div>
           <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
         </div>
         <DayPlan time={time} level={cur.level} lang={lang} who={L(cur.key)} reduce={reduce} />
