@@ -55,7 +55,7 @@ const TEXT = {
       // Beginner: learn how the language is built, then practise using it
       beginner: {
         path: { t: '依照你的目標安排課程', d: '從最基本的文法和單字開始，EhYo 依你的目標排好學習順序，一步步建立語言的基礎架構。' },
-        ehyo: { t: 'EhYo 記住你卡住的地方', d: '卡住、答錯的地方，EhYo 都會記下來，幫你個人化調整接下來的課程內容。' },
+        ehyo: { t: '課程永遠跟得上你的程度', d: '卡住、答錯的地方，EhYo 都會記下來，隨時依你的程度調整課程，不會難到放棄，也不會簡單到無聊。' },
         toolkit: { t: '輕鬆複習，不用多想', d: (m: string) => `拿${m}來複習，不必自己排進度；EhYo 會隨時觀察你的複習狀況，幫你調整下一步。` },
         sync: { t: '在電腦學，用手機複習', d: '在電腦上專心上課、做筆記，通勤或排隊的空檔打開手機，複習今天學的單字和句型，紀錄自動同步。' },
       },
@@ -105,7 +105,7 @@ const TEXT = {
     cards: {
       beginner: {
         path: { t: 'Lessons planned around your goal', d: 'Start from the most basic grammar and words. EhYo puts them in order for your goal, so the structure of the language builds up step by step.' },
-        ehyo: { t: 'EhYo remembers where you got stuck', d: 'Wherever you get stuck or answer wrong, EhYo notes it and adjusts your next lessons to fit you.' },
+        ehyo: { t: 'Lessons that keep pace with you', d: "Wherever you get stuck or answer wrong, EhYo notes it and adjusts your lessons to your level as you go: never so hard you give up, never so easy you're bored." },
         toolkit: { t: 'Review without overthinking it', d: (m: string) => `Review with ${m}, no schedule to plan; EhYo keeps an eye on how your reviews go and adjusts what comes next.` },
         sync: { t: 'Study at the computer, review on your phone', d: "Take lessons and notes at the computer; on the commute or in a queue, open your phone to review today's words and patterns, with everything synced." },
       },
