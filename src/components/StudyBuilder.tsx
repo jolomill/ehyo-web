@@ -12,7 +12,8 @@ import { EhYoMark } from './EhYoMark';
 // three parts of EhYo line up in the order that suits them, with a day plan below.
 
 type Lang = 'en' | 'zh';
-type Level = 'beginner' | 'experienced';
+type Level = 'beginner' | 'experienced' | 'advanced';
+const LEVELS: Level[] = ['beginner', 'experienced', 'advanced'];
 type Count = 1 | 2 | 3;
 type Time = 15 | 30 | 60;
 type Goal = 'travel' | 'exam' | 'work' | 'content' | 'maintain';
@@ -21,9 +22,8 @@ type Part = 'path' | 'ehyo' | 'toolkit';
 const LANGS = ['en', 'zh', 'ja', 'ko', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ar', 'hi', 'th', 'vi', 'id', 'ms', 'tr', 'nl', 'pl', 'sv', 'no', 'da', 'fi', 'el', 'cs', 'uk', 'he', 'tl'] as const;
 type LangKey = (typeof LANGS)[number];
 type Pick = { key: LangKey; level: Level };
-const MAX_LANGS = 5;
 // Who the visitor starts as, before they change anything
-const START: Pick[] = [{ key: 'ja', level: 'beginner' }, { key: 'en', level: 'experienced' }, { key: 'ko', level: 'beginner' }, { key: 'es', level: 'beginner' }, { key: 'fr', level: 'beginner' }];
+const START: Pick[] = [{ key: 'ja', level: 'beginner' }, { key: 'en', level: 'experienced' }, { key: 'ko', level: 'advanced' }];
 
 const GOALS: Goal[] = ['content', 'travel', 'exam', 'work', 'maintain'];
 const TIMES: Time[] = [15, 30, 60];
@@ -31,22 +31,23 @@ const TIMES: Time[] = [15, 30, 60];
 const ORDER: Record<Level, Part[]> = {
   beginner: ['path', 'ehyo', 'toolkit'],
   experienced: ['toolkit', 'ehyo', 'path'],
+  advanced: ['toolkit', 'ehyo', 'path'],
 };
 
 const TEXT = {
   zh: {
     title: '你的 EhYo 學習方式',
     sub: '點一下句子裡的底線，換成你的狀況。下面會排出最適合你的學法。',
-    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', perDay: '每天大概有', for: '學語言是為了', end: '。', add: '再加一種', remove: '移除' },
-    count: { 1: '一種', 2: '兩種', 3: '三種以上' } as Record<Count, string>,
+    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', perDay: '每天大概有', for: '學語言是為了', end: '。' },
+    count: { 1: '一種', 2: '兩種', 3: '三種' } as Record<Count, string>,
     lang: { en: '英文', zh: '中文', ja: '日文', ko: '韓文', es: '西班牙文', fr: '法文', de: '德文', it: '義大利文', pt: '葡萄牙文', ru: '俄文', ar: '阿拉伯文', hi: '印地文', th: '泰文', vi: '越南文', id: '印尼文', ms: '馬來文', tr: '土耳其文', nl: '荷蘭文', pl: '波蘭文', sv: '瑞典文', no: '挪威文', da: '丹麥文', fi: '芬蘭文', el: '希臘文', cs: '捷克文', uk: '烏克蘭文', he: '希伯來文', tl: '菲律賓文' } as Record<LangKey, string>,
-    level: { beginner: '初學者', experienced: '有基礎' } as Record<Level, string>,
+    level: { beginner: '初學者', experienced: '有基礎', advanced: '進階想要更好' } as Record<Level, string>,
     time: { 15: '15 分鐘以內', 30: '30 分鐘左右', 60: '一小時以上' } as Record<Time, string>,
     goal: { content: '看懂喜歡的內容', travel: '旅行與日常會話', exam: '考試或檢定', work: '工作需要', maintain: '維持不退步' } as Record<Goal, string>,
     soon: '即將推出',
     boost: '補強',
     focus: '最常用',
-    route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強' } as Record<Level, string>,
+    route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
     multiNote: '每個語言各自記錄、各走各的順序，進度不會混在一起。',
     dayTitle: (t: string) => `每天 ${t}，可以這樣安排`,
     dayFor: (l: string) => `以${l}為例`,
@@ -67,6 +68,11 @@ const TEXT = {
         ehyo: { t: 'EhYo 找出你的弱點', d: '自學時犯的錯，EhYo 會整理成你的錯誤模式，不用自己記。' },
         path: { t: '針對弱點補強', d: '把不熟的地方排成專屬課程，練熟了再回到素材。' },
       },
+      advanced: {
+        toolkit: { t: '用道地的素材挑戰自己', d: (m: string) => `直接讀、直接聽${m}，細微的用法差異點一下就懂，生字和句型自動整理好。` },
+        ehyo: { t: 'EhYo 抓出你沒發現的習慣', d: '用字重複、說法不夠自然這些小地方，EhYo 也會記下來，整理成你的錯誤模式。' },
+        path: { t: '把最後的細節補起來', d: '針對你的錯誤模式排出專屬課程，讓表達更精準、更自然。' },
+      },
     },
     material: {
       content: '喜歡的劇、小說和歌詞', travel: '旅遊影片和日常對話', exam: '程度剛好的文章和範文', work: '工作信件和產業新聞', maintain: '平常會看的新聞和文章',
@@ -81,16 +87,16 @@ const TEXT = {
   en: {
     title: 'How EhYo fits you',
     sub: 'Tap the underlined words to describe yourself. EhYo lines up the way that suits you below.',
-    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', perDay: 'I have', for: 'a day, and I want to', end: '.', add: 'Add one', remove: 'Remove' },
-    count: { 1: 'one language', 2: 'two languages', 3: 'three or more languages' } as Record<Count, string>,
+    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', perDay: 'I have', for: 'a day, and I want to', end: '.' },
+    count: { 1: 'one language', 2: 'two languages', 3: 'three languages' } as Record<Count, string>,
     lang: { en: 'English', zh: 'Chinese', ja: 'Japanese', ko: 'Korean', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi', th: 'Thai', vi: 'Vietnamese', id: 'Indonesian', ms: 'Malay', tr: 'Turkish', nl: 'Dutch', pl: 'Polish', sv: 'Swedish', no: 'Norwegian', da: 'Danish', fi: 'Finnish', el: 'Greek', cs: 'Czech', uk: 'Ukrainian', he: 'Hebrew', tl: 'Tagalog' } as Record<LangKey, string>,
-    level: { beginner: 'beginner level', experienced: 'intermediate level' } as Record<Level, string>,
+    level: { beginner: 'beginner level', experienced: 'intermediate level', advanced: 'advanced level, aiming higher' } as Record<Level, string>,
     time: { 15: '15 minutes or less', 30: 'about 30 minutes', 60: 'an hour or more' } as Record<Time, string>,
     goal: { content: 'enjoy content I love', travel: 'travel and chat', exam: 'pass an exam', work: 'use it at work', maintain: 'keep what I know' } as Record<Goal, string>,
     soon: 'Coming soon',
     boost: 'Fix weak spots',
     focus: 'Use most',
-    route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots' } as Record<Level, string>,
+    route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
     multiNote: 'Each language keeps its own record and its own order, so progress never gets mixed up.',
     dayTitle: (t: string) => `With ${t} a day, you could`,
     dayFor: (l: string) => `For ${l}`,
@@ -111,6 +117,11 @@ const TEXT = {
         ehyo: { t: 'EhYo finds your weak spots', d: 'The mistakes you make while studying become your mistake patterns, without you keeping notes.' },
         path: { t: 'Fix the weak spots', d: "What you're unsure of becomes a course made for you; once it sticks, go back to your material." },
       },
+      advanced: {
+        toolkit: { t: 'Challenge yourself with native material', d: (m: string) => `Read and listen to ${m} as they are. Tap any fine shade of meaning, and new words and patterns are sorted for you.` },
+        ehyo: { t: "EhYo catches habits you don't notice", d: 'Small things like repeated words or phrasing that sounds off are noted too, and become your mistake patterns.' },
+        path: { t: 'Polish the last details', d: 'A course built on your mistake patterns makes what you say more precise and more natural.' },
+      },
     },
     material: {
       content: 'the shows, novels and lyrics you love', travel: 'travel videos and everyday talk', exam: 'articles and model essays at your level', work: 'work emails and industry news', maintain: 'the news and articles you already read',
@@ -127,9 +138,9 @@ const TEXT = {
 type Act = keyof typeof TEXT.zh.acts;
 // A day's plan: activity and minutes, by time and level
 const DAY: Record<Time, Record<Level, [Act, number][]>> = {
-  15: { beginner: [['path', 10], ['review', 5]], experienced: [['read', 10], ['review', 5]] },
-  30: { beginner: [['path', 15], ['read', 10], ['review', 5]], experienced: [['read', 15], ['write', 10], ['review', 5]] },
-  60: { beginner: [['path', 25], ['read', 20], ['write', 10], ['review', 5]], experienced: [['read', 25], ['write', 15], ['shadow', 10], ['boost', 10]] },
+  15: { beginner: [['path', 10], ['review', 5]], experienced: [['read', 10], ['review', 5]], advanced: [['read', 10], ['boost', 5]] },
+  30: { beginner: [['path', 15], ['read', 10], ['review', 5]], experienced: [['read', 15], ['write', 10], ['review', 5]], advanced: [['read', 15], ['write', 10], ['boost', 5]] },
+  60: { beginner: [['path', 25], ['read', 20], ['write', 10], ['review', 5]], experienced: [['read', 25], ['write', 15], ['shadow', 10], ['boost', 10]], advanced: [['read', 25], ['write', 20], ['shadow', 10], ['boost', 5]] },
 };
 const ACT_PART: Record<Act, Part> = { path: 'path', boost: 'path', read: 'toolkit', write: 'toolkit', shadow: 'toolkit', review: 'ehyo' };
 const PART_STYLE: Record<Part, { bar: string; soft: string; text: string }> = {
@@ -224,7 +235,7 @@ const Badges: React.FC<{ part: Part; level: Level; lang: Lang }> = ({ part, leve
   if (part !== 'path') return null;
   return (
     <>
-      {level === 'experienced' && <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>}
+      {level !== 'beginner' && <span className="text-xs font-bold rounded-full px-2 py-0.5 bg-ehyo-indigo text-white">{t.boost}</span>}
       <span className="text-xs font-semibold rounded-full px-2 py-0.5 bg-ehyo-coral/15 text-[#B23A5E]">{t.soon}</span>
     </>
   );
@@ -247,7 +258,7 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
         <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
         <Badges part={part} level={level} lang={lang} />
       </div>
-      <h4 className="font-serif text-2xl md:text-3xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+      <h4 className="font-sans text-2xl md:text-3xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
       <p className="text-stone-600 leading-relaxed">{desc}</p>
       {part === 'toolkit' && (
         <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
@@ -285,7 +296,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                 <motion.li key={part} layout={!reduce} layoutId={`${id}-${part}`} transition={{ type: 'spring', stiffness: 260, damping: 30 }} className="flex gap-4">
                   {/* the step and the line down to the next one */}
                   <div className="flex flex-col items-center flex-shrink-0">
-                    <span className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
+                    <span className={`w-12 h-12 rounded-full flex items-center justify-center font-sans text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
                     {!last && <span className="w-px flex-1 min-h-6 bg-stone-200 my-1" aria-hidden="true" />}
                   </div>
                   <div className={`flex-1 min-w-0 ${last ? '' : 'pb-4'}`}>
@@ -303,7 +314,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                             <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
                             <Badges part={part} level={level} lang={lang} />
                           </span>
-                          <span className={`block font-serif text-lg font-bold leading-snug ${active ? 'text-ehyo-text' : 'text-stone-600'}`}>{title}</span>
+                          <span className={`block font-sans text-lg font-bold leading-snug ${active ? 'text-ehyo-text' : 'text-stone-600'}`}>{title}</span>
                         </span>
                         <ChevronDown size={18} className={`lg:hidden flex-shrink-0 transition-transform duration-200 ${active ? 'text-ehyo-indigo rotate-180' : 'text-stone-300'}`} aria-hidden="true" />
                         <ChevronRight size={18} className={`hidden lg:block flex-shrink-0 transition-colors duration-200 ${active ? 'text-ehyo-indigo' : 'text-stone-300'}`} aria-hidden="true" />
@@ -350,7 +361,7 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
   return (
     <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-5">
-        <h3 className="font-serif text-2xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
+        <h3 className="font-sans text-2xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
         <span className="text-sm text-stone-500">{t.dayFor(who)}</span>
       </div>
       <div className="flex h-4 rounded-full overflow-hidden bg-stone-100 gap-0.5" aria-hidden="true">
@@ -398,7 +409,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
 
   // One, two or three-plus: grow or shrink the list, keeping what is already chosen
   const setCount = (c: Count) => {
-    const n = c === 3 ? Math.max(3, picks.length) : c;
+    const n = c;
     const next = picks.slice(0, n);
     for (const p of START) if (next.length < n && !next.some((q) => q.key === p.key)) next.push(p);
     setPicks(next);
@@ -409,11 +420,6 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
     return ps.map((p, k) => (k === i ? { ...p, key } : k === j ? { ...p, key: ps[i].key } : p));
   });
   const setLevel = (i: number, level: Level) => setPicks((ps) => ps.map((p, k) => (k === i ? { ...p, level } : p)));
-  const addOne = () => setPicks((ps) => {
-    const key = LANGS.find((k) => !ps.some((p) => p.key === k))!;
-    return [...ps, { key, level: 'beginner' }];
-  });
-  const removeOne = (i: number) => setPicks((ps) => ps.filter((_, k) => k !== i));
 
   const L = (k: LangKey) => t.lang[k];
   const lv = (v: Level) => t.level[v];
@@ -423,35 +429,23 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   return (
     <div>
       {/* The sentence the visitor fills in */}
-      <div className="font-serif text-2xl md:text-[2rem] leading-[1.9] text-ehyo-text max-w-4xl mx-auto text-center">
+      <div className="font-sans text-2xl md:text-[1.875rem] font-medium leading-[1.9] text-ehyo-text max-w-4xl text-left">
         <p>
           {s.learning}{sp}
           <Choice label={s.learning} value={count} options={[1, 2, 3] as const} onChange={setCount} render={(v) => t.count[v]} />
           {s.langsUnit}
         </p>
-        <ul className="list-none p-0 m-0 flex flex-wrap justify-center gap-x-2">
+        <ul className="list-none p-0 m-0">
           {picks.map((p, i) => (
             <li key={i} className="whitespace-nowrap">
               <Choice label={`${s.langsUnit || "Language"} ${i + 1}`} value={p.key} options={LANGS} onChange={(k) => setKey(i, k)} render={L} />
               {sp}{s.is}{sp}
-              <Choice label={L(p.key)} value={p.level} options={['beginner', 'experienced'] as const} onChange={(v) => setLevel(i, v)} render={lv} />
-              {i >= 3 && (
-                <button type="button" onClick={() => removeOne(i)} aria-label={`${s.remove} ${L(p.key)}`}
-                  className="ml-1 align-middle w-8 h-8 inline-flex items-center justify-center rounded-full text-stone-400 hover:text-ehyo-text hover:bg-stone-100 font-sans text-lg">×</button>
-              )}
-              {i < picks.length - 1 && s.and}
+              <Choice label={L(p.key)} value={p.level} options={LEVELS} onChange={(v) => setLevel(i, v)} render={lv} />
+              {i < picks.length - 1 ? s.and : s.comma}
             </li>
           ))}
-          {count === 3 && picks.length < MAX_LANGS && (
-            <li>
-              <button type="button" onClick={addOne}
-                className="font-sans text-base align-middle inline-flex items-center gap-1 min-h-11 px-4 rounded-full border border-dashed border-ehyo-indigo/50 text-ehyo-indigo hover:bg-ehyo-indigo/5">
-                + {s.add}
-              </button>
-            </li>
-          )}
         </ul>
-        <p className="text-balance">
+        <p>
           {s.perDay}{sp}
           <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} />{lang === 'zh' ? '，' : ''}</span>
           {sp}{s.for}{sp}
@@ -470,7 +464,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
                   return (
                     <button key={i} type="button" role="tab" aria-selected={active} onClick={() => setLaneSel(i)}
                       className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}>
-                      <span className={`font-serif text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key)}</span>
+                      <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key)}</span>
                       <span className="ml-2 text-sm text-stone-500">{t.level[p.level]}</span>
                     </button>
                   );
@@ -482,7 +476,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
               </p>
             </div>
           ) : (
-            <h3 className="font-serif text-2xl font-bold text-ehyo-text mb-2">{L(cur.key)} · {t.level[cur.level]}</h3>
+            <h3 className="font-sans text-2xl font-bold text-ehyo-text mb-2">{L(cur.key)} · {t.level[cur.level]}</h3>
           )}
           <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
         </div>
