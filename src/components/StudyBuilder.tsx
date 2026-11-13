@@ -55,7 +55,7 @@ const TEXT = {
       // Beginner: learn how the language is built, then practise using it
       beginner: {
         path: { t: '依照你的目標安排課程', d: '從最基本的文法和單字開始，EhYo 依你的目標排好學習順序，一步步建立語言的基礎架構。' },
-        ehyo: { t: '課程永遠跟得上你的程度', d: '卡住、答錯的地方，EhYo 都會記下來，隨時依你的程度調整課程，不會難到放棄，也不會簡單到無聊。' },
+        ehyo: { t: '課程跟著你的程度', d: '卡住、答錯的地方，EhYo 都會記下來，隨時依你的程度調整課程，不會難到放棄，也不會簡單到無聊。' },
         toolkit: { t: '輕鬆複習，不用多想', d: (m: string) => `拿${m}來複習，不必自己排進度；EhYo 會隨時觀察你的複習狀況，幫你調整下一步。` },
         sync: { t: '在電腦學，用手機複習', d: '在電腦上專心上課、做筆記，通勤或排隊的空檔打開手機，複習今天學的單字和句型，紀錄自動同步。' },
       },
@@ -68,7 +68,7 @@ const TEXT = {
       },
       // Advanced: keep using your own material, see the habits you miss, polish them away
       advanced: {
-        toolkit: { t: '用自己習慣的素材', d: (m: string) => `不用換教材，繼續讀、繼續聽${m}，細微的用法差異點一下就懂，句型和說法自動整理好。` },
+        toolkit: { t: '用自己的內容', d: '原文書、長篇報導、專業文章這類比較難的內容，都能直接匯入來讀；細微的用法差異點一下就懂，句型和說法自動整理好。' },
         ehyo: { t: 'EhYo 抓出你沒發現的習慣', d: '用字重複、說法不夠自然這些小地方，EhYo 也會記下來，讓你看見自己沒察覺的習慣。' },
         path: { t: '把最後的細節補起來', d: '針對這些習慣排出專屬課程，讓你的表達更精準、更自然。' },
         sync: { t: '在電腦學，用手機複習', d: '在電腦上精讀、寫作，空檔打開手機，複習道地說法和常犯的小錯，紀錄自動同步。' },
@@ -105,7 +105,7 @@ const TEXT = {
     cards: {
       beginner: {
         path: { t: 'Lessons planned around your goal', d: 'Start from the most basic grammar and words. EhYo puts them in order for your goal, so the structure of the language builds up step by step.' },
-        ehyo: { t: 'Lessons that keep pace with you', d: "Wherever you get stuck or answer wrong, EhYo notes it and adjusts your lessons to your level as you go: never so hard you give up, never so easy you're bored." },
+        ehyo: { t: 'Lessons that follow your level', d: "Wherever you get stuck or answer wrong, EhYo notes it and adjusts your lessons to your level as you go: never so hard you give up, never so easy you're bored." },
         toolkit: { t: 'Review without overthinking it', d: (m: string) => `Review with ${m}, no schedule to plan; EhYo keeps an eye on how your reviews go and adjusts what comes next.` },
         sync: { t: 'Study at the computer, review on your phone', d: "Take lessons and notes at the computer; on the commute or in a queue, open your phone to review today's words and patterns, with everything synced." },
       },
@@ -116,7 +116,7 @@ const TEXT = {
         sync: { t: 'Study at the computer, review on your phone', d: 'Read and save words at the computer; in spare moments, open your phone to review your weak spots and new words, with everything synced.' },
       },
       advanced: {
-        toolkit: { t: 'Keep the material you know', d: (m: string) => `No new textbook: keep reading and listening to ${m}. Tap any fine shade of meaning, and patterns and phrasing are sorted for you.` },
+        toolkit: { t: 'Bring your own content', d: 'Import harder reads like books in the original, long-form reporting and professional articles; tap any fine shade of meaning, and patterns and phrasing are sorted for you.' },
         ehyo: { t: "EhYo catches habits you don't notice", d: "Small things like repeated words or phrasing that sounds off are noted too, so you can see habits you didn't know you had." },
         path: { t: 'Polish the last details', d: 'A course built on those habits makes what you say more precise and more natural.' },
         sync: { t: 'Study at the computer, review on your phone', d: 'Read closely and write at the computer; in spare moments, review native phrasing and your small slips on your phone, with everything synced.' },
