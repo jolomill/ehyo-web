@@ -43,7 +43,7 @@ const TEXT = {
     goal: { content: '看懂喜歡的內容', travel: '旅行與日常會話', exam: '考試或檢定', work: '工作需要', maintain: '維持不退步' } as Record<Goal, string>,
     boost: '補強',
     focus: '最常用',
-    route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
+    route: { beginner: '了解基礎架構後，練習使用', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
     thinking: '正在思考如何幫助你中',
     multiNote: '每個語言各自記錄、各走各的順序，進度不會混在一起。',
     parts: {
@@ -53,23 +53,26 @@ const TEXT = {
       sync: { name: '跨裝置複習' },
     },
     cards: {
+      // Beginner: learn how the language is built, then practise using it
       beginner: {
-        path: { t: '跟著路徑打基礎', d: 'EhYo 依你的目標排好文法、單字和練習，不用煩惱先學什麼。' },
-        ehyo: { t: 'EhYo 記住你卡住的地方', d: '練習時的錯誤都會被記下來，下一步就幫你安排複習。' },
-        toolkit: { t: '用喜歡的素材複習', d: (m: string) => `拿${m}來讀、來聽，把剛學的東西用在真實內容裡。` },
-        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
+        path: { t: '依照你的目標安排課程', d: '從最基本的文法和單字開始，EhYo 依你的目標排好學習順序，一步步建立語言的基礎架構。' },
+        ehyo: { t: 'EhYo 記住你卡住的地方', d: '上課時卡住、答錯的地方，EhYo 都會記下來，下一堂課就幫你多練幾次。' },
+        toolkit: { t: '用喜歡的素材複習', d: (m: string) => `基礎有了，就拿${m}來練習，看看剛學的文法和單字在真實內容裡怎麼用。` },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心上課、做筆記，通勤或排隊的空檔打開手機，複習今天學的單字和句型，紀錄自動同步。' },
       },
+      // Experienced: learn from what you enjoy, let EhYo find the weak spots, then work on them
       experienced: {
-        toolkit: { t: '照你的興趣自學', d: (m: string) => `直接用${m}學，看不懂點一下就懂，生字自動整理好。` },
-        ehyo: { t: 'EhYo 找出你的弱點', d: '自學時犯的錯，EhYo 會整理成你的錯誤模式，不用自己記。' },
-        path: { t: '針對弱點補強', d: '把不熟的地方排成專屬課程，練熟了再回到素材。' },
-        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
+        toolkit: { t: '照你的興趣自學', d: (m: string) => `已經有基礎，就直接用${m}學，看不懂點一下就懂，生字自動整理好。` },
+        ehyo: { t: 'EhYo 找出你的弱項', d: '自學時犯過的錯，EhYo 會整理成你的錯誤模式，讓你清楚知道哪裡最需要加強。' },
+        path: { t: '針對弱點安排課程', d: 'EhYo 把你的弱項排成專屬課程，不浪費時間在已經會的地方，練熟了再回到喜歡的素材。' },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上讀素材、存生字，空檔打開手機，複習弱項和剛存的單字，紀錄自動同步。' },
       },
+      // Advanced: keep using your own material, see the habits you miss, polish them away
       advanced: {
-        toolkit: { t: '用道地的素材挑戰自己', d: (m: string) => `直接讀、直接聽${m}，細微的用法差異點一下就懂，生字和句型自動整理好。` },
-        ehyo: { t: 'EhYo 抓出你沒發現的習慣', d: '用字重複、說法不夠自然這些小地方，EhYo 也會記下來，整理成你的錯誤模式。' },
-        path: { t: '把最後的細節補起來', d: '針對你的錯誤模式排出專屬課程，讓表達更精準、更自然。' },
-        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
+        toolkit: { t: '用自己習慣的素材', d: (m: string) => `不用換教材，繼續讀、繼續聽${m}，細微的用法差異點一下就懂，句型和說法自動整理好。` },
+        ehyo: { t: 'EhYo 抓出你沒發現的習慣', d: '用字重複、說法不夠自然這些小地方，EhYo 也會記下來，讓你看見自己沒察覺的習慣。' },
+        path: { t: '把最後的細節補起來', d: '針對這些習慣排出專屬課程，讓你的表達更精準、更自然。' },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上精讀、寫作，空檔打開手機，複習道地說法和常犯的小錯，紀錄自動同步。' },
       },
     },
     material: {
@@ -95,7 +98,7 @@ const TEXT = {
     goal: { content: 'enjoy content I love', travel: 'travel and chat', exam: 'pass an exam', work: 'use it at work', maintain: 'keep what I know' } as Record<Goal, string>,
     boost: 'Fix weak spots',
     focus: 'Use most',
-    route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
+    route: { beginner: 'Learn how the language is built, then put it to use', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
     thinking: 'Thinking about how to help you',
     multiNote: 'Each language keeps its own record and its own order, so progress never gets mixed up.',
     parts: {
@@ -106,22 +109,22 @@ const TEXT = {
     },
     cards: {
       beginner: {
-        path: { t: 'Build your basics on the path', d: 'EhYo lines up grammar, words and practice for your goal, so you never wonder what to learn first.' },
-        ehyo: { t: 'EhYo remembers where you got stuck', d: 'Every mistake you make in practice is noted, and your next step reviews it.' },
-        toolkit: { t: 'Review with material you love', d: (m: string) => `Read and listen to ${m}, and use what you just learned on real content.` },
-        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
+        path: { t: 'Lessons planned around your goal', d: 'Start from the most basic grammar and words. EhYo puts them in order for your goal, so the structure of the language builds up step by step.' },
+        ehyo: { t: 'EhYo remembers where you got stuck', d: 'Wherever you get stuck or answer wrong, EhYo notes it, and your next lesson practises it a few more times.' },
+        toolkit: { t: 'Review with material you love', d: (m: string) => `With the basics in place, practise on ${m} and see how what you just learned works in real content.` },
+        sync: { t: 'Study at the computer, review on your phone', d: "Take lessons and notes at the computer; on the commute or in a queue, open your phone to review today's words and patterns, with everything synced." },
       },
       experienced: {
-        toolkit: { t: 'Learn from what you enjoy', d: (m: string) => `Learn straight from ${m}. Tap anything you don't get, and new words are sorted for you.` },
-        ehyo: { t: 'EhYo finds your weak spots', d: 'The mistakes you make while studying become your mistake patterns, without you keeping notes.' },
-        path: { t: 'Fix the weak spots', d: "What you're unsure of becomes a course made for you; once it sticks, go back to your material." },
-        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
+        toolkit: { t: 'Learn from what you enjoy', d: (m: string) => `You know the basics, so learn straight from ${m}. Tap anything you don't get, and new words are sorted for you.` },
+        ehyo: { t: 'EhYo finds your weak spots', d: 'The mistakes you make while studying become your mistake patterns, so you can see exactly what needs work.' },
+        path: { t: 'Lessons built on your weak spots', d: "EhYo turns your weak spots into a course made for you, with no time spent on what you already know; once it sticks, go back to your material." },
+        sync: { t: 'Study at the computer, review on your phone', d: 'Read and save words at the computer; in spare moments, open your phone to review your weak spots and new words, with everything synced.' },
       },
       advanced: {
-        toolkit: { t: 'Challenge yourself with native material', d: (m: string) => `Read and listen to ${m} as they are. Tap any fine shade of meaning, and new words and patterns are sorted for you.` },
-        ehyo: { t: "EhYo catches habits you don't notice", d: 'Small things like repeated words or phrasing that sounds off are noted too, and become your mistake patterns.' },
-        path: { t: 'Polish the last details', d: 'A course built on your mistake patterns makes what you say more precise and more natural.' },
-        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
+        toolkit: { t: 'Keep the material you know', d: (m: string) => `No new textbook: keep reading and listening to ${m}. Tap any fine shade of meaning, and patterns and phrasing are sorted for you.` },
+        ehyo: { t: "EhYo catches habits you don't notice", d: "Small things like repeated words or phrasing that sounds off are noted too, so you can see habits you didn't know you had." },
+        path: { t: 'Polish the last details', d: 'A course built on those habits makes what you say more precise and more natural.' },
+        sync: { t: 'Study at the computer, review on your phone', d: 'Read closely and write at the computer; in spare moments, review native phrasing and your small slips on your phone, with everything synced.' },
       },
     },
     material: {
