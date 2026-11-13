@@ -56,13 +56,13 @@ const TEXT = {
       // Beginner: learn how the language is built, then practise using it
       beginner: {
         path: { t: '依照你的目標安排課程', d: '從最基本的文法和單字開始，EhYo 依你的目標排好學習順序，一步步建立語言的基礎架構。' },
-        ehyo: { t: 'EhYo 記住你卡住的地方', d: '上課時卡住、答錯的地方，EhYo 都會記下來，下一堂課就幫你多練幾次。' },
-        toolkit: { t: '用喜歡的素材複習', d: (m: string) => `基礎有了，就拿${m}來練習，看看剛學的文法和單字在真實內容裡怎麼用。` },
+        ehyo: { t: 'EhYo 記住你卡住的地方', d: '卡住、答錯的地方，EhYo 都會記下來，幫你個人化調整接下來的課程內容。' },
+        toolkit: { t: '輕鬆複習，不用多想', d: (m: string) => `拿${m}來複習，不必自己排進度；EhYo 會隨時觀察你的複習狀況，幫你調整下一步。` },
         sync: { t: '在電腦學，用手機複習', d: '在電腦上專心上課、做筆記，通勤或排隊的空檔打開手機，複習今天學的單字和句型，紀錄自動同步。' },
       },
       // Experienced: learn from what you enjoy, let EhYo find the weak spots, then work on them
       experienced: {
-        toolkit: { t: '照你的興趣自學', d: (m: string) => `已經有基礎，就直接用${m}學，看不懂點一下就懂，生字自動整理好。` },
+        toolkit: { t: '用你的興趣來學', d: (m: string) => `已經有基礎，就直接用${m}學，看不懂點一下就懂，生字自動整理好。` },
         ehyo: { t: 'EhYo 找出你的弱項', d: '自學時犯過的錯，EhYo 會整理成你的錯誤模式，讓你清楚知道哪裡最需要加強。' },
         path: { t: '針對弱點安排課程', d: 'EhYo 把你的弱項排成專屬課程，不浪費時間在已經會的地方，練熟了再回到喜歡的素材。' },
         sync: { t: '在電腦學，用手機複習', d: '在電腦上讀素材、存生字，空檔打開手機，複習弱項和剛存的單字，紀錄自動同步。' },
@@ -110,12 +110,12 @@ const TEXT = {
     cards: {
       beginner: {
         path: { t: 'Lessons planned around your goal', d: 'Start from the most basic grammar and words. EhYo puts them in order for your goal, so the structure of the language builds up step by step.' },
-        ehyo: { t: 'EhYo remembers where you got stuck', d: 'Wherever you get stuck or answer wrong, EhYo notes it, and your next lesson practises it a few more times.' },
-        toolkit: { t: 'Review with material you love', d: (m: string) => `With the basics in place, practise on ${m} and see how what you just learned works in real content.` },
+        ehyo: { t: 'EhYo remembers where you got stuck', d: 'Wherever you get stuck or answer wrong, EhYo notes it and adjusts your next lessons to fit you.' },
+        toolkit: { t: 'Review without overthinking it', d: (m: string) => `Review with ${m}, no schedule to plan; EhYo keeps an eye on how your reviews go and adjusts what comes next.` },
         sync: { t: 'Study at the computer, review on your phone', d: "Take lessons and notes at the computer; on the commute or in a queue, open your phone to review today's words and patterns, with everything synced." },
       },
       experienced: {
-        toolkit: { t: 'Learn from what you enjoy', d: (m: string) => `You know the basics, so learn straight from ${m}. Tap anything you don't get, and new words are sorted for you.` },
+        toolkit: { t: 'Learn through what you enjoy', d: (m: string) => `You know the basics, so learn straight from ${m}. Tap anything you don't get, and new words are sorted for you.` },
         ehyo: { t: 'EhYo finds your weak spots', d: 'The mistakes you make while studying become your mistake patterns, so you can see exactly what needs work.' },
         path: { t: 'Lessons built on your weak spots', d: "EhYo turns your weak spots into a course made for you, with no time spent on what you already know; once it sticks, go back to your material." },
         sync: { t: 'Study at the computer, review on your phone', d: 'Read and save words at the computer; in spare moments, open your phone to review your weak spots and new words, with everything synced.' },
