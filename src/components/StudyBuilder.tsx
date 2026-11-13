@@ -42,7 +42,6 @@ const TEXT = {
     level: { beginner: '初學者', experienced: '有基礎', advanced: '進階想要更好' } as Record<Level, string>,
     goal: { content: '看懂喜歡的內容', travel: '旅行與日常會話', exam: '考試或檢定', work: '工作需要', maintain: '維持不退步' } as Record<Goal, string>,
     boost: '補強',
-    focus: '最常用',
     route: { beginner: '了解基礎架構後，練習使用', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
     thinking: '正在思考如何幫助你中',
     multiNote: '每個語言各自記錄、各走各的順序，進度不會混在一起。',
@@ -78,9 +77,6 @@ const TEXT = {
     material: {
       content: '喜歡的劇、小說和歌詞', travel: '旅遊影片和日常對話', exam: '程度剛好的文章和範文', work: '工作信件和產業新聞', maintain: '平常會看的新聞和文章',
     } as Record<Goal, string>,
-    tools: {
-      content: ['閱讀', '聽力'], travel: ['聽力', '跟讀'], exam: ['寫作批改', '單字'], work: ['寫作', '閱讀'], maintain: ['單字複習', '跨裝置同步'],
-    } as Record<Goal, string[]>,
     device: {
       desk: { name: '電腦', role: '專心學', hint: '大螢幕讀得久，筆記和單字順手存' },
       phone: { name: '手機', role: '隨時複習', hint: '通勤、排隊的空檔，複習剛存的內容' },
@@ -97,7 +93,6 @@ const TEXT = {
     level: { beginner: 'beginner level', experienced: 'intermediate level', advanced: 'advanced level, aiming higher' } as Record<Level, string>,
     goal: { content: 'enjoy content I love', travel: 'travel and chat', exam: 'pass an exam', work: 'use it at work', maintain: 'keep what I know' } as Record<Goal, string>,
     boost: 'Fix weak spots',
-    focus: 'Use most',
     route: { beginner: 'Learn how the language is built, then put it to use', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
     thinking: 'Thinking about how to help you',
     multiNote: 'Each language keeps its own record and its own order, so progress never gets mixed up.',
@@ -130,9 +125,6 @@ const TEXT = {
     material: {
       content: 'the shows, novels and lyrics you love', travel: 'travel videos and everyday talk', exam: 'articles and model essays at your level', work: 'work emails and industry news', maintain: 'the news and articles you already read',
     } as Record<Goal, string>,
-    tools: {
-      content: ['Reading', 'Listening'], travel: ['Listening', 'Shadowing'], exam: ['Writing feedback', 'Vocabulary'], work: ['Writing', 'Reading'], maintain: ['Vocabulary review', 'Sync across devices'],
-    } as Record<Goal, string[]>,
     device: {
       desk: { name: 'Computer', role: 'Focused study', hint: 'A big screen for long reads; notes and words saved as you go' },
       phone: { name: 'Phone', role: 'Review anywhere', hint: "On the commute or in a queue, go over what you just saved" },
@@ -292,14 +284,6 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
         </>
       )}
       <p className="text-stone-600 leading-relaxed">{desc}</p>
-      {part === 'toolkit' && (
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-stone-500">{t.focus}</span>
-          {t.tools[goal].map((x) => (
-            <span key={x} className="rounded-full px-2.5 py-1 bg-ehyo-bg text-ehyo-text border border-stone-100">{x}</span>
-          ))}
-        </div>
-      )}
       {part === 'sync' && <DevicePair lang={lang} />}
       {renderDetail && <div className="mt-8">{renderDetail(part, { goal, level, lang })}</div>}
     </div>
