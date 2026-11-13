@@ -11,7 +11,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CentralizeVisual, TimeSaveVisual, LevelVisual, WeaknessVisual, SyncVisual, LearningPathVisual } from './components/SolutionVisuals';
 import { EhYoMark } from './components/EhYoMark';
 import { StudyBuilder, type StudyPart, type StudyDetailContext } from './components/StudyBuilder';
-import { ArrowRight, Menu, X, BookOpen, Sprout, ChevronLeft, ChevronRight, Check, PenLine, Headphones, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, RefreshCw, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Menu, X, Sprout, FolderOpen, Lightbulb, RotateCcw, Scale, Hourglass, Clock, RefreshCw, type LucideIcon } from 'lucide-react';
 
 const Logo = ({ onClick }: { scrolled?: boolean; onClick?: () => void }) => (
   <div className="flex items-center cursor-pointer" onClick={onClick ?? (() => window.scrollTo({ top: 0, behavior: 'smooth' }))}>
@@ -543,18 +543,7 @@ const App: React.FC = () => {
     localStorage.setItem('ehyo-lang', lang);
   }, [lang]);
   const [page, setPage] = useState<Page>('home');
-  type FeatureId = 'reading' | 'vocabulary' | 'writing' | 'listening';
-  const [activeFeature, setActiveFeature] = useState<FeatureId>('reading');
   const [probIdx, setProbIdx] = useState(0);
-  const [imageIdx, setImageIdx] = useState(0);
-  const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
-
-  const featureTabs: { id: FeatureId; icon: any }[] = [
-    { id: 'reading', icon: BookOpen },
-    { id: 'vocabulary', icon: Sprout },
-    { id: 'writing', icon: PenLine },
-    { id: 'listening', icon: Headphones }
-  ];
 
   const navigate = (p: Page) => {
     setPage(p);
@@ -789,121 +778,6 @@ const App: React.FC = () => {
               <div className="flex justify-center">
                 <LearningPathVisual text={t.engine.path} />
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* How to study with EhYo: beginners start on the learning path, experienced learners with
-            their own material; both parts feed each other. */}
-        <section id="features" className="py-24 bg-[#FBFAF6]">
-          <div className="container mx-auto px-6">
-            {/* The toolkit, for everyone */}
-            <div>
-              <div className="text-center max-w-2xl mx-auto mb-10">
-                <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.study.toolkit.tag}</div>
-                <h3 className="font-serif text-3xl mb-3 text-ehyo-text">{t.study.toolkit.title}</h3>
-                <p className="text-stone-500 leading-relaxed">{t.study.toolkit.desc}</p>
-              </div>
-            {/* Tab Pills */}
-            <div className="flex flex-wrap justify-center gap-3 mb-16">
-              {featureTabs.map(({ id, icon: Icon }) => {
-                const active = activeFeature === id;
-                return (
-                  <button
-                    key={id}
-                    onClick={() => { setActiveFeature(id); setImageIdx(0); }}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 outline-none focus:outline-none ${active
-                      ? 'bg-ehyo-indigo/10 text-ehyo-indigo'
-                      : 'bg-white text-stone-500 hover:bg-stone-100'
-                      }`}
-                  >
-                    <Icon size={16} strokeWidth={2} />
-                    {t.showcase.tabs[id]}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Tab Content */}
-            {(() => {
-              const feat = t.showcase[activeFeature];
-              const slides = feat.slides;
-              const slide = slides[imageIdx];
-              const hasMany = slides.length > 1;
-              const prev = () => { setSlideDir('left'); setImageIdx((i) => (i - 1 + slides.length) % slides.length); };
-              const next = () => { setSlideDir('right'); setImageIdx((i) => (i + 1) % slides.length); };
-              const goTo = (i: number) => { setSlideDir(i > imageIdx ? 'right' : 'left'); setImageIdx(i); };
-              const animClass = slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
-              return (
-                <div className="max-w-5xl mx-auto">
-                  <div className="grid grid-cols-[auto_1fr_auto] gap-6 md:gap-10 items-center">
-                    {/* Left arrow */}
-                    <button
-                      onClick={prev}
-                      aria-label="Previous"
-                      disabled={!hasMany}
-                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                        }`}
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
-
-                    {/* Image + Description */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                      <div className="flex justify-center overflow-hidden">
-                        <img
-                          key={slide.image}
-                          src={slide.image}
-                          alt={slide.title}
-                          className={`w-full max-w-[280px] aspect-[9/19.5] object-cover rounded-[2.5rem] shadow-xl ${animClass}`}
-                        />
-                      </div>
-                      <div key={slide.title} className={animClass}>
-                        <h3 className="font-serif text-2xl md:text-3xl mb-5 text-ehyo-text leading-tight">
-                          {slide.title}
-                        </h3>
-                        <ul className="space-y-3">
-                          {slide.bullets.map((b, i) => (
-                            <li key={i} className="flex gap-3 text-stone-600 leading-relaxed">
-                              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-ehyo-indigo/10 text-ehyo-indigo flex items-center justify-center mt-1">
-                                <Check size={12} strokeWidth={3} />
-                              </span>
-                              <span>{b}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Right arrow */}
-                    <button
-                      onClick={next}
-                      aria-label="Next"
-                      disabled={!hasMany}
-                      className={`w-11 h-11 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center text-stone-500 hover:text-ehyo-indigo hover:shadow-md transition-all outline-none focus:outline-none ${!hasMany ? 'opacity-0 pointer-events-none' : ''
-                        }`}
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                  </div>
-
-                  {/* Dot indicator */}
-                  {hasMany && (
-                    <div className="flex justify-center gap-1.5 mt-10">
-                      {slides.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => goTo(i)}
-                          aria-label={`Go to slide ${i + 1}`}
-                          className={`h-1.5 rounded-full transition-all outline-none focus:outline-none ${i === imageIdx ? 'w-6 bg-ehyo-indigo' : 'w-1.5 bg-stone-300'
-                            }`}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
             </div>
           </div>
         </section>
