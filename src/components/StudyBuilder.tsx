@@ -15,62 +15,61 @@ type Lang = 'en' | 'zh';
 type Level = 'beginner' | 'experienced' | 'advanced';
 const LEVELS: Level[] = ['beginner', 'experienced', 'advanced'];
 type Count = 1 | 2 | 3;
-type Time = 15 | 30 | 60;
 type Goal = 'travel' | 'exam' | 'work' | 'content' | 'maintain';
-type Part = 'path' | 'ehyo' | 'toolkit';
+type Part = 'path' | 'ehyo' | 'toolkit' | 'sync';
 // The languages EhYo offers (list to be confirmed by the team)
 const LANGS = ['en', 'zh', 'ja', 'ko', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ar', 'hi', 'th', 'vi', 'id', 'ms', 'tr', 'nl', 'pl', 'sv', 'no', 'da', 'fi', 'el', 'cs', 'uk', 'he', 'tl'] as const;
 type LangKey = (typeof LANGS)[number];
 type Pick = { key: LangKey; level: Level };
 
 const GOALS: Goal[] = ['content', 'travel', 'exam', 'work', 'maintain'];
-const TIMES: Time[] = [15, 30, 60];
 
 const ORDER: Record<Level, Part[]> = {
-  beginner: ['path', 'ehyo', 'toolkit'],
-  experienced: ['toolkit', 'ehyo', 'path'],
-  advanced: ['toolkit', 'ehyo', 'path'],
+  // every route ends the same way: review across devices
+  beginner: ['path', 'ehyo', 'toolkit', 'sync'],
+  experienced: ['toolkit', 'ehyo', 'path', 'sync'],
+  advanced: ['toolkit', 'ehyo', 'path', 'sync'],
 };
 
 const TEXT = {
   zh: {
     title: '你的 EhYo 學習方式',
     sub: '點一下句子裡的底線，換成你的狀況。下面會排出最適合你的學法。',
-    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', perDay: '每天有', canLearn: '可以學', for: '學語言是為了', end: '。' },
-    ph: { count: '幾種', lang: '哪種語言', level: '程度', time: '多少時間', goal: '什麼目標' },
+    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', for: '學語言是為了', end: '。' },
+    ph: { count: '幾種', lang: '哪種語言', level: '程度', goal: '什麼目標' },
     count: { 1: '一種', 2: '兩種', 3: '三種以上' } as Record<Count, string>,
     lang: { en: '英文', zh: '中文', ja: '日文', ko: '韓文', es: '西班牙文', fr: '法文', de: '德文', it: '義大利文', pt: '葡萄牙文', ru: '俄文', ar: '阿拉伯文', hi: '印地文', th: '泰文', vi: '越南文', id: '印尼文', ms: '馬來文', tr: '土耳其文', nl: '荷蘭文', pl: '波蘭文', sv: '瑞典文', no: '挪威文', da: '丹麥文', fi: '芬蘭文', el: '希臘文', cs: '捷克文', uk: '烏克蘭文', he: '希伯來文', tl: '菲律賓文' } as Record<LangKey, string>,
     level: { beginner: '初學者', experienced: '有基礎', advanced: '進階想要更好' } as Record<Level, string>,
-    time: { 15: '15 分鐘以內', 30: '30 分鐘左右', 60: '一小時以上' } as Record<Time, string>,
     goal: { content: '看懂喜歡的內容', travel: '旅行與日常會話', exam: '考試或檢定', work: '工作需要', maintain: '維持不退步' } as Record<Goal, string>,
     boost: '補強',
     focus: '最常用',
     route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
     thinking: '正在思考如何幫助你中',
     multiNote: '每個語言各自記錄、各走各的順序，進度不會混在一起。',
-    dayTitle: (t: string) => `每天 ${t}，可以這樣安排`,
-    dayFor: (l: string) => `以${l}為例`,
-    min: '分鐘',
     parts: {
       path: { name: '個人化學習路徑' },
       ehyo: { name: 'EhYo' },
       toolkit: { name: '自學工具組' },
+      sync: { name: '跨裝置複習' },
     },
     cards: {
       beginner: {
         path: { t: '跟著路徑打基礎', d: 'EhYo 依你的目標排好文法、單字和練習，不用煩惱先學什麼。' },
         ehyo: { t: 'EhYo 記住你卡住的地方', d: '練習時的錯誤都會被記下來，下一步就幫你安排複習。' },
         toolkit: { t: '用喜歡的素材複習', d: (m: string) => `拿${m}來讀、來聽，把剛學的東西用在真實內容裡。` },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
       },
       experienced: {
         toolkit: { t: '照你的興趣自學', d: (m: string) => `直接用${m}學，看不懂點一下就懂，生字自動整理好。` },
         ehyo: { t: 'EhYo 找出你的弱點', d: '自學時犯的錯，EhYo 會整理成你的錯誤模式，不用自己記。' },
         path: { t: '針對弱點補強', d: '把不熟的地方排成專屬課程，練熟了再回到素材。' },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
       },
       advanced: {
         toolkit: { t: '用道地的素材挑戰自己', d: (m: string) => `直接讀、直接聽${m}，細微的用法差異點一下就懂，生字和句型自動整理好。` },
         ehyo: { t: 'EhYo 抓出你沒發現的習慣', d: '用字重複、說法不夠自然這些小地方，EhYo 也會記下來，整理成你的錯誤模式。' },
         path: { t: '把最後的細節補起來', d: '針對你的錯誤模式排出專屬課程，讓表達更精準、更自然。' },
+        sync: { t: '在電腦學，用手機複習', d: '在電腦上專心讀、存單字和做筆記，通勤或排隊的空檔打開手機就能複習，紀錄自動同步。' },
       },
     },
     material: {
@@ -79,9 +78,6 @@ const TEXT = {
     tools: {
       content: ['閱讀', '聽力'], travel: ['聽力', '跟讀'], exam: ['寫作批改', '單字'], work: ['寫作', '閱讀'], maintain: ['單字複習', '跨裝置同步'],
     } as Record<Goal, string[]>,
-    acts: {
-      path: '學習路徑的一個單元', read: '讀文章、看影片', note: '邊讀邊存單字、做筆記', write: '寫一段，馬上批改', boost: '學習路徑：補強弱點', review: '單字複習', shadow: '跟讀練口說',
-    },
     device: {
       desk: { name: '電腦', role: '專心學', hint: '大螢幕讀得久，筆記和單字順手存' },
       phone: { name: '手機', role: '隨時複習', hint: '通勤、排隊的空檔，複習剛存的內容' },
@@ -91,41 +87,41 @@ const TEXT = {
   en: {
     title: 'How EhYo fits you',
     sub: 'Tap the underlined words to describe yourself. EhYo lines up the way that suits you below.',
-    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', perDay: 'I have', canLearn: 'a day to learn', for: 'and I want to', end: '.' },
-    ph: { count: 'how many', lang: 'which language', level: 'what level', time: 'how long', goal: 'do what' },
+    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', for: 'I want to', end: '.' },
+    ph: { count: 'how many', lang: 'which language', level: 'what level', goal: 'do what' },
     count: { 1: 'one language', 2: 'two languages', 3: 'three or more languages' } as Record<Count, string>,
     lang: { en: 'English', zh: 'Chinese', ja: 'Japanese', ko: 'Korean', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi', th: 'Thai', vi: 'Vietnamese', id: 'Indonesian', ms: 'Malay', tr: 'Turkish', nl: 'Dutch', pl: 'Polish', sv: 'Swedish', no: 'Norwegian', da: 'Danish', fi: 'Finnish', el: 'Greek', cs: 'Czech', uk: 'Ukrainian', he: 'Hebrew', tl: 'Tagalog' } as Record<LangKey, string>,
     level: { beginner: 'beginner level', experienced: 'intermediate level', advanced: 'advanced level, aiming higher' } as Record<Level, string>,
-    time: { 15: '15 minutes or less', 30: 'about 30 minutes', 60: 'an hour or more' } as Record<Time, string>,
     goal: { content: 'enjoy content I love', travel: 'travel and chat', exam: 'pass an exam', work: 'use it at work', maintain: 'keep what I know' } as Record<Goal, string>,
     boost: 'Fix weak spots',
     focus: 'Use most',
     route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
     thinking: 'Thinking about how to help you',
     multiNote: 'Each language keeps its own record and its own order, so progress never gets mixed up.',
-    dayTitle: (t: string) => `With ${t} a day, you could`,
-    dayFor: (l: string) => `For ${l}`,
-    min: 'min',
     parts: {
       path: { name: 'Personal Learning Path' },
       ehyo: { name: 'EhYo' },
       toolkit: { name: 'Self-Study Toolkit' },
+      sync: { name: 'Review on any device' },
     },
     cards: {
       beginner: {
         path: { t: 'Build your basics on the path', d: 'EhYo lines up grammar, words and practice for your goal, so you never wonder what to learn first.' },
         ehyo: { t: 'EhYo remembers where you got stuck', d: 'Every mistake you make in practice is noted, and your next step reviews it.' },
         toolkit: { t: 'Review with material you love', d: (m: string) => `Read and listen to ${m}, and use what you just learned on real content.` },
+        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
       },
       experienced: {
         toolkit: { t: 'Learn from what you enjoy', d: (m: string) => `Learn straight from ${m}. Tap anything you don't get, and new words are sorted for you.` },
         ehyo: { t: 'EhYo finds your weak spots', d: 'The mistakes you make while studying become your mistake patterns, without you keeping notes.' },
         path: { t: 'Fix the weak spots', d: "What you're unsure of becomes a course made for you; once it sticks, go back to your material." },
+        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
       },
       advanced: {
         toolkit: { t: 'Challenge yourself with native material', d: (m: string) => `Read and listen to ${m} as they are. Tap any fine shade of meaning, and new words and patterns are sorted for you.` },
         ehyo: { t: "EhYo catches habits you don't notice", d: 'Small things like repeated words or phrasing that sounds off are noted too, and become your mistake patterns.' },
         path: { t: 'Polish the last details', d: 'A course built on your mistake patterns makes what you say more precise and more natural.' },
+        sync: { t: 'Study at the computer, review on your phone', d: 'Read, save words and take notes on the big screen; open your phone on the commute to review, with everything synced.' },
       },
     },
     material: {
@@ -134,9 +130,6 @@ const TEXT = {
     tools: {
       content: ['Reading', 'Listening'], travel: ['Listening', 'Shadowing'], exam: ['Writing feedback', 'Vocabulary'], work: ['Writing', 'Reading'], maintain: ['Vocabulary review', 'Sync across devices'],
     } as Record<Goal, string[]>,
-    acts: {
-      path: 'One learning path unit', read: 'Read articles, watch videos', note: 'Save words and take notes as you read', write: 'Write a paragraph, get feedback', boost: 'Learning path: fix weak spots', review: 'Vocabulary review', shadow: 'Shadow to practise speaking',
-    },
     device: {
       desk: { name: 'Computer', role: 'Focused study', hint: 'A big screen for long reads; notes and words saved as you go' },
       phone: { name: 'Phone', role: 'Review anywhere', hint: "On the commute or in a queue, go over what you just saved" },
@@ -145,32 +138,12 @@ const TEXT = {
   },
 };
 
-type Act = keyof typeof TEXT.zh.acts;
 type Device = 'desk' | 'phone';
-// Long, focused study happens at the computer; the phone is for review in spare moments
-const ACT_DEVICE: Record<Act, Device> = { path: 'desk', read: 'desk', note: 'desk', write: 'desk', boost: 'desk', review: 'phone', shadow: 'phone' };
-// A day's plan: activity and minutes, by time and level
-const DAY: Record<Time, Record<Level, [Act, number][]>> = {
-  15: {
-    beginner: [['path', 10], ['review', 5]],
-    experienced: [['read', 10], ['review', 5]],
-    advanced: [['read', 10], ['review', 5]],
-  },
-  30: {
-    beginner: [['path', 15], ['note', 5], ['review', 10]],
-    experienced: [['read', 15], ['note', 5], ['review', 10]],
-    advanced: [['read', 15], ['write', 5], ['review', 10]],
-  },
-  60: {
-    beginner: [['path', 25], ['read', 10], ['note', 5], ['review', 10], ['shadow', 10]],
-    experienced: [['read', 25], ['write', 15], ['review', 10], ['shadow', 10]],
-    advanced: [['read', 20], ['write', 15], ['boost', 10], ['review', 5], ['shadow', 10]],
-  },
-};
 const PART_STYLE: Record<Part, { bar: string; soft: string; text: string }> = {
   path: { bar: 'bg-ehyo-indigo', soft: 'bg-ehyo-indigo/10', text: 'text-ehyo-indigo' },
   ehyo: { bar: 'bg-ehyo-sage', soft: 'bg-ehyo-sage/15', text: 'text-[#5E6B45]' },
   toolkit: { bar: 'bg-ehyo-coral', soft: 'bg-ehyo-coral/15', text: 'text-[#B23A5E]' },
+  sync: { bar: 'bg-ehyo-text', soft: 'bg-stone-100', text: 'text-ehyo-text' },
 };
 
 // ---------------------------------------------------------------------------
@@ -255,7 +228,7 @@ type RenderDetail = (part: Part, ctx: StudyDetailContext) => React.ReactNode;
 
 const PartIcon: React.FC<{ part: Part; size?: 'sm' | 'md' }> = ({ part, size = 'md' }) => {
   if (part === 'ehyo') return <EhYoMark className={size === 'sm' ? 'w-7' : 'w-12'} />;
-  const Icon = part === 'path' ? Route : BookOpen;
+  const Icon = part === 'path' ? Route : part === 'sync' ? RefreshCw : BookOpen;
   return <Icon size={size === 'sm' ? 18 : 22} strokeWidth={1.75} />;
 };
 
@@ -272,6 +245,33 @@ const cardText = (part: Part, level: Level, goal: Goal, lang: Lang) => {
 };
 
 // The open part: what it is for this visitor, then its own material
+// Study at the computer, review on the phone: one record across both
+const DevicePair: React.FC<{ lang: Lang }> = ({ lang }) => {
+  const t = TEXT[lang];
+  const one = (d: Device) => {
+    const Icon = d === 'desk' ? Laptop : Smartphone;
+    const st = d === 'desk' ? PART_STYLE.path : PART_STYLE.toolkit;
+    return (
+      <div className="flex-1 min-w-0 rounded-2xl bg-ehyo-bg p-4 flex items-start gap-3">
+        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><Icon size={20} strokeWidth={1.75} /></span>
+        <span className="min-w-0">
+          <span className="block font-semibold text-ehyo-text">{t.device[d].name} · {t.device[d].role}</span>
+          <span className="block text-sm text-stone-500 leading-relaxed">{t.device[d].hint}</span>
+        </span>
+      </div>
+    );
+  };
+  return (
+    <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      {one('desk')}
+      <span className="flex sm:flex-col items-center justify-center gap-1 text-ehyo-indigo text-xs font-semibold whitespace-nowrap" aria-hidden="true">
+        <RefreshCw size={16} />{t.synced}
+      </span>
+      {one('phone')}
+    </div>
+  );
+};
+
 // `inline`: opened under its own card on small screens, where the card already shows the name and title
 const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; renderDetail?: RenderDetail; inline?: boolean }> = ({ part, level, goal, lang, renderDetail, inline }) => {
   const t = TEXT[lang];
@@ -297,6 +297,7 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
           ))}
         </div>
       )}
+      {part === 'sync' && <DevicePair lang={lang} />}
       {renderDetail && <div className="mt-8">{renderDetail(part, { goal, level, lang })}</div>}
     </div>
   );
@@ -381,78 +382,6 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
   );
 };
 
-// The day plan: one bar split by minutes, coloured by which part each activity uses
-const DEVICE_STYLE: Record<Device, { bar: string; soft: string; text: string }> = {
-  desk: { bar: 'bg-ehyo-indigo', soft: 'bg-ehyo-indigo/10', text: 'text-ehyo-indigo' },
-  phone: { bar: 'bg-ehyo-coral', soft: 'bg-ehyo-coral/15', text: 'text-[#B23A5E]' },
-};
-
-// One device's share of the day
-const DeviceColumn: React.FC<{ d: Device; items: [Act, number][]; lang: Lang }> = ({ d, items, lang }) => {
-  const t = TEXT[lang];
-  const Icon = d === 'desk' ? Laptop : Smartphone;
-  const st = DEVICE_STYLE[d];
-  return (
-    <div className="min-w-0">
-      <div className="flex items-center gap-3 mb-4">
-        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><Icon size={20} strokeWidth={1.75} /></span>
-        <span className="min-w-0">
-          <span className="block font-semibold text-ehyo-text">{t.device[d].name} · {t.device[d].role}<span className="ml-2 text-sm font-normal text-stone-500">{items.reduce((n, [, m]) => n + m, 0)} {t.min}</span></span>
-          <span className="block text-sm text-stone-500">{t.device[d].hint}</span>
-        </span>
-      </div>
-      <ol className="list-none p-0 m-0 space-y-2">
-        {items.map(([a, m], i) => (
-          <li key={i} className="flex items-baseline justify-between gap-4 rounded-xl bg-ehyo-bg px-4 py-3">
-            <span className="text-ehyo-text">{t.acts[a]}</span>
-            <span className="text-sm text-stone-500 whitespace-nowrap tabular-nums">{m} {t.min}</span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
-};
-
-// The day plan, split by device: study at the computer, review on the phone, one record across both
-const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; reduce: boolean }> = ({ time, level, lang, who, reduce }) => {
-  const t = TEXT[lang];
-  const plan = DAY[time][level];
-  const total = plan.reduce((n, [, m]) => n + m, 0);
-  const of = (d: Device) => plan.filter(([a]) => ACT_DEVICE[a] === d);
-  // the bar runs computer first, then phone
-  const ordered = [...of('desk'), ...of('phone')];
-  return (
-    <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-6">
-        <h3 className="font-sans text-xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
-        <span className="text-sm text-stone-500">{t.dayFor(who)}</span>
-      </div>
-      <div className="flex h-3 rounded-full overflow-hidden bg-stone-100 gap-0.5 mb-8" aria-hidden="true">
-        {ordered.map(([a, m], i) => (
-          <motion.span
-            key={`${time}-${level}-${i}`}
-            className={`h-full ${DEVICE_STYLE[ACT_DEVICE[a]].bar} ${i > 0 && ACT_DEVICE[a] === ACT_DEVICE[ordered[i - 1][0]] ? 'opacity-80' : ''}`}
-            initial={reduce ? false : { width: 0 }}
-            animate={{ width: `${(m / total) * 100}%` }}
-            transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-          />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-6 md:gap-8 items-start">
-        <DeviceColumn d="desk" items={of('desk')} lang={lang} />
-        {/* one record across both devices */}
-        <div className="flex md:flex-col items-center justify-center gap-2 text-ehyo-indigo md:pt-2" aria-hidden="true">
-          <motion.span animate={reduce ? undefined : { rotate: 360 }} transition={reduce ? undefined : { duration: 6, repeat: Infinity, ease: 'linear' }} className="w-10 h-10 rounded-full bg-ehyo-indigo/10 flex items-center justify-center">
-            <RefreshCw size={18} />
-          </motion.span>
-          <span className="text-xs font-semibold whitespace-nowrap">{t.synced}</span>
-        </div>
-        <DeviceColumn d="phone" items={of('phone')} lang={lang} />
-      </div>
-    </div>
-  );
-};
-
 // Until the route is ready: the logo, and one line with a light sweeping across it.
 // The bars below fill as the sentence does.
 const SHIMMER = 'linear-gradient(90deg, #A8A29E 0%, #A8A29E 38%, #6B7FD7 50%, #A8A29E 62%, #A8A29E 100%)';
@@ -486,7 +415,6 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   // Everything starts blank; the route appears once the sentence is complete
   const [count, setCountState] = useState<Count>();
   const [picks, setPicks] = useState<Partial<Pick>[]>([]);
-  const [time, setTime] = useState<Time>();
   const [goal, setGoal] = useState<Goal>();
   const [laneSel, setLaneSel] = useState(0);
 
@@ -503,9 +431,9 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   const setLevel = (i: number, level: Level) => setPicks((ps) => ps.map((p, k) => (k === i ? { ...p, level } : p)));
 
   const done = (p: Partial<Pick>): p is Pick => !!p.key && !!p.level;
-  const ready = !!count && picks.length === count && picks.every(done) && !!time && !!goal;
-  const total = 1 + 2 * (count ?? 1) + 2;
-  const filled = (count ? 1 : 0) + picks.reduce((n, p) => n + (p.key ? 1 : 0) + (p.level ? 1 : 0), 0) + (time ? 1 : 0) + (goal ? 1 : 0);
+  const ready = !!count && picks.length === count && picks.every(done) && !!goal;
+  const total = 1 + 2 * (count ?? 1) + 1;
+  const filled = (count ? 1 : 0) + picks.reduce((n, p) => n + (p.key ? 1 : 0) + (p.level ? 1 : 0), 0) + (goal ? 1 : 0);
   // wait while there are blanks; build for a moment once there are none; then show
   const [stage, setStage] = useState<'wait' | 'build' | 'show'>('wait');
   useEffect(() => {
@@ -546,16 +474,14 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
             </span>
           ))}
         </p>
-        {/* the time and the goal start their own line */}
+        {/* the goal starts its own line */}
         <p>
-          {s.perDay}{sp}
-          <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} placeholder={t.ph.time} />{sp}{s.canLearn}{s.comma}</span>
-          {sp}{s.for}{sp}
+          {s.for}{sp}
           <span className="whitespace-nowrap"><Choice label={s.for} value={goal} options={GOALS} onChange={setGoal} render={(v) => t.goal[v]} placeholder={t.ph.goal} />{s.end}</span>
         </p>
       </div>
 
-      {/* What fits: the route for the chosen language, then the day */}
+      {/* What fits: the route for the chosen language */}
       <div aria-live="polite">
       <AnimatePresence mode="wait">
       {stage !== 'show' && (
@@ -563,7 +489,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
           <Loader filled={filled} total={total} lang={lang} reduce={reduce} />
         </motion.div>
       )}
-      {stage === 'show' && cur && time && goal && (
+      {stage === 'show' && cur && goal && (
       <motion.div
         key="result"
         initial={reduce ? false : { opacity: 0, y: 24 }}
@@ -615,7 +541,6 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
           </div>
           <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
         </div>
-        <DayPlan time={time} level={cur.level} lang={lang} who={L(cur.key)} reduce={reduce} />
       </motion.div>
       )}
       </AnimatePresence>
