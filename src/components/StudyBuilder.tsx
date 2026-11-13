@@ -156,7 +156,8 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
   value: T | undefined; options: readonly T[]; label: string; onChange: (v: T) => void; render: (v: T) => string; placeholder: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [alignRight, setAlignRight] = useState(false);
+  // How far the menu shifts left so it stays on screen
+  const [shift, setShift] = useState(0);
   const wrap = useRef<HTMLSpanElement>(null);
   const id = useId();
   useEffect(() => {
@@ -175,15 +176,16 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={id}
-        aria-label={value === undefined ? label : `${label}: ${render(value)}`}
+        aria-label={value === undefined ? `${label}: ${placeholder}` : `${label}: ${render(value)}`}
         onClick={() => {
           const r = wrap.current?.getBoundingClientRect();
-          setAlignRight(!!r && r.left + (options.length > 8 ? 360 : 200) > window.innerWidth);
+          const menuW = options.length > 8 ? Math.min(352, window.innerWidth - 32) : 192;
+          setShift(r ? Math.max(Math.min(0, window.innerWidth - 16 - menuW - r.left), 16 - r.left) : 0);
           setOpen((o) => !o);
         }}
-        className={`inline-flex items-baseline gap-1 border-b-2 border-dashed ${value === undefined ? 'text-ehyo-indigo/60 border-ehyo-indigo/50 min-w-[4.5em] justify-between' : 'text-ehyo-indigo border-ehyo-indigo/40'} hover:border-ehyo-indigo hover:bg-ehyo-indigo/5 rounded-t-md px-1 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50`}
+        className={`inline-flex items-baseline gap-1 border-b-2 border-dashed ${value === undefined ? 'text-ehyo-indigo/50 border-ehyo-indigo/50' : 'text-ehyo-indigo border-ehyo-indigo/40'} hover:border-ehyo-indigo hover:bg-ehyo-indigo/5 rounded-t-md px-1 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50`}
       >
-        {value === undefined ? placeholder : render(value)}
+        {value === undefined ? <span className="inline-block w-[4em]" aria-hidden="true">&nbsp;</span> : render(value)}
         <ChevronDown size={18} className={`self-center transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
       <AnimatePresence>
@@ -195,7 +197,8 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18 }}
-            className={`absolute ${alignRight ? 'right-0' : 'left-0'} top-full mt-2 z-30 ${options.length > 8 ? 'grid grid-cols-2 w-[min(22rem,calc(100vw-2rem))] max-h-80 overflow-y-auto' : 'flex flex-col min-w-[11rem]'} p-1.5 bg-white rounded-2xl border border-stone-100 shadow-xl font-rounded text-base`}
+            style={{ left: shift }}
+            className={`absolute top-full mt-2 z-30 ${options.length > 8 ? 'grid grid-cols-2 w-[min(22rem,calc(100vw-2rem))] max-h-80 overflow-y-auto' : 'flex flex-col w-48'} p-1.5 bg-white rounded-2xl border border-stone-100 shadow-xl font-sans text-base`}
           >
             {options.map((o) => (
               <button
@@ -258,7 +261,7 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
         <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
         <Badges part={part} level={level} lang={lang} />
       </div>
-      <h4 className="font-rounded text-xl md:text-2xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+      <h4 className="font-sans text-xl md:text-2xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
       <p className="text-stone-600 leading-relaxed">{desc}</p>
       {part === 'toolkit' && (
         <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
@@ -296,7 +299,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                 <motion.li key={part} layout={!reduce} layoutId={`${id}-${part}`} transition={{ type: 'spring', stiffness: 260, damping: 30 }} className="flex gap-4">
                   {/* the step and the line down to the next one */}
                   <div className="flex flex-col items-center flex-shrink-0">
-                    <span className={`w-12 h-12 rounded-full flex items-center justify-center font-rounded text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
+                    <span className={`w-12 h-12 rounded-full flex items-center justify-center font-sans text-lg font-bold transition-colors duration-200 ${active ? `${st.bar} text-white` : 'bg-white border border-stone-200 text-stone-400'}`}>{i + 1}</span>
                     {!last && <span className="w-px flex-1 min-h-6 bg-stone-200 my-1" aria-hidden="true" />}
                   </div>
                   <div className={`flex-1 min-w-0 ${last ? '' : 'pb-4'}`}>
@@ -314,7 +317,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                             <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
                             <Badges part={part} level={level} lang={lang} />
                           </span>
-                          <span className={`block font-rounded text-lg font-bold leading-snug ${active ? 'text-ehyo-text' : 'text-stone-600'}`}>{title}</span>
+                          <span className={`block font-sans text-lg font-bold leading-snug ${active ? 'text-ehyo-text' : 'text-stone-600'}`}>{title}</span>
                         </span>
                         <ChevronDown size={18} className={`lg:hidden flex-shrink-0 transition-transform duration-200 ${active ? 'text-ehyo-indigo rotate-180' : 'text-stone-300'}`} aria-hidden="true" />
                         <ChevronRight size={18} className={`hidden lg:block flex-shrink-0 transition-colors duration-200 ${active ? 'text-ehyo-indigo' : 'text-stone-300'}`} aria-hidden="true" />
@@ -361,7 +364,7 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
   return (
     <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-5">
-        <h3 className="font-rounded text-xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
+        <h3 className="font-sans text-xl font-bold text-ehyo-text">{t.dayTitle(t.time[time])}</h3>
         <span className="text-sm text-stone-500">{t.dayFor(who)}</span>
       </div>
       <div className="flex h-4 rounded-full overflow-hidden bg-stone-100 gap-0.5" aria-hidden="true">
@@ -430,26 +433,22 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   const sp = lang === 'zh' ? '' : ' ';
 
   return (
-    <div className="font-rounded">
+    <div>
       {/* The sentence the visitor fills in */}
-      <div className="font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text max-w-3xl text-left">
+      <div className="font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text max-w-3xl mx-auto text-center">
         <p>
           {s.learning}{sp}
           <Choice label={s.learning} value={count} options={[1, 2, 3] as const} onChange={setCount} render={(v) => t.count[v]} placeholder={t.ph.count} />
-          {s.langsUnit}
+          {s.langsUnit}{picks.length > 0 ? (lang === 'zh' ? '：' : ': ') : (lang === 'zh' ? '，' : ',')}
+          {picks.map((p, i) => (
+            <span key={i} className="whitespace-nowrap">
+              <Choice label={`${s.langsUnit || 'Language'} ${i + 1}`} value={p.key} options={LANGS} onChange={(k) => setKey(i, k)} render={L} placeholder={t.ph.lang} />
+              {sp}{s.is}{sp}
+              <Choice label={p.key ? L(p.key) : t.ph.level} value={p.level} options={LEVELS} onChange={(v) => setLevel(i, v)} render={lv} placeholder={t.ph.level} />
+              {i < picks.length - 1 ? s.and : s.comma}{sp}
+            </span>
+          ))}
         </p>
-        {picks.length > 0 && (
-          <ul className="list-none p-0 m-0">
-            {picks.map((p, i) => (
-              <li key={i} className="whitespace-nowrap">
-                <Choice label={`${s.langsUnit || 'Language'} ${i + 1}`} value={p.key} options={LANGS} onChange={(k) => setKey(i, k)} render={L} placeholder={t.ph.lang} />
-                {sp}{s.is}{sp}
-                <Choice label={p.key ? L(p.key) : t.ph.level} value={p.level} options={LEVELS} onChange={(v) => setLevel(i, v)} render={lv} placeholder={t.ph.level} />
-                {i < picks.length - 1 ? s.and : s.comma}
-              </li>
-            ))}
-          </ul>
-        )}
         <p>
           {s.perDay}{sp}
           <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} placeholder={t.ph.time} />{lang === 'zh' ? '，' : ''}</span>
@@ -479,7 +478,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
                   return (
                     <button key={i} type="button" role="tab" aria-selected={active} onClick={() => setLaneSel(i)}
                       className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}>
-                      <span className={`font-rounded text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key)}</span>
+                      <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key)}</span>
                       <span className="ml-2 text-sm text-stone-500">{t.level[p.level]}</span>
                     </button>
                   );
@@ -491,7 +490,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
               </p>
             </div>
           ) : (
-            <h3 className="font-rounded text-xl font-bold text-ehyo-text mb-2">{L(cur.key)} · {t.level[cur.level]}</h3>
+            <h3 className="font-sans text-xl font-bold text-ehyo-text mb-2">{L(cur.key)} · {t.level[cur.level]}</h3>
           )}
           <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
         </div>
