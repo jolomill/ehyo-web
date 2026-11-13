@@ -36,9 +36,9 @@ const TEXT = {
   zh: {
     title: '你的 EhYo 學習方式',
     sub: '點一下句子裡的底線，換成你的狀況。下面會排出最適合你的學法。',
-    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', perDay: '每天大概有', for: '學語言是為了', end: '。' },
+    s: { learning: '我在自學', langsUnit: '語言', is: '是', comma: '，', and: '、', perDay: '每天有', canLearn: '可以學', for: '學語言是為了', end: '。' },
     ph: { count: '幾種', lang: '哪種語言', level: '程度', time: '多少時間', goal: '什麼目標' },
-    count: { 1: '一種', 2: '兩種', 3: '三種' } as Record<Count, string>,
+    count: { 1: '一種', 2: '兩種', 3: '三種以上' } as Record<Count, string>,
     lang: { en: '英文', zh: '中文', ja: '日文', ko: '韓文', es: '西班牙文', fr: '法文', de: '德文', it: '義大利文', pt: '葡萄牙文', ru: '俄文', ar: '阿拉伯文', hi: '印地文', th: '泰文', vi: '越南文', id: '印尼文', ms: '馬來文', tr: '土耳其文', nl: '荷蘭文', pl: '波蘭文', sv: '瑞典文', no: '挪威文', da: '丹麥文', fi: '芬蘭文', el: '希臘文', cs: '捷克文', uk: '烏克蘭文', he: '希伯來文', tl: '菲律賓文' } as Record<LangKey, string>,
     level: { beginner: '初學者', experienced: '有基礎', advanced: '進階想要更好' } as Record<Level, string>,
     time: { 15: '15 分鐘以內', 30: '30 分鐘左右', 60: '一小時以上' } as Record<Time, string>,
@@ -86,9 +86,9 @@ const TEXT = {
   en: {
     title: 'How EhYo fits you',
     sub: 'Tap the underlined words to describe yourself. EhYo lines up the way that suits you below.',
-    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', perDay: 'I have', for: 'a day, and I want to', end: '.' },
+    s: { learning: "I'm teaching myself", langsUnit: '', is: 'at', comma: ',', and: ',', perDay: 'I have', canLearn: 'a day to learn', for: 'and I want to', end: '.' },
     ph: { count: 'how many', lang: 'which language', level: 'what level', time: 'how long', goal: 'do what' },
-    count: { 1: 'one language', 2: 'two languages', 3: 'three languages' } as Record<Count, string>,
+    count: { 1: 'one language', 2: 'two languages', 3: 'three or more languages' } as Record<Count, string>,
     lang: { en: 'English', zh: 'Chinese', ja: 'Japanese', ko: 'Korean', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi', th: 'Thai', vi: 'Vietnamese', id: 'Indonesian', ms: 'Malay', tr: 'Turkish', nl: 'Dutch', pl: 'Polish', sv: 'Swedish', no: 'Norwegian', da: 'Danish', fi: 'Finnish', el: 'Greek', cs: 'Czech', uk: 'Ukrainian', he: 'Hebrew', tl: 'Tagalog' } as Record<LangKey, string>,
     level: { beginner: 'beginner level', experienced: 'intermediate level', advanced: 'advanced level, aiming higher' } as Record<Level, string>,
     time: { 15: '15 minutes or less', 30: 'about 30 minutes', 60: 'an hour or more' } as Record<Time, string>,
@@ -186,7 +186,7 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
         className={`inline-flex items-baseline gap-1 border-b-2 border-dashed ${value === undefined ? 'text-ehyo-indigo/50 border-ehyo-indigo/50' : 'text-ehyo-indigo border-ehyo-indigo/40'} hover:border-ehyo-indigo hover:bg-ehyo-indigo/5 rounded-t-md px-1 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50`}
       >
         {value === undefined ? <span className="inline-block w-[4em]" aria-hidden="true">&nbsp;</span> : render(value)}
-        <ChevronDown size={18} className={`self-center transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />
+        {value === undefined && <ChevronDown size={18} className={`self-center transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />}
       </button>
       <AnimatePresence>
         {open && (
@@ -435,7 +435,7 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   return (
     <div>
       {/* The sentence the visitor fills in */}
-      <div className="font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text max-w-3xl mx-auto text-center">
+      <div className="font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text max-w-6xl mx-auto text-center">
         <p>
           {s.learning}{sp}
           <Choice label={s.learning} value={count} options={[1, 2, 3] as const} onChange={setCount} render={(v) => t.count[v]} placeholder={t.ph.count} />
@@ -448,10 +448,8 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
               {i < picks.length - 1 ? s.and : s.comma}{sp}
             </span>
           ))}
-        </p>
-        <p>
           {s.perDay}{sp}
-          <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} placeholder={t.ph.time} />{lang === 'zh' ? '，' : ''}</span>
+          <span className="whitespace-nowrap"><Choice label={s.perDay} value={time} options={TIMES} onChange={setTime} render={(v) => t.time[v]} placeholder={t.ph.time} />{sp}{s.canLearn}{s.comma}</span>
           {sp}{s.for}{sp}
           <span className="whitespace-nowrap"><Choice label={s.for} value={goal} options={GOALS} onChange={setGoal} render={(v) => t.goal[v]} placeholder={t.ph.goal} />{s.end}</span>
         </p>
