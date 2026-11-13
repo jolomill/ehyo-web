@@ -183,10 +183,12 @@ function Choice<T extends string | number>({ value, options, label, onChange, re
           setShift(r ? Math.max(Math.min(0, window.innerWidth - 16 - menuW - r.left), 16 - r.left) : 0);
           setOpen((o) => !o);
         }}
-        className={`inline-flex items-baseline gap-1 border-b-2 border-dashed ${value === undefined ? 'text-ehyo-indigo/50 border-ehyo-indigo/50' : 'text-ehyo-indigo border-ehyo-indigo/40'} hover:border-ehyo-indigo hover:bg-ehyo-indigo/5 rounded-t-md px-1 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50`}
+        className={`group mx-1 inline-flex items-baseline gap-1 rounded-sm transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-ehyo-indigo/50 ${value === undefined ? 'text-ehyo-indigo/50' : 'text-ehyo-indigo'}`}
       >
-        {value === undefined ? <span className="inline-block w-[4em]" aria-hidden="true">&nbsp;</span> : render(value)}
-        {value === undefined && <ChevronDown size={18} className={`self-center transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />}
+        {value === undefined
+          ? <span className="inline-block w-[4em] h-0 translate-y-[7px] border-b-2 border-dashed border-ehyo-indigo/45 group-hover:border-ehyo-indigo" aria-hidden="true" />
+          : <span className="underline decoration-dashed decoration-2 underline-offset-[7px] decoration-ehyo-indigo/45 group-hover:decoration-ehyo-indigo transition-colors duration-200">{render(value)}</span>}
+        {value === undefined && <ChevronDown size={18} className={`translate-y-[2px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} aria-hidden="true" />}
       </button>
       <AnimatePresence>
         {open && (
