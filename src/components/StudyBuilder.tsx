@@ -407,7 +407,8 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
 
   const setCount = (c: Count) => {
     setCountState(c);
-    setPicks((ps) => Array.from({ length: c }, (_, i) => ps[i] ?? {}));
+    // each new row comes with a level already picked: beginner, then has basics, then advanced
+    setPicks((ps) => Array.from({ length: c }, (_, i) => ({ ...ps[i], level: ps[i]?.level ?? LEVELS[i] })));
     setLaneSel(0);
   };
   // Every language appears once: picking one already listed swaps the two
