@@ -3,8 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useState, useEffect } from 'react';
-import { HeroScene } from './components/QuantumScene';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useReducedMotion } from 'framer-motion';
+
+// three.js is the heaviest part of the page: load it after the first paint
+const HeroScene = lazy(() => import('./components/QuantumScene').then((m) => ({ default: m.HeroScene })));
 import { ChangelogPage } from './components/ChangelogPage';
 import { RoadmapPage } from './components/RoadmapPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
@@ -36,7 +39,7 @@ const ProblemAnswer = ({ item }: { item: ProblemItem }) => (
   <div>
     {item.problem && (
       <div className="mb-6 pb-6 border-b border-stone-100">
-        <div className="text-sm font-bold text-stone-400 line-through decoration-ehyo-coral/70">{item.problem}</div>
+        <div className="text-sm font-bold text-stone-500 line-through decoration-ehyo-coral/70">{item.problem}</div>
         {item.problemDetail && <p className="text-sm text-stone-500 leading-relaxed mt-1">{item.problemDetail}</p>}
       </div>
     )}
@@ -48,11 +51,11 @@ const ProblemAnswer = ({ item }: { item: ProblemItem }) => (
 
 const translations = {
   en: {
-    nav: { get: "Get Started", changelog: "Changelog", roadmap: "Roadmap" },
+    nav: { get: "Download", changelog: "Changelog", roadmap: "Roadmap", openMenu: "Open menu", closeMenu: "Close menu", language: "Language" },
     hero: {
       beta: "Now Available in Beta",
       h1_1: "EhYo",
-      sub: "Designed for self-learners — save your time\nand turn every mistake into your learning journey.",
+      sub: "Designed for self-learners.\nSave your time and turn every mistake into your next step.",
       langs: "Supports 28+ languages: English, Chinese, Japanese, Korean, Spanish, and more",
       btn_start: "Try it out!",
     },
@@ -260,16 +263,20 @@ const translations = {
       trial: "Free 7-day trial."
     },
     footer: {
-      desc: "EhYo is an app dedicated to making language learning personal, cultural, and deeply human."
+      desc: "EhYo is an app dedicated to making language learning personal, cultural, and deeply human.",
+      social: "Social",
+      privacy: "Privacy Policy",
+      contact: "Contact",
+      rights: "EhYo Language Learning. All rights reserved.",
     }
   },
   zh: {
-    nav: { get: "下載", changelog: "更新日誌", roadmap: "開發路線" },
+    nav: { get: "下載", changelog: "更新日誌", roadmap: "開發路線", openMenu: "開啟選單", closeMenu: "關閉選單", language: "語言" },
     hero: {
       beta: "Beta 測試版現已開放",
       h1_1: "EhYo",
-      sub: "為語言自學者設計— 根據你的學習紀錄，打造最有效率的學習。",
-      langs: "支援 28+ 種語言學習：英文、中文、日文、韓文、西班牙文...等",
+      sub: "為語言自學者設計\n根據你的學習紀錄，打造最有效率的學習。",
+      langs: "支援 28 種以上語言：英文、中文、日文、韓文、西班牙文等",
       btn_start: "試試看！",
     },
     prob: {
@@ -478,7 +485,11 @@ const translations = {
       trial: "7 天免費試用。"
     },
     footer: {
-      desc: "EhYo 是一個致力於讓語言學習變得個人化、文化化且重視人文的軟體。"
+      desc: "EhYo 是一個致力於讓語言學習變得個人化、文化化且重視人文的軟體。",
+      social: "社群",
+      privacy: "隱私權政策",
+      contact: "聯絡我們",
+      rights: "EhYo Language Learning. 保留所有權利。",
     }
   }
 };
@@ -583,6 +594,34 @@ const App: React.FC = () => {
     { icon: RefreshCw, title: t.prob.s7_t, description: t.prob.s7_d, visual: <SyncVisual text={t.vis.sync} /> },
   ];
 
+  // The page's language for screen readers and search engines
+  useEffect(() => {
+    document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+  }, [lang]);
+
+  // Pause the hero scene once it scrolls away, and keep it still for visitors who ask for less motion
+  const heroRef = useRef<HTMLElement>(null);
+  const [heroVisible, setHeroVisible] = useState(true);
+  const reduceMotion = !!useReducedMotion();
+  // Start the 3D scene once the browser is idle, so the page itself is usable first
+  const [sceneReady, setSceneReady] = useState(false);
+  useEffect(() => {
+    const start = () => setSceneReady(true);
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(start, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = globalThis.setTimeout(start, 1500);
+    return () => globalThis.clearTimeout(id);
+  }, []);
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setHeroVisible(e.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -598,16 +637,24 @@ const App: React.FC = () => {
           <Logo scrolled={scrolled} onClick={() => navigate('home')} />
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide text-stone-600">
-            <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
-            <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
+            <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
+            <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
             {/* Language Switcher */}
-            <div className="flex items-center gap-2 border-stone-300 pl-4 border-l">
-              <button onClick={() => setLang('en')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'en' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>EN</button>
-              <button onClick={() => setLang('zh')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'zh' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>中</button>
+            <div className="flex items-center gap-2 border-stone-300 pl-4 border-l" role="group" aria-label={t.nav.language}>
+              <button aria-pressed={lang === 'en'} onClick={() => setLang('en')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'en' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>EN</button>
+              <button aria-pressed={lang === 'zh'} onClick={() => setLang('zh')} className={`bg-transparent outline-none focus:outline-none transition-colors ${lang === 'zh' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>中</button>
             </div>
+            <a
+              href="https://apps.apple.com/us/app/ehyo/id6745819373"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2 rounded-full bg-ehyo-text text-white hover:bg-ehyo-indigo transition-colors"
+            >
+              {t.nav.get}
+            </a>
           </div>
 
-          <button className="md:hidden text-stone-900 p-2" onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="md:hidden text-stone-900 p-2" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu} aria-expanded={menuOpen}>
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
@@ -615,14 +662,22 @@ const App: React.FC = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#FBFAF6] flex flex-col items-center justify-center gap-8 text-xl font-serif-in">
+        <div className="fixed inset-0 z-40 bg-[#FBFAF6] flex flex-col items-center justify-center gap-8 text-xl font-serif">
           <Logo scrolled={true} />
-          <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
-          <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-400 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
-          <div className="flex gap-6 mt-2">
-            <button onClick={() => { setLang('en'); setMenuOpen(false); }} className={lang === 'en' ? 'font-bold' : 'text-stone-400'}>EN</button>
-            <button onClick={() => { setLang('zh'); setMenuOpen(false); }} className={lang === 'zh' ? 'font-bold' : 'text-stone-400'}>中</button>
+          <button onClick={() => navigate('changelog')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'changelog' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>{t.nav.changelog}</button>
+          <button onClick={() => navigate('roadmap')} className={`bg-transparent outline-none focus:outline-none transition-colors ${page === 'roadmap' ? 'text-ehyo-text font-bold' : 'text-stone-500 hover:text-ehyo-indigo'}`}>{t.nav.roadmap}</button>
+          <div className="flex gap-6 mt-2" role="group" aria-label={t.nav.language}>
+            <button aria-pressed={lang === 'en'} onClick={() => { setLang('en'); setMenuOpen(false); }} className={lang === 'en' ? 'font-bold' : 'text-stone-500'}>EN</button>
+            <button aria-pressed={lang === 'zh'} onClick={() => { setLang('zh'); setMenuOpen(false); }} className={lang === 'zh' ? 'font-bold' : 'text-stone-500'}>中</button>
           </div>
+          <a
+            href="https://apps.apple.com/us/app/ehyo/id6745819373"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 px-8 py-3 rounded-full bg-ehyo-text text-white text-base font-sans"
+          >
+            {t.nav.get}
+          </a>
         </div>
       )}
 
@@ -631,29 +686,33 @@ const App: React.FC = () => {
       {page === 'privacy' && <PrivacyPolicyPage />}
 
       {/* Hero Section */}
-      <header className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${page !== 'home' ? 'hidden' : ''}`}>
-        <HeroScene />
+      <header ref={heroRef} className={`relative min-h-screen flex items-center justify-center overflow-hidden pt-20 ${page !== 'home' ? 'hidden' : ''}`}>
+        {sceneReady && (
+          <Suspense fallback={null}>
+            <HeroScene paused={!heroVisible || reduceMotion || page !== 'home'} />
+          </Suspense>
+        )}
 
         {/* Soft Overlay - Reduced opacity at center (0.0) for better visibility of Earth */}
         <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(251,250,246,0.0)_0%,rgba(251,250,246,0.5)_70%,rgba(251,250,246,1)_100%)]" />
 
         <div className="relative z-10 container mx-auto px-6 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-full shadow-sm-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-full shadow-sm" style={{ animationDelay: '0.1s' }}>
             <span className="w-2 h-2 rounded-full bg-ehyo-coral"></span>
             <span className="text-xs font-bold tracking-widest text-stone-500 uppercase">{t.hero.beta}</span>
           </div>
 
-          <h1 className="font-serif text-6xl md:text-8xl font-medium leading-tight mb-8 text-ehyo-text drop-shadow-sm-in-up" style={{ animationDelay: '0.2s' }}>
+          <h1 className="font-serif text-6xl md:text-8xl font-medium leading-tight mb-8 text-ehyo-text drop-shadow-sm" style={{ animationDelay: '0.2s' }}>
             {t.hero.h1_1}
           </h1>
 
-          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm-in-up whitespace-pre-line" style={{ animationDelay: '0.25s' }}>
+          <div className="font-serif text-xl md:text-3xl font-light leading-tight mb-10 text-ehyo-indigo drop-shadow-sm whitespace-pre-line" style={{ animationDelay: '0.25s' }}>
             {t.hero.sub}
           </div>
 
 
 
-          <div className="flex flex-col md:flex-row justify-center gap-4-in-up" style={{ animationDelay: '0.4s' }}>
+          <div className="flex flex-col md:flex-row justify-center gap-4" style={{ animationDelay: '0.4s' }}>
             <a
               href="https://apps.apple.com/us/app/ehyo/id6745819373"
               target="_blank"
@@ -664,7 +723,7 @@ const App: React.FC = () => {
             </a>
           </div>
 
-          <p className="text-sm text-stone-400 mt-6" style={{ animationDelay: '0.45s', fontSize: '14px' }}>
+          <p className="text-sm text-stone-500 mt-6">
             {t.hero.langs}
           </p>
         </div>
@@ -672,12 +731,12 @@ const App: React.FC = () => {
 
       <main className={page !== 'home' ? 'hidden' : ''}>
         {/* Philosophy Section - Updated Layout */}
-        <section id="philosophy" className="py-24 bg-white relative overflow-hidden">
+        <section id="philosophy" className="py-24 md:py-28 bg-white relative overflow-hidden">
           {/* Decorative background element */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-ehyo-sage/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
 
           <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
-            <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage-in-up">
+            <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage">
               <Sprout size={28} />
             </div>
 
@@ -696,11 +755,10 @@ const App: React.FC = () => {
         </section>
 
         {/* How EhYo fits you: the visitor describes themselves, EhYo lines up the route */}
-        <section id="how" className="py-24 md:py-28 bg-[#FBFAF6]">
+        <section id="how" className="py-24 md:py-28 bg-ehyo-bg">
           <div className="container mx-auto px-6">
             <div className="text-center mb-10 md:mb-14 max-w-2xl mx-auto">
-              <div className="text-xs font-bold tracking-widest uppercase text-ehyo-indigo mb-3">{t.builder.tag}</div>
-              <h2 className="font-sans font-bold tracking-tight text-4xl md:text-5xl mb-4">{t.builder.title}</h2>
+              <h2 className="font-serif text-4xl md:text-5xl mb-4 text-ehyo-text">{t.builder.title}</h2>
               <p className="text-stone-500 leading-relaxed">{t.builder.sub}</p>
             </div>
             <StudyBuilder key={lang} lang={lang} renderDetail={renderStudyDetail} />
@@ -708,7 +766,7 @@ const App: React.FC = () => {
         </section>
 
         {/* Problems Section */}
-        <section id="problems" className="py-24 bg-[#FBFAF6]">
+        <section id="problems" className="py-24 md:py-28 bg-white">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12 max-w-2xl mx-auto">
               <h2 className="font-serif text-4xl">{t.prob.title}</h2>
@@ -717,24 +775,24 @@ const App: React.FC = () => {
             {/* Each problem beside how EhYo solves it: pick a row, the card on the right shows the answer.
                 On small screens the answer opens under the chosen row instead. */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start max-w-6xl mx-auto">
-              <ul role="tablist" aria-label={t.prob.title} className="lg:col-span-5 border-t border-stone-200">
+              <ul aria-label={t.prob.title} className="lg:col-span-5 border-t border-stone-200">
                 {problems.map((item, i) => {
                   const active = probIdx === i;
                   return (
                     <li key={i} className="border-b border-stone-200">
                       <button
                         type="button"
-                        role="tab"
-                        aria-selected={active}
+                        aria-expanded={active}
+                        aria-controls="problem-answer"
                         onClick={() => setProbIdx(i)}
                         className={`w-full flex items-center gap-4 text-left px-4 py-4 my-1 rounded-2xl transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : 'hover:bg-white/60'}`}
                       >
-                        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${active ? 'bg-ehyo-indigo/10 text-ehyo-indigo' : 'bg-stone-100 text-stone-400'}`}>
+                        <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-200 ${active ? 'bg-ehyo-indigo/10 text-ehyo-indigo' : 'bg-stone-100 text-stone-500'}`}>
                           <item.icon size={20} />
                         </span>
                         <span className="flex-1 min-w-0">
                           {item.problem && (
-                            <span className="block text-sm text-stone-400 line-through decoration-ehyo-coral/70">{item.problem}</span>
+                            <span className="block text-sm text-stone-500 line-through decoration-ehyo-coral/70">{item.problem}</span>
                           )}
                           <span className={`block font-serif text-lg font-bold ${active ? 'text-ehyo-indigo' : 'text-ehyo-text'}`}>{item.title}</span>
                         </span>
@@ -746,7 +804,7 @@ const App: React.FC = () => {
                 })}
               </ul>
               <div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-28">
-                <div key={`${lang}-${probIdx}`} role="tabpanel" className="bg-white p-8 rounded-3xl border border-stone-100 shadow-sm min-h-[520px] motion-safe-fade animate-[fadeUp_0.35s_ease-out]">
+                <div key={`${lang}-${probIdx}`} id="problem-answer" role="region" aria-live="polite" aria-label={problems[probIdx].title} className="bg-white p-8 rounded-3xl border border-stone-100 shadow-sm min-h-[520px] motion-safe-fade animate-[fadeUp_0.35s_ease-out]">
                   <ProblemAnswer item={problems[probIdx]} />
                 </div>
               </div>
@@ -755,9 +813,13 @@ const App: React.FC = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-32 bg-white text-center">
+        <section className="py-28 md:py-32 bg-ehyo-bg text-center">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto">
+              <p className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-ehyo-coral/15 text-[#9E2F52] font-semibold">
+                <span className="w-2 h-2 rounded-full bg-ehyo-coral" aria-hidden="true" />
+                {t.cta.trial}
+              </p>
               <h2 className="font-serif text-5xl md:text-6xl mb-8 text-ehyo-text">{t.cta.title}</h2>
               <p className="text-xl text-stone-500 mb-12 font-light">
                 {t.cta.sub}
@@ -773,7 +835,6 @@ const App: React.FC = () => {
                 </a>
 
               </div>
-              <p className="mt-8 text-sm text-stone-400">{t.cta.trial}</p>
             </div>
           </div>
         </section>
@@ -784,31 +845,33 @@ const App: React.FC = () => {
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
           <div className="text-center md:text-left max-w-xs">
             <Logo scrolled={true} />
-            <p className="mt-4 text-sm text-stone-500 leading-relaxed">
-              {t.footer && t.footer.desc ? t.footer.desc : "EhYo is a platform dedicated to making language learning personal, cultural, and deeply human."}
+            <p className="mt-4 text-sm text-stone-600 leading-relaxed">
+              {t.footer.desc}
             </p>
           </div>
 
           <div className="flex flex-col gap-4 text-sm">
 
             <div className="flex flex-col gap-4 ">
-              <h4 className="font-bold text-ehyo-text uppercase tracking-wider text-xs">Social</h4>
+              <p className="font-bold text-ehyo-text text-sm">{t.footer.social}</p>
               <a
                 href="https://www.instagram.com/ehyo.world/"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-ehyo-indigo transition-colors">Instagram</a>
               <a
                 href="https://discord.com/invite/htVu7kyx3m"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-ehyo-indigo transition-colors">Discord</a>
             </div>
           </div>
         </div>
-        <div className="container mx-auto px-6 mt-16 pt-8 border-t border-stone-300 text-center md:text-left flex flex-col md:flex-row justify-between text-xs text-stone-400">
-          <p>© 2025 EhYo Language Learning. All rights reserved.</p>
+        <div className="container mx-auto px-6 mt-16 pt-8 border-t border-stone-300 text-center md:text-left flex flex-col md:flex-row justify-between text-xs text-stone-600">
+          <p>© {new Date().getFullYear()} {t.footer.rights}</p>
           <div className="flex gap-6 justify-center md:justify-end mt-4 md:mt-0">
-            <button onClick={() => navigate('privacy')} className="bg-transparent outline-none hover:text-ehyo-indigo transition-colors">Privacy Policy</button>
-            <a href="mailto:valzin@ehyo.app" className="hover:text-ehyo-indigo transition-colors">Contact</a>
+            <button onClick={() => navigate('privacy')} className="bg-transparent outline-none hover:text-ehyo-indigo transition-colors">{t.footer.privacy}</button>
+            <a href="mailto:valzin@ehyo.app" className="hover:text-ehyo-indigo transition-colors">{t.footer.contact}</a>
           </div>
         </div>
       </footer>

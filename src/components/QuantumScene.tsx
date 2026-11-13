@@ -5,7 +5,7 @@
 
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Html, Stars, Environment, Torus } from '@react-three/drei';
+import { Float, Html, Stars, Torus } from '@react-three/drei';
 import * as THREE from 'three';
 
 const FloatingChar = ({ char, position, color, size = 1, rotation = [0, 0, 0] }: { char: string, position: [number, number, number], color: string, size?: number, rotation?: [number, number, number] }) => {
@@ -44,7 +44,7 @@ const CulturalRing = () => {
   return (
     <group ref={ref}>
        <Torus args={[4, 0.05, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
-         <meshStandardMaterial color="#E6D3A3" emissive="#E6D3A3" emissiveIntensity={0.2} transparent opacity={0.4} />
+         <meshStandardMaterial color="#E6D3A3" emissive="#E6D3A3" emissiveIntensity={0.2} transparent opacity={0.15} />
        </Torus>
        
        <RingText text="Bonjour" angle={0} color="#C06C54" />
@@ -75,10 +75,11 @@ const RingText = ({ text, angle, color }: { text: string, angle: number, color: 
     )
 }
 
-export const HeroScene: React.FC = () => {
+// `paused` stops rendering (off screen, or when the visitor asks for less motion)
+export const HeroScene: React.FC<{ paused?: boolean }> = ({ paused = false }) => {
   return (
-    <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 8], fov: 40 }}>
+    <div className="absolute inset-0 z-0 opacity-80 pointer-events-none" aria-hidden="true">
+      <Canvas frameloop={paused ? 'never' : 'always'} camera={{ position: [0, 0, 8], fov: 40 }}>
         <ambientLight intensity={0.8} />
         <pointLight position={[10, 10, 10]} intensity={1.5} color="#fff" />
         <pointLight position={[-10, -5, -10]} intensity={0.5} color="#C06C54" />
@@ -96,7 +97,6 @@ export const HeroScene: React.FC = () => {
             <FloatingChar char="สวย" position={[-4, -3, -4]} color="#C06C54"  rotation={[0, 0, 1]} />
         </group>
 
-        <Environment preset="city" />
         {/* Soft atmospheric particles */}
         <Stars radius={100} depth={50} count={300} factor={4} saturation={0} fade speed={0.5} />
       </Canvas>

@@ -1,68 +1,28 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          serif: ['"Playfair Display"', 'serif'],
-          sans: ['"Inter"', 'sans-serif'],
-          // the rounded face of the "How EhYo fits you" sentence
-          rounded: ['"Nunito"', '"Huninn"', '"M PLUS Rounded 1c"', 'system-ui', 'sans-serif'],
-        },
-        colors: {
-          ehyo: {
-            bg: '#FBFAF6',
-            text: '#2D2A26',
-            coral: '#FF8FAB',
-            indigo: '#6B7FD7',
-            sage: '#A3B18A',
-            dark: '#1a1a1a',
-          }
-        },
-        animation: {
-          'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-          'float': 'float 6s ease-in-out infinite',
-          'slide-in-right': 'slideInRight 0.4s ease-out forwards',
-          'slide-in-left': 'slideInLeft 0.4s ease-out forwards',
-        },
-        keyframes: {
-          fadeInUp: {
-            '0%': { opacity: '0', transform: 'translateY(20px)' },
-            '100%': { opacity: '1', transform: 'translateY(0)' },
-          },
-          float: {
-            '0%, 100%': { transform: 'translateY(0)' },
-            '50%': { transform: 'translateY(-20px)' },
-          },
-          slideInRight: {
-            '0%': { transform: 'translateX(40px)' },
-            '100%': { transform: 'translateX(0)' },
-          },
-          slideInLeft: {
-            '0%': { transform: 'translateX(-40px)' },
-            '100%': { transform: 'translateX(0)' },
-          }
-        }
-      }
-    }
-  }
-</script>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/EhYo.png" />
-    <!-- Rounded type for the "How EhYo fits you" sentence; one link per family so a missing one can't break the others -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EhYo｜語言自學 App · Learn languages your way</title>
+    <meta name="description" content="EhYo 根據你的學習紀錄排出專屬的學法：用喜歡的內容自學、錯誤自動整理、在電腦學用手機複習。Learn from what you love; EhYo turns your mistakes into your next step." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ehyo.app/" />
+    <meta property="og:title" content="EhYo｜語言自學 App · Learn languages your way" />
+    <meta property="og:description" content="根據你的學習紀錄，打造最有效率的語言自學。Learn from what you love; EhYo turns your mistakes into your next step." />
+    <meta property="og:image" content="https://ehyo.app/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ehyo, train your language brain</title>
-    <meta property="og:title" content="ehyo, train your language brain" />
-    <meta name="description" content="train your language brain" />
-    <meta property="og:description" content="train your language brain" />
+    <!-- The site's type: Playfair Display headings and Inter text, with Noto Serif / Sans TC for Chinese -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" media="print" onload="this.media='all'" />
+    <!-- Rounded type for the "How EhYo fits you" sentence; one link per family so a missing one can't break the others -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700&display=swap" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap" media="print" onload="this.media='all'" />
     <style>
       * {
         margin: 0;

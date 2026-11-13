@@ -302,7 +302,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
       <div className="lg:col-span-5">
         <LayoutGroup id={id}>
-          <ol role="tablist" aria-orientation="vertical" className="list-none p-0 m-0">
+          <ol className="list-none p-0 m-0" data-route>
             {order.map((part, i) => {
               const active = sel === part;
               const st = PART_STYLE[part];
@@ -318,8 +318,8 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                   <div className={`flex-1 min-w-0 ${last ? '' : 'pb-4'}`}>
                     <button
                       type="button"
-                      role="tab"
-                      aria-selected={active}
+                      aria-expanded={active}
+                      aria-controls={`${id}-detail`}
                       onClick={() => setSel(part)}
                       className={`w-full text-left rounded-2xl p-4 md:p-5 border transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white border-stone-100 shadow-sm' : 'border-transparent hover:bg-white/60'}`}
                     >
@@ -354,7 +354,9 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={`${id}-${level}-${sel}`}
-            role="tabpanel"
+            id={`${id}-detail`}
+            role="region"
+            aria-live="polite"
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0, y: -10 }}
