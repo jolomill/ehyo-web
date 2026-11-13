@@ -47,6 +47,8 @@ const TEXT = {
     boost: '補強',
     focus: '最常用',
     route: { beginner: '先打基礎，再用喜歡的素材複習', experienced: '先用素材自學，再針對弱點補強', advanced: '用道地的素材精進，再把細節補到位' } as Record<Level, string>,
+    waiting: '填好上面的句子，EhYo 會為你排出學法',
+    building: 'EhYo 正在為你安排學習方式',
     multiNote: '每個語言各自記錄、各走各的順序，進度不會混在一起。',
     dayTitle: (t: string) => `每天 ${t}，可以這樣安排`,
     dayFor: (l: string) => `以${l}為例`,
@@ -97,6 +99,8 @@ const TEXT = {
     boost: 'Fix weak spots',
     focus: 'Use most',
     route: { beginner: 'Build the basics first, then review with material you love', experienced: 'Learn from your own material first, then fix the weak spots', advanced: 'Sharpen yourself on native material, then polish the details' } as Record<Level, string>,
+    waiting: 'Fill in the sentence above and EhYo will line up your way to learn',
+    building: 'EhYo is putting your plan together',
     multiNote: 'Each language keeps its own record and its own order, so progress never gets mixed up.',
     dayTitle: (t: string) => `With ${t} a day, you could`,
     dayFor: (l: string) => `For ${l}`,
@@ -398,6 +402,48 @@ const DayPlan: React.FC<{ time: Time; level: Level; lang: Lang; who: string; red
   );
 };
 
+// While the sentence has blanks, EhYo waits; once it is complete, EhYo works for a moment
+// before the route appears, so the result never pops in from nothing.
+const Loader: React.FC<{ building: boolean; filled: number; total: number; lang: Lang; reduce: boolean }> = ({ building, filled, total, lang, reduce }) => {
+  const t = TEXT[lang];
+  const loop = reduce ? undefined : { duration: building ? 0.9 : 2.4, repeat: Infinity, ease: 'easeInOut' as const };
+  return (
+    <div className="mt-14 md:mt-20 min-h-[320px] rounded-3xl border border-dashed border-stone-200 bg-white/50 flex flex-col items-center justify-center gap-6 px-6 py-12 text-center">
+      <motion.div
+        animate={reduce ? undefined : { scale: building ? [1, 1.08, 1] : [1, 1.04, 1], opacity: building ? 1 : [0.55, 1, 0.55] }}
+        transition={loop}
+      >
+        <EhYoMark className="w-28" />
+      </motion.div>
+      <div className="flex items-center gap-2 text-ehyo-indigo font-semibold" role="status">
+        <motion.span
+          animate={reduce || !building ? { rotate: 0, scale: 1 } : { rotate: [0, 20, -20, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 0.8, repeat: reduce || !building ? 0 : Infinity }}
+        >
+          <Sparkles size={16} aria-hidden="true" />
+        </motion.span>
+        <span className={building ? '' : 'text-stone-500 font-medium'}>{building ? t.building : t.waiting}</span>
+        <span className="flex gap-1" aria-hidden="true">
+          {[0, 1, 2].map((d) => (
+            <motion.span
+              key={d}
+              className="w-1.5 h-1.5 rounded-full bg-ehyo-indigo"
+              animate={reduce ? { opacity: 0.6 } : { opacity: [0.2, 1, 0.2] }}
+              transition={{ duration: building ? 0.6 : 1.2, repeat: Infinity, delay: d * (building ? 0.1 : 0.2) }}
+            />
+          ))}
+        </span>
+      </div>
+      {/* how much of the sentence is filled in */}
+      <div className="flex gap-1.5" aria-hidden="true">
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className={`h-1.5 w-6 rounded-full transition-colors duration-300 ${i < filled ? 'bg-ehyo-indigo' : 'bg-stone-200'}`} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // ---------------------------------------------------------------------------
 export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }> = ({ lang, renderDetail }) => {
   const t = TEXT[lang];
@@ -423,6 +469,19 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
 
   const done = (p: Partial<Pick>): p is Pick => !!p.key && !!p.level;
   const ready = !!count && picks.length === count && picks.every(done) && !!time && !!goal;
+  const total = 1 + 2 * (count ?? 1) + 2;
+  const filled = (count ? 1 : 0) + picks.reduce((n, p) => n + (p.key ? 1 : 0) + (p.level ? 1 : 0), 0) + (time ? 1 : 0) + (goal ? 1 : 0);
+  // wait while there are blanks; build for a moment once there are none; then show
+  const [stage, setStage] = useState<'wait' | 'build' | 'show'>('wait');
+  useEffect(() => {
+    if (!ready) { setStage('wait'); return; }
+    if (stage !== 'wait') return;
+    if (reduce) { setStage('show'); return; }
+    setStage('build');
+    const id = setTimeout(() => setStage('show'), 1400);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
   const full = picks.filter(done);
   const lane = Math.min(laneSel, Math.max(full.length - 1, 0));
   const cur = full[lane];
@@ -460,8 +519,13 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
 
       {/* What fits: the route for the chosen language, then the day */}
       <div aria-live="polite">
-      <AnimatePresence>
-      {ready && cur && time && goal && (
+      <AnimatePresence mode="wait">
+      {stage !== 'show' && (
+        <motion.div key="loader" initial={false} exit={reduce ? undefined : { opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+          <Loader building={stage === 'build'} filled={filled} total={total} lang={lang} reduce={reduce} />
+        </motion.div>
+      )}
+      {stage === 'show' && ready && cur && time && goal && (
       <motion.div
         key="result"
         initial={reduce ? false : { opacity: 0, y: 24 }}
