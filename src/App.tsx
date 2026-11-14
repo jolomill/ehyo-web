@@ -259,8 +259,7 @@ const translations = {
       title: "Sounds great?",
       sub: "Start changing the way you maintain a language. Try it now!",
       ios: "Download for iOS",
-      and: "Follow EhYo",
-      trial: "Free 7-day trial."
+      and: "Follow EhYo"
     },
     footer: {
       desc: "EhYo is an app dedicated to making language learning personal, cultural, and deeply human.",
@@ -481,8 +480,7 @@ const translations = {
       title: "聽起來很讚？",
       sub: "一起改變維持語言的方式，快來體驗！",
       ios: "下載 iOS 版",
-      and: "追蹤 EhYo",
-      trial: "7 天免費試用。"
+      and: "追蹤 EhYo"
     },
     footer: {
       desc: "EhYo 是一個致力於讓語言學習變得個人化、文化化且重視人文的軟體。",
@@ -811,10 +809,6 @@ const App: React.FC = () => {
         <section className="py-28 md:py-32 bg-ehyo-bg text-center">
           <div className="container mx-auto px-6">
             <div className="max-w-3xl mx-auto">
-              <p className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-ehyo-coral/15 text-[#9E2F52] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-ehyo-coral" aria-hidden="true" />
-                {t.cta.trial}
-              </p>
               <h2 className="font-serif text-5xl md:text-6xl mb-8 text-ehyo-text">{t.cta.title}</h2>
               <p className="text-xl text-stone-500 mb-12 font-light">
                 {t.cta.sub}
