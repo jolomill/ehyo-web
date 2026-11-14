@@ -505,7 +505,10 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; a
         animate={{ opacity: 1, y: 0 }}
         exit={reduce ? undefined : { opacity: 0, y: 12 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-16 md:mt-24 space-y-12 md:space-y-16"
+        className={aside
+          // beside the opening words the route opens on a white band running edge to edge, down to the section's end
+          ? "relative isolate mt-16 md:mt-24 -mb-24 md:-mb-28 pt-16 md:pt-20 pb-24 md:pb-28 before:content-[''] before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-screen before:bg-white before:-z-10"
+          : 'mt-16 md:mt-24 space-y-12 md:space-y-16'}
       >
         <div>
           {/* One tab per language, even with one; adding a language splits a new tab off the last one */}
