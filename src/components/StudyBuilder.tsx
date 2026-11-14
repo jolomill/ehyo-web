@@ -398,7 +398,9 @@ const Loader: React.FC<{ filled: number; total: number; lang: Lang; reduce: bool
 };
 
 // ---------------------------------------------------------------------------
-export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }> = ({ lang, renderDetail }) => {
+// `aside` and `head`: when given, the sentence sits in a card on the right with its heading,
+// the aside on the left, and the route opens full width below both.
+export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; aside?: React.ReactNode; head?: React.ReactNode }> = ({ lang, renderDetail, aside, head }) => {
   const t = TEXT[lang];
   const reduce = !!useReducedMotion();
   // Everything starts blank; the route appears once the sentence is complete
@@ -447,29 +449,46 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail }>
   const s = t.s;
   const sp = lang === 'zh' ? '' : ' ';
 
+  const sentence = (
+    <div className={`font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text ${aside ? 'text-left' : 'max-w-6xl mx-auto text-center'}`}>
+      <p>
+        {s.learning}{sp}
+        <Choice label={s.learning} value={count} options={[1, 2, 3] as const} onChange={setCount} render={(v) => t.count[v]} placeholder={t.ph.count} />
+        {s.langsUnit}{picks.length > 0 ? (lang === 'zh' ? '：' : ': ') : (lang === 'zh' ? '，' : ',')}
+        {picks.map((p, i) => (
+          <span key={i} className="whitespace-nowrap">
+            <Choice label={`${s.langsUnit || 'Language'} ${i + 1}`} value={p.key} options={LANGS} onChange={(k) => setKey(i, k)} render={L} placeholder={t.ph.lang} />
+            {sp}{s.is}{sp}
+            <Choice label={p.key ? L(p.key) : t.ph.level} value={p.level} options={LEVELS} onChange={(v) => setLevel(i, v)} render={lv} placeholder={t.ph.level} />
+            {i < picks.length - 1 ? s.and : s.comma}{sp}
+          </span>
+        ))}
+      </p>
+      {/* the goal starts its own line */}
+      <p>
+        {s.for}{sp}
+        <span className="whitespace-nowrap"><Choice label={s.for} value={goal} options={GOALS} onChange={setGoal} render={(v) => t.goal[v]} placeholder={t.ph.goal} />{s.end}</span>
+      </p>
+    </div>
+  );
+
   return (
     <div>
       {/* The sentence the visitor fills in */}
-      <div className="font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text max-w-6xl mx-auto text-center">
-        <p>
-          {s.learning}{sp}
-          <Choice label={s.learning} value={count} options={[1, 2, 3] as const} onChange={setCount} render={(v) => t.count[v]} placeholder={t.ph.count} />
-          {s.langsUnit}{picks.length > 0 ? (lang === 'zh' ? '：' : ': ') : (lang === 'zh' ? '，' : ',')}
-          {picks.map((p, i) => (
-            <span key={i} className="whitespace-nowrap">
-              <Choice label={`${s.langsUnit || 'Language'} ${i + 1}`} value={p.key} options={LANGS} onChange={(k) => setKey(i, k)} render={L} placeholder={t.ph.lang} />
-              {sp}{s.is}{sp}
-              <Choice label={p.key ? L(p.key) : t.ph.level} value={p.level} options={LEVELS} onChange={(v) => setLevel(i, v)} render={lv} placeholder={t.ph.level} />
-              {i < picks.length - 1 ? s.and : s.comma}{sp}
-            </span>
-          ))}
-        </p>
-        {/* the goal starts its own line */}
-        <p>
-          {s.for}{sp}
-          <span className="whitespace-nowrap"><Choice label={s.for} value={goal} options={GOALS} onChange={setGoal} render={(v) => t.goal[v]} placeholder={t.ph.goal} />{s.end}</span>
-        </p>
-      </div>
+      {aside ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          <div className="lg:col-span-5">{aside}</div>
+          <div className="lg:col-span-7 bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-10">
+            {head}
+            {sentence}
+          </div>
+        </div>
+      ) : (
+        <>
+          {head}
+          {sentence}
+        </>
+      )}
 
       {/* What fits: the route for the chosen language */}
       <div aria-live="polite">

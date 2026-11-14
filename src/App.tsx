@@ -731,37 +731,32 @@ const App: React.FC = () => {
 
       <main className={page !== 'home' ? 'hidden' : ''}>
         {/* Philosophy Section - Updated Layout */}
-        <section id="philosophy" className="py-24 md:py-28 bg-white relative overflow-hidden">
-          {/* Decorative background element */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-ehyo-sage/20 to-transparent rounded-full blur-[100px] pointer-events-none" />
-
-          <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
-            <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage">
-              <Sprout size={28} />
-            </div>
-
-            <h2 className="font-serif text-4xl md:text-5xl mb-6 text-ehyo-text">{t.phil.title}</h2>
-
-            <p className="text-xl text-stone-600 leading-relaxed mb-8">
-              {t.phil.p1}
-            </p>
-
-            <p className="text-lg text-stone-500 leading-relaxed mb-10 font-light">
-              {t.phil.p2}
-            </p>
-
-
-          </div>
-        </section>
-
-        {/* How EhYo fits you: the visitor describes themselves, EhYo lines up the route */}
-        <section id="how" className="py-24 md:py-28 bg-ehyo-bg">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-10 md:mb-14 max-w-2xl mx-auto">
-              <h2 className="font-serif text-4xl md:text-5xl mb-4 text-ehyo-text">{t.builder.title}</h2>
-              <p className="text-stone-500 leading-relaxed">{t.builder.sub}</p>
-            </div>
-            <StudyBuilder key={lang} lang={lang} renderDetail={renderStudyDetail} />
+        {/* "Spending a lot of time on languages?" on the left, "How EhYo fits you" on the right;
+            the route the visitor builds opens full width below both */}
+        <section id="how" className="py-24 md:py-28 bg-ehyo-bg relative overflow-hidden">
+          <div className="absolute top-24 -left-40 w-[560px] h-[560px] bg-gradient-to-tr from-ehyo-sage/20 to-transparent rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
+          <div className="container mx-auto px-6 relative z-10">
+            <StudyBuilder
+              key={lang}
+              lang={lang}
+              renderDetail={renderStudyDetail}
+              aside={
+                <div id="philosophy" className="text-center lg:text-left">
+                  <div className="inline-flex items-center justify-center p-3 mb-8 bg-ehyo-sage/10 rounded-full text-ehyo-sage">
+                    <Sprout size={28} />
+                  </div>
+                  <h2 className="font-serif text-4xl md:text-5xl mb-6 text-ehyo-text">{t.phil.title}</h2>
+                  <p className="text-xl text-stone-600 leading-relaxed mb-6">{t.phil.p1}</p>
+                  <p className="text-lg text-stone-500 leading-relaxed font-light">{t.phil.p2}</p>
+                </div>
+              }
+              head={
+                <div className="mb-6">
+                  <h2 className="font-serif text-3xl md:text-4xl mb-3 text-ehyo-text">{t.builder.title}</h2>
+                  <p className="text-stone-500 leading-relaxed">{t.builder.sub}</p>
+                </div>
+              }
+            />
           </div>
         </section>
 
