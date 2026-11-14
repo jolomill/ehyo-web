@@ -449,6 +449,8 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; a
   const s = t.s;
   const sp = lang === 'zh' ? '' : ' ';
 
+  const opened = !!aside && stage === 'show' && !!cur && !!goal;
+
   const sentence = (
     <div className={`font-rounded text-lg md:text-[1.375rem] font-medium leading-[2.1] text-ehyo-text ${aside ? 'text-left' : 'max-w-6xl mx-auto text-center'}`}>
       <p>
@@ -477,10 +479,15 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; a
       {/* The sentence the visitor fills in */}
       {aside ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <div className="lg:col-span-5">{aside}</div>
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-stone-100 shadow-sm p-6 md:p-10">
+          <div className="lg:col-span-5 lg:pb-10">{aside}</div>
+          {/* Once the route shows, this card runs straight down into it: its bottom corners go square
+              and a curved fillet joins it to the wider panel below */}
+          <div className={`relative lg:col-span-7 lg:self-end bg-white rounded-t-3xl p-6 md:p-10 transition-[border-radius] duration-300 ${opened ? '' : 'rounded-b-3xl'}`}>
             {head}
             {sentence}
+            {opened && (
+              <span aria-hidden="true" className="hidden lg:block absolute bottom-0 -left-6 w-6 h-6" style={{ background: 'radial-gradient(circle at 0 0, transparent 24px, #fff 24.5px)' }} />
+            )}
           </div>
         </div>
       ) : (
@@ -501,13 +508,14 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; a
       {stage === 'show' && cur && goal && (
       <motion.div
         key="result"
-        initial={reduce ? false : { opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={reduce ? undefined : { opacity: 0, y: 12 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        // beside the opening words the panel unrolls downward out of the card; on its own it rises in
+        initial={reduce ? false : aside ? { clipPath: 'inset(0 0 100% 0)' } : { opacity: 0, y: 24 }}
+        animate={aside ? { clipPath: 'inset(0 0 0% 0)' } : { opacity: 1, y: 0 }}
+        exit={reduce ? undefined : aside ? { clipPath: 'inset(0 0 100% 0)' } : { opacity: 0, y: 12 }}
+        transition={{ duration: aside ? 0.7 : 0.45, ease: [0.16, 1, 0.3, 1] }}
         className={aside
-          // beside the opening words the route opens on a white band running edge to edge, down to the section's end
-          ? "relative isolate mt-16 md:mt-24 -mb-24 md:-mb-28 pt-16 md:pt-20 pb-24 md:pb-28 before:content-[''] before:absolute before:inset-y-0 before:left-1/2 before:-translate-x-1/2 before:w-screen before:bg-white before:-z-10"
+          // the sentence card above extends into this panel: same white, no gap, top-right corner square
+          ? 'bg-white rounded-b-3xl lg:rounded-tl-3xl px-5 pb-8 pt-4 md:px-10 md:pb-12 md:pt-8'
           : 'mt-16 md:mt-24 space-y-12 md:space-y-16'}
       >
         <div>
