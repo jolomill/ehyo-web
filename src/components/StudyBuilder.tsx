@@ -292,7 +292,8 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
 
 // One language's route, top to bottom: the three parts in this visitor's order.
 // Picking a part opens its detail beside the list (under it on small screens).
-const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce: boolean; renderDetail?: RenderDetail }> = ({ id, level, goal, lang, reduce, renderDetail }) => {
+// `top` (the language tabs) heads the list column, so the detail starts level with it.
+const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce: boolean; renderDetail?: RenderDetail; top?: React.ReactNode }> = ({ id, level, goal, lang, reduce, renderDetail, top }) => {
   const t = TEXT[lang];
   const order = ORDER[level];
   const [sel, setSel] = useState<Part>(order[0]);
@@ -301,6 +302,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
       <div className="lg:col-span-5">
+        {top}
         <LayoutGroup id={id}>
           <ol className="list-none p-0 m-0" data-route>
             {order.map((part, i) => {
@@ -519,47 +521,50 @@ export const StudyBuilder: React.FC<{ lang: Lang; renderDetail?: RenderDetail; a
           : 'mt-16 md:mt-24 space-y-12 md:space-y-16'}
       >
         <div>
-          {/* One tab per language, even with one; adding a language splits a new tab off the last one */}
-          <div className="mb-10 md:mb-12 flex flex-col items-center text-center gap-4">
-            <LayoutGroup id="lang-tabs">
-              <div role="tablist" aria-label={s.learning} className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-100">
-                <AnimatePresence initial={false}>
-                  {picks.map((p, i) => {
-                    const ok = done(p);
-                    const active = ok && lane === i;
-                    return (
-                      <motion.button
-                        key={i}
-                        layout={!reduce}
-                        initial={reduce ? false : { opacity: 0, x: -28, scale: 0.85 }}
-                        animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={reduce ? undefined : { opacity: 0, x: -28, scale: 0.85 }}
-                        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-                        type="button" role="tab" aria-selected={active} disabled={!ok} onClick={() => setLaneSel(i)}
-                        className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : ok ? 'hover:bg-white/60' : 'border border-dashed border-stone-300 cursor-default'}`}>
-                        {ok ? (
-                          <>
-                            <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key!)}</span>
-                            <span className="ml-2 text-sm text-stone-500">{t.level[p.level!]}</span>
-                          </>
-                        ) : (
-                          <span className="font-sans text-lg font-bold text-stone-300" aria-label={`${s.langsUnit || 'Language'} ${i + 1}`}>？</span>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-            </LayoutGroup>
-            <p className="text-ehyo-text font-medium">{t.route[cur.level]}</p>
-            {picks.length > 1 && (
-              <p className="-mt-2 text-sm text-stone-500 text-balance max-w-md">
-                <Sparkles size={14} className="inline-block align-[-2px] mr-1.5 text-ehyo-indigo" aria-hidden="true" />
-                {t.multiNote}
-              </p>
-            )}
-          </div>
-          <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail} />
+          <Lane key={`${lane}-${cur.key}`} id={`lane-${lane}`} level={cur.level} goal={goal} lang={lang} reduce={reduce} renderDetail={renderDetail}
+            top={<>
+            {/* One tab per language, even with one; adding a language splits a new tab off the last one */}
+            <div className="mb-8 md:mb-10 flex flex-col items-start text-left gap-3">
+              <LayoutGroup id="lang-tabs">
+                <div role="tablist" aria-label={s.learning} className="inline-flex flex-wrap gap-1 p-1.5 rounded-2xl bg-stone-100">
+                  <AnimatePresence initial={false}>
+                    {picks.map((p, i) => {
+                      const ok = done(p);
+                      const active = ok && lane === i;
+                      return (
+                        <motion.button
+                          key={i}
+                          layout={!reduce}
+                          initial={reduce ? false : { opacity: 0, x: -28, scale: 0.85 }}
+                          animate={{ opacity: 1, x: 0, scale: 1 }}
+                          exit={reduce ? undefined : { opacity: 0, x: -28, scale: 0.85 }}
+                          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                          type="button" role="tab" aria-selected={active} disabled={!ok} onClick={() => setLaneSel(i)}
+                          className={`rounded-xl px-4 py-2.5 text-left transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white shadow-sm' : ok ? 'hover:bg-white/60' : 'border border-dashed border-stone-300 cursor-default'}`}>
+                          {ok ? (
+                            <>
+                              <span className={`font-sans text-lg font-bold ${active ? 'text-ehyo-text' : 'text-stone-500'}`}>{L(p.key!)}</span>
+                              <span className="ml-2 text-sm text-stone-500">{t.level[p.level!]}</span>
+                            </>
+                          ) : (
+                            <span className="font-sans text-lg font-bold text-stone-300" aria-label={`${s.langsUnit || 'Language'} ${i + 1}`}>？</span>
+                          )}
+                        </motion.button>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              </LayoutGroup>
+              <p className="text-ehyo-text font-medium">{t.route[cur.level]}</p>
+              {picks.length > 1 && (
+                <p className="-mt-1 text-sm text-stone-500 text-pretty max-w-md">
+                  <Sparkles size={14} className="inline-block align-[-2px] mr-1.5 text-ehyo-indigo" aria-hidden="true" />
+                  {t.multiNote}
+                </p>
+              )}
+            </div>
+            </>}
+          />
         </div>
       </motion.div>
       )}
