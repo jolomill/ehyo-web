@@ -280,10 +280,10 @@ const Detail: React.FC<{ part: Part; level: Level; goal: Goal; lang: Lang; rende
             <span className={`text-sm font-semibold ${st.text}`}>{t.parts[part].name}</span>
             <Badges part={part} level={level} lang={lang} />
           </div>
-          <h4 className="font-sans text-xl md:text-2xl font-bold text-ehyo-text leading-snug mb-3">{title}</h4>
+          <h4 className="font-sans text-2xl md:text-[2rem] font-bold text-ehyo-text leading-tight tracking-tight mt-1 mb-4">{title}</h4>
         </>
       )}
-      <p className="text-stone-600 leading-relaxed">{desc}</p>
+      <p className={`text-stone-600 leading-relaxed ${inline ? '' : 'text-lg max-w-xl'}`}>{desc}</p>
       {part === 'sync' && <DevicePair lang={lang} />}
       {renderDetail && <div className="mt-8">{renderDetail(part, { goal, level, lang })}</div>}
     </div>
@@ -323,7 +323,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                       aria-expanded={active}
                       aria-controls={`${id}-detail`}
                       onClick={() => setSel(part)}
-                      className={`w-full text-left rounded-2xl p-4 md:p-5 border transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 ${active ? 'bg-white border-stone-100 shadow-sm' : 'border-transparent hover:bg-white/60'}`}
+                      className={`w-full text-left rounded-2xl p-4 md:p-5 border transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ehyo-indigo/50 border-transparent ${active ? '' : 'hover:bg-stone-50'}`}
                     >
                       <span className="flex items-center gap-3">
                         <span className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${st.soft} ${st.text}`}><PartIcon part={part} size="sm" /></span>
@@ -341,7 +341,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
                     </button>
                     {/* small screens: the detail opens right here */}
                     {active && (
-                      <div className="lg:hidden mt-3 bg-white rounded-2xl border border-stone-100 shadow-sm p-5">
+                      <div className="lg:hidden mt-1 px-4 pb-4">
                         <Detail part={part} level={level} goal={goal} lang={lang} renderDetail={renderDetail} inline />
                       </div>
                     )}
@@ -363,7 +363,7 @@ const Lane: React.FC<{ id: string; level: Level; goal: Goal; lang: Lang; reduce:
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}
-            className="bg-white rounded-3xl border border-stone-100 shadow-sm p-8 min-h-[480px]"
+            className="lg:border-l lg:border-stone-200 lg:pl-12 min-h-[480px]"
           >
             <Detail part={sel} level={level} goal={goal} lang={lang} renderDetail={renderDetail} />
           </motion.div>
